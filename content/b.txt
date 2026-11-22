@@ -1,0 +1,367 @@
+# cat:is
+M|'Deadline' kelimesinin Türkçe karşılığı nedir?|Son teslim tarihi|Toplantı|Fazla mesai|Yıllık izin
+M|Toplantıda 'Bir bakalım, dönüş yaparız' cümlesi çoğu zaman ne anlama gelir?|Muhtemelen hayır 😄|Kesinlikle evet|Hemen başlıyoruz|Zam geliyor
+M|CEO kimdir?|Şirketin en üst yöneticisi|Muhasebe müdürü|İK uzmanı|Satış temsilcisi
+M|İK neyin kısaltmasıdır?|İnsan Kaynakları|İç Kontrol|İş Kanunu|İdari Kurul
+M|SGK neyin kısaltmasıdır?|Sosyal Güvenlik Kurumu|Sigorta Genel Kurulu|Sağlık Güvence Kurumu|Sosyal Gelir Kurumu
+M|Brüt maaş nedir?|Kesintiler öncesi maaş|Ele geçen maaş|Prim|İkramiye
+M|Net maaş nedir?|Ele geçen maaş|Kesintiler öncesi maaş|Yıllık maaş|Prim
+M|Mülakat nedir?|İş görüşmesi|Terfi|İzin|Toplantı
+M|KPI neyi ifade eder?|Performans göstergesi|Maaş bordrosu|İzin türü|Sigorta türü
+M|Asgari ücret nedir?|Yasal en düşük ücret|Ortalama maaş|Prim|Kıdem ödemesi
+M|Kıdem tazminatının tutarı esas olarak neye bağlıdır?|Çalışma süresine|Yaşa|Unvana|Şehre
+M|Freelance çalışmak ne demektir?|Serbest çalışmak|Tam zamanlı çalışmak|Staj yapmak|Gönüllü çalışmak
+T|CV, 'Curriculum Vitae' ifadesinin kısaltmasıdır.|1
+T|'Onboarding', yeni çalışanın işe alışma sürecini anlatır.|1
+T|'Brainstorming' Türkçede beyin fırtınası demektir.|1
+T|LinkedIn profesyonel bir sosyal ağdır.|1
+T|Türkiye'de 1–5 yıl kıdemi olan çalışanın yıllık izni en az 14 gündür.|1
+T|B2B, işletmeden tüketiciye satış demektir.|0
+T|Staj her zaman ücretsizdir.|0
+T|Zoom bir video konferans uygulamasıdır.|1
+T|Excel bir sunum programıdır.|0
+T|Normal çalışma süresini aşan çalışmaya fazla mesai denir.|1
+T|1 Mayıs Türkiye'de resmi tatildir.|1
+T|'Remote' çalışma uzaktan çalışma demektir.|1
+E|4857 sayılı İş Kanunu'na göre haftalık azami çalışma süresi kaç saattir?|45|3|saat
+E|1–5 yıl kıdemde yasal yıllık izin en az kaç gündür?|14|2|gün
+E|Standart bir iş haftası kaç iş günüdür?|5|1|gün
+E|Standart bir mesai günü genelde kaç saattir?|8|1|saat
+E|Microsoft hangi yıl kuruldu?|1975|3|yıl
+E|Apple hangi yıl kuruldu?|1976|3|yıl
+E|LinkedIn hangi yıl yayına girdi?|2003|2|yıl
+E|Excel'in güncel sürümlerinde bir sayfada kaç satır vardır?|1048576|50000|satır
+J|💻🏠🩴|Evden çalışma|Vardiyalı çalışma|Saha çalışması|Staj
+J|☕📊😴|Sabah toplantısı|Öğle arası|Mesai bitimi|Yıllık izin
+J|🏖️✈️📵|Yıllık izin|Fazla mesai|Toplantı|Mülakat
+J|💰📈🎉|Zam|Kesinti|Vergi iadesi|Ceza
+J|📧📧📧😩|Dolu e-posta kutusu|Spam filtresi|Şifre unutmak|Yazıcı arızası
+J|🤝👔📄|İş görüşmesi|İstifa|Terfi|Zam
+J|🖨️❌😤|Yazıcı arızası|İnternet kesintisi|Elektrik kesintisi|Bilgisayar virüsü
+J|🕔🏃‍♂️🚪|Mesai bitimi|Mesai başı|Öğle arası|Toplantı
+A|Ofis|Evden çalışma
+A|Yüksek maaş|Esnek saat
+A|Toplantı|E-posta
+A|Patron olmak|Takım arkadaşı olmak
+A|Sabah 8|Öğlen 12
+A|Kurumsal şirket|Girişim
+A|Sabit maaş|Prim
+A|Uzun tatil|Sık kısa tatil
+A|Telefonla konuşmak|Mesajlaşmak
+A|Sessiz ofis|Müzikli ofis
+A|Takım çalışması|Yalnız çalışmak
+A|Kendi işini kurmak|Büyük şirkette yükselmek
+A|Öğle yemeği dışarıda|Yemekhanede
+A|Dizüstü|Masaüstü
+A|Takım elbise|Rahat kıyafet
+A|Sabah kahvesi|Sabah çayı
+A|Yapılacaklar listesi|Aklında tutmak
+A|Erken bitirmek|Son ana bırakmak
+A|Sunum yapmak|Sunum dinlemek
+A|Yüz yüze toplantı|Online toplantı
+L|Hayalindeki iş ne?
+L|İlk iş deneyimin neydi?
+L|Şu an ne iş yapıyorsun ya da ne yapmak istiyorsun?
+L|Çalışırken ne dinlersin?
+L|Sabahçı bir çalışan mısın, gececi mi?
+L|Hiç yarı zamanlı çalıştın mı?
+L|En sevdiğin çalışma ortamı nasıl?
+L|Mesaiden sonra ilk ne yaparsın?
+L|Çalıştığın en ilginç yer neresiydi?
+L|Bir haftalık izin bulsan ne yapardın?
+P|Hayalindeki iş günü nasıl geçerdi, baştan sona anlat.
+P|Para olmasa da yapacağın iş hangisi?
+P|Kariyerinde en çok gurur duyduğun an?
+P|Örnek aldığın bir yönetici ya da kişi var mı?
+P|10 yıl sonra kendini nerede görüyorsun?
+P|İşte seni en çok yoran şey ne?
+P|Hiç kendi işini kurmayı düşündün mü?
+P|İşinde en çok sevdiğin kısım ne?
+P|Başarıyı nasıl tanımlarsın?
+P|Bir işi bırakmanın doğru zamanı sence ne zaman?
+B|İş ya da stajda yaptığın en büyük hata?
+B|Hiç bir işten 'yeter' deyip çıktın mı?
+B|Patronuna söylemek istediğin ama söyleyemediğin şey?
+B|Mesai saatinde yaptığın en alakasız şey?
+B|Bir iş görüşmesinde rezil olduğun an?
+B|İş yerinde hoşlandığın biri oldu mu?
+B|Hasta numarası yapıp işe gitmediğin oldu mu?
+B|CV'nde biraz abarttığın bir şey var mı?
+B|Bir toplantıda uyuyakaldığın oldu mu?
+B|En kötü iş arkadaşın nasıl biriydi?
+
+# cat:seyahat
+M|Kapadokya bölgesinin merkezi sayılan il hangisidir?|Nevşehir|Konya|Sivas|Eskişehir
+M|Hangisi bir Karadeniz yaylasıdır?|Ayder|Uludağ|Erciyes|Palandöken
+M|Sümela Manastırı hangi ildedir?|Trabzon|Rize|Giresun|Artvin
+M|Dev heykelleriyle ünlü Nemrut Dağı hangi ildedir?|Adıyaman|Malatya|Şanlıurfa|Van
+M|Göbeklitepe hangi ildedir?|Şanlıurfa|Mardin|Gaziantep|Diyarbakır
+M|Ölüdeniz hangi ildedir?|Muğla|Antalya|İzmir|Aydın
+M|Tarihi Osmanlı evleriyle ünlü Safranbolu hangi ildedir?|Karabük|Bolu|Kastamonu|Bartın
+M|Kolezyum hangi şehirdedir?|Roma|Atina|Milano|İstanbul
+M|Big Ben hangi şehirdedir?|Londra|Paris|Dublin|Edinburgh
+M|Japonya'nın başkenti neresidir?|Tokyo|Kyoto|Osaka|Seul
+M|Yunanistan'ın para birimi nedir?|Euro|Drahmi|Lira|Frank
+M|Mısır'daki büyük piramitler hangi bölgededir?|Gize|Luksor|İskenderiye|Asuan
+T|Pamukkale traverten terasları Denizli'dedir.|1
+T|Efes Antik Kenti Antalya'dadır.|0
+T|Truva Antik Kenti Çanakkale'dedir.|1
+T|Abant Gölü Bolu'dadır.|1
+T|Van Gölü Türkiye'nin en büyük gölüdür.|1
+T|Uludağ Bursa'dadır.|1
+T|Kız Kulesi Ankara'dadır.|0
+T|Kangurular doğal olarak Avustralya'da yaşar.|1
+T|Venedik kanallarıyla ünlüdür.|1
+T|Amazon Nehri Afrika'dadır.|0
+T|Sahra, dünyanın en büyük sıcak çölüdür.|1
+T|İzlanda'da kuzey ışıkları görülebilir.|1
+E|Galata Kulesi yaklaşık kaç metre yüksekliğindedir?|63|8|metre
+E|Ağrı Dağı yaklaşık kaç metre yüksekliğindedir?|5137|150|metre
+E|Van Gölü'nün yüzölçümü yaklaşık kaç km²'dir?|3700|300|km²
+E|Türkiye'nin kıyı uzunluğu yaklaşık kaç kilometredir?|8333|800|km
+E|Eyfel Kulesi yaklaşık kaç metre yüksekliğindedir?|330|30|metre
+E|Kolezyum yaklaşık hangi yıl tamamlandı (MS)?|80|10|yıl
+E|Birleşmiş Milletler'in kaç üye ülkesi vardır?|193|5|ülke
+E|İstanbul–Ankara arası karayolu yaklaşık kaç kilometredir?|450|50|km
+J|🗼🥐🇫🇷|Paris|Roma|Londra|Barselona
+J|🗽🍎🚕|New York|Londra|Paris|Tokyo
+J|🎈🪨🌅|Kapadokya|Pamukkale|Efes|Ölüdeniz
+J|🍕🏛️🛵|Roma|Atina|Madrid|Lizbon
+J|🌸🗻🍣|Japonya|Çin|Kore|Tayland
+J|🐪🔺☀️|Mısır|Fas|Dubai|Hindistan
+J|🪂🏝️🌊|Ölüdeniz|Uludağ|Abant|Safranbolu
+J|🎡☕🌧️🇬🇧|Londra|Dublin|Paris|Berlin
+A|Deniz|Dağ
+A|Plansız gezi|Dakika dakika plan
+A|Otel|Kamp
+A|Uçak|Karayolu
+A|Yurt içi|Yurt dışı
+A|Tren|Otobüs
+A|Tek başına|Kalabalık grup
+A|Müze|Plaj
+A|Büyük şehir|Küçük köy
+A|Yaz tatili|Kış tatili
+A|Sırt çantası|Valiz
+A|Pencere kenarı|Koridor
+A|Yerel yemek|Bildiğin yemek
+A|Fotoğraf çekmek|Anı yaşamak
+A|Erken uçuş|Gece uçuşu
+A|Rehberli tur|Kendi başına keşif
+A|Hostel|Butik otel
+A|Hafta sonu kaçamağı|Uzun tatil
+A|Kuzey ışıkları|Tropik ada
+A|Karavan|Tekne
+L|Gittiğin en güzel yer neresiydi?
+L|Bütçe derdi olmasa ilk nereye giderdin?
+L|Tatilde olmazsa olmazın ne?
+L|Deniz mi dağ mı?
+L|Hiç yurt dışına çıktın mı?
+L|Türkiye'de en sevdiğin şehir hangisi?
+L|Valize ilk koyduğun şey?
+L|En son nereye gittin?
+L|Seyahatte en sevdiğin ulaşım aracı?
+L|Hayalindeki tatil nasıl?
+P|Hiç tanımadığın bir yerde kaybolduğun oldu mu?
+P|Hayatını değiştiren bir yolculuk var mı?
+P|Yaşamak için bir ülke seçsen hangisi olurdu?
+P|Bir yolculukta tanıştığın ve unutamadığın biri var mı?
+P|Seyahat ederken kendinle ilgili ne öğrendin?
+P|Bir daha asla gitmem dediğin yer?
+P|Çocukken gittiğin ve hâlâ hatırladığın tatil?
+P|Bir şehre aşık olduğun oldu mu?
+P|Seyahatte en çok neyi özlersin?
+P|Bucket list'inde ilk sırada ne var?
+B|Bir yolculukta yaptığın en çılgın şey?
+B|Tek başına mı seyahat etmek, kalabalıkla mı? Neden?
+B|Seyahatte başına gelen en büyük felaket?
+B|Uçağı ya da otobüsü kaçırdığın oldu mu?
+B|Tatilde biriyle tanışıp aşık olduğun oldu mu?
+B|Bir otelden ya da evden hiç kaçarcasına ayrıldın mı?
+B|Yolculukta biriyle kavga ettiğin oldu mu?
+B|Bir yerde dilini bilmeden yaşadığın en komik an?
+B|Hiç plansız bir şekilde bir şehre gittin mi?
+B|Seyahatte yediğin ve pişman olduğun şey?
+
+# cat:spor
+M|Bir futbol maçında sahada her takımdan kaç oyuncu bulunur?|11|10|12|9
+M|Teniste 0 puan için hangi terim kullanılır?|Love|Zero|Deuce|Ace
+M|'12 Dev Adam' hangi spor dalındaki milli takımımızdır?|Basketbol|Voleybol|Futbol|Hentbol
+M|Naim Süleymanoğlu hangi sporla ünlüdür?|Halter|Güreş|Boks|Judo
+M|Olimpiyat bayrağında kaç halka vardır?|5|4|6|7
+M|Yaz Olimpiyatları kaç yılda bir düzenlenir?|4|2|3|5
+M|Satrançta en güçlü taş hangisidir?|Vezir|Kale|At|Fil
+M|Bir futbol maçının normal süresi kaç dakikadır?|90|80|100|120
+M|Golfte topu tek vuruşta deliğe sokmaya ne denir?|Hole-in-one|Birdie|Eagle|Par
+M|Teniste dört büyük turnuvaya genel olarak ne denir?|Grand Slam|Masters|Davis Kupası|Major League
+M|Kırkpınar hangi sporla ilgilidir?|Yağlı güreş|Cirit|Okçuluk|At yarışı
+M|Kırkpınar hangi ilde düzenlenir?|Edirne|Bursa|Konya|Balıkesir
+T|Basketbolda üç sayı çizgisinin dışından atılan basket 3 sayıdır.|1
+T|Voleybolda bir set genelde 25 sayıya oynanır.|1
+T|Basketbolda sahada her takımdan 5 oyuncu bulunur.|1
+T|Hentbolda top elle oynanır.|1
+T|Ofsayt kuralı basketbolda vardır.|0
+T|Maratonda koşulan mesafe yaklaşık 21 km'dir.|0
+T|Türkiye 2002 Dünya Kupası'nda üçüncü oldu.|1
+T|Cirit atlı bir spordur.|1
+T|Boks maçları raundlardan oluşur.|1
+T|Formula 1 bir motor sporudur.|1
+T|Yüzmede 'kelebek' bir stil adıdır.|1
+T|Satranç tahtasında 64 kare vardır.|1
+E|Maraton yaklaşık kaç kilometredir?|42|2|km
+E|Futbol kalesinin genişliği yaklaşık kaç metredir?|7.32|0.5|metre
+E|Basketbol potasının yerden yüksekliği kaç metredir?|3.05|0.2|metre
+E|İlk modern olimpiyatlar hangi yıl düzenlendi?|1896|4|yıl
+E|Hakan Şükür 2002 Dünya Kupası'nda Güney Kore'ye golünü kaçıncı saniyede attı?|11|3|saniye
+E|Voleybolda sahada her takımdan kaç oyuncu bulunur?|6|1|oyuncu
+E|Standart bir golf sahasında kaç delik vardır?|18|2|delik
+E|Bir tenis kortu yaklaşık kaç metre uzunluğundadır?|23.77|2|metre
+J|🏐🇹🇷👑|Filenin Sultanları|12 Dev Adam|Ay-Yıldızlılar|Filenin Efeleri
+J|🏀🇹🇷💪|12 Dev Adam|Filenin Efeleri|Ay-Yıldızlılar|Filenin Sultanları
+J|🤼🫒🏆|Kırkpınar yağlı güreşi|Judo|Sumo|Boks
+J|🏎️🏁🔥|Formula 1|Bisiklet yarışı|Maraton|Kürek
+J|⚽🥅🧤|Kaleci|Hakem|Forvet|Teknik direktör
+J|🥊🔔|Boks|Güreş|Eskrim|Judo
+J|🏊‍♂️🦋|Kelebek stili|Serbest stil|Kurbağalama|Sırtüstü
+J|🎾🍓🇬🇧|Wimbledon|Roland Garros|ABD Açık|Avustralya Açık
+A|Maç izlemek|Maç yapmak
+A|Spor salonu|Açık hava
+A|Futbol|Basketbol
+A|Sabah koşusu|Akşam yürüyüşü
+A|Takım sporu|Bireysel spor
+A|Stadyumda izlemek|Evde izlemek
+A|Yüzme|Bisiklet
+A|Yoga|Ağırlık
+A|Kazanmak|İyi oynamak
+A|Voleybol|Tenis
+A|Kayak|Sörf
+A|Olimpiyatlar|Dünya Kupası
+A|Penaltı atmak|Penaltı kurtarmak
+A|Satranç|Masa tenisi
+A|Antrenör olmak|Oyuncu olmak
+A|Spor ayakkabı|Krampon
+A|Maç özeti|Maçın tamamı
+A|Derbi|Milli maç
+A|Doğa yürüyüşü|Koşu bandı
+A|Dart|Bowling
+L|Takım tutuyor musun, hangisi?
+L|Hangi sporu denemek isterdin?
+L|Düzenli spor yapıyor musun?
+L|İzlemeyi en sevdiğin spor hangisi?
+L|En sevdiğin sporcu kim?
+L|Çocukken hangi sporu yaptın?
+L|Stadyuma gittin mi hiç?
+L|Spor yaparken ne dinlersin?
+L|Hangi spor sana en sıkıcı geliyor?
+L|Bir olimpiyat sporunda yarışsan hangisi olurdu?
+P|Hayatında ilk izlediğin ya da gittiğin maç?
+P|Spor sende hangi hissi yaratıyor?
+P|Bir sporcu olsan kim olmak isterdin?
+P|Spor yüzünden edindiğin bir arkadaşlık var mı?
+P|Kendini en çok zorladığın fiziksel an?
+P|Takımının kaybettiği ve unutamadığın maç?
+P|Spor sana disiplini öğretti mi?
+P|Takım tutmayı sana kim sevdirdi?
+P|Bir spor hedefin var mı?
+P|Spor yapmayı bıraktığın bir dönem oldu mu, neden?
+B|Spor yaparken başına gelen en komik kaza?
+B|Bir maç yüzünden hiç biriyle kavga ettin mi?
+B|Takımın için yaptığın en çılgın şey?
+B|Spor salonunda rezil olduğun an?
+B|Bir maçta hakeme haksız yere bağırdığın oldu mu?
+B|Kaybedince en kötü tepkin ne oldu?
+B|Bir yarışmada hile yaptığın oldu mu?
+B|Kimseye söylemediğin bir spor korkun var mı?
+B|Takım değiştirmeyi hiç düşündün mü?
+B|Maç için önemli bir şeyi ektiğin oldu mu?
+
+# cat:hayvanlar
+M|Van kedisinin bilinen özelliği hangisidir?|Farklı renkte gözleri olabilmesi ve suyu sevmesi|Kuyruğunun olmaması|Tüysüz olması|Kulaklarının katlanık olması
+M|Hangisi bir memeli değildir?|Penguen|Yarasa|Balina|Yunus
+M|Hangi hayvan ayakta da uyuyabilir?|At|Kedi|Köpek|Tavşan
+M|Köpek yavrusuna ne denir?|Enik|Kuzu|Buzağı|Tay
+M|At yavrusuna ne denir?|Tay|Enik|Oğlak|Buzağı
+M|Kedilerde bıyıkların asıl işlevi nedir?|Çevreyi algılamak|Isınmak|Süs|Koku almak
+M|Hangi kuş konuşmaları taklit etmesiyle bilinir?|Papağan|Serçe|Kartal|Güvercin
+M|Dünyanın en büyük hayvanı hangisidir?|Mavi balina|Fil|Köpek balığı|Zürafa
+M|Kaplumbağalar hangi hayvan sınıfındadır?|Sürüngen|Amfibi|Memeli|Balık
+M|Kurbağa yavrusuna ne denir?|İribaş|Tırtıl|Civciv|Kuzu
+M|Hamsterlar genelde günün hangi saatlerinde daha aktiftir?|Gece|Öğle|Sabah|Hiç aktif olmazlar
+M|Arıların yaptığı dans genelde neyi anlatır?|Besin kaynağının yerini|Tehlikeyi|Kraliçenin yerini|Hava durumunu
+T|Ahtapotun üç kalbi vardır.|1
+T|Yunuslar bir balık türüdür.|0
+T|Kediler tatlı tadını algılayamaz.|1
+T|Köpeklerin koku alma duyusu insanlardan çok daha güçlüdür.|1
+T|Develer hörgüçlerinde su depolar.|0
+T|Penguenler uçabilir.|0
+T|Zürafanın boynunda insanınki kadar, yani 7 omur vardır.|1
+T|Kelebekler ayaklarıyla da tat alabilir.|1
+T|Japon balıklarının hafızası sadece 3 saniyedir.|0
+T|Baykuşlar başlarını çok geniş bir açıyla çevirebilir.|1
+T|Tavşanların dişleri ömür boyu uzar.|1
+T|Kediler günün büyük kısmını uyuyarak geçirir.|1
+E|Bir ev kedisi ortalama kaç yıl yaşar?|14|3|yıl
+E|Bir köpek ortalama kaç yıl yaşar?|12|3|yıl
+E|Bir kedinin genelde toplam kaç tırnağı vardır?|18|2|tırnak
+E|Yetişkin bir köpeğin kaç dişi vardır?|42|4|diş
+E|Mavi balina yaklaşık kaç metre uzunluğa ulaşabilir?|30|5|metre
+E|Bir filin gebelik süresi yaklaşık kaç aydır?|22|2|ay
+E|Çita yaklaşık kaç km/sa hıza ulaşabilir?|110|15|km/sa
+E|Bir ahtapotun kaç kolu vardır?|8|1|kol
+J|🐕🦴🇹🇷|Kangal|Golden Retriever|Husky|Pug
+J|🐈💛💙|Van kedisi|Tekir|Sfenks|Scottish Fold
+J|🐠🫧🏠|Akvaryum|Kuş kafesi|Köpek kulübesi|Kümes
+J|🦜🗣️|Konuşan papağan|Öten kanarya|Uçan güvercin|Yüzen ördek
+J|🐶🎾🏃|Top getirme oyunu|Tasma takmak|Mama vermek|Banyo yaptırmak
+J|🐱📦|Kutuya giren kedi|Kargo beklemek|Taşınmak|Hediye açmak
+J|🐹🎡|Çarkta koşan hamster|Lunapark|Zıplayan tavşan|Saklanan fare
+J|🐾🏥💉|Veteriner|Pet kuaför|Pet shop|Barınak
+A|Kedi|Köpek
+A|Akvaryum|Kuş kafesi
+A|Sahiplenmek|Satın almak
+A|Küçük ırk|Büyük ırk
+A|Evde hayvan|Bahçede hayvan
+A|Tavşan|Hamster
+A|Papağan|Kanarya
+A|Tekir|Van kedisi
+A|Golden|Husky
+A|Kaplumbağa|Balık
+A|Hayvanat bahçesi|Safari
+A|Yunus|Penguen
+A|Aslan|Kaplan
+A|Kedi videosu|Köpek videosu
+A|Mama|Ev yemeği
+A|Tek hayvan|Çok hayvan
+A|Uyuyan kedi|Oynayan köpek
+A|At binmek|Deve binmek
+A|Panda|Koala
+A|Kartal|Baykuş
+L|Kedici misin köpekçi mi?
+L|Bir hayvan olsan ne olurdun?
+L|Evcil hayvanın var mı, adı ne?
+L|En sevdiğin hayvan hangisi?
+L|Sahiplenmek istediğin bir hayvan var mı?
+L|Evcil hayvanına koyacağın en komik isim?
+L|Hayvan videosu izlemeyi sever misin?
+L|Hayvanat bahçesine gittin mi?
+L|Hangi hayvanı evde beslemek isterdin ama mümkün değil?
+L|Sokak hayvanlarını besler misin?
+P|Hayatındaki ilk evcil hayvanın neydi?
+P|Bir hayvanla yaşadığın en duygusal an?
+P|Bir hayvan seni hiç teselli etti mi?
+P|Evcil hayvanını kaybettiğin oldu mu?
+P|Hayvanlarla insanlardan daha iyi anlaştığın oluyor mu?
+P|Evcil hayvanın karakteri sana benziyor mu?
+P|Bir hayvanın hayatını değiştirdiğin oldu mu?
+P|Çocukken bir hayvan için ağladığın oldu mu?
+P|Hayvanların sana öğrettiği bir şey var mı?
+P|Bir gün çiftlikte yaşamak ister miydin?
+B|Korktuğun bir hayvan var mı, neden?
+B|Sokakta bir hayvanı kurtardığın oldu mu?
+B|Bir hayvan tarafından rezil edildiğin an?
+B|Evcil hayvanınla konuşur musun, ne anlatırsın?
+B|Bir hayvanın seni kovaladığı oldu mu?
+B|Hiç bir hayvanı gizlice eve soktun mu?
+B|Bir hayvanın eşyanı mahvettiği oldu mu?
+B|Hangi hayvanın sana benzediğini düşünüyorsun?
+B|Evcil hayvanının fotoğrafı telefonunda kaç tane var?
+B|Hayvanı kendinden daha çok sevdiğin biri var mı?

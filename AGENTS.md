@@ -14,7 +14,7 @@ Bu repo bir "önce oyun, sonra sohbet" web sitesidir. Ürünün tamamı `docs/SP
 pnpm install
 docker compose up -d            # yerel Postgres + Redis
 pnpm --filter realtime prisma migrate dev
-pnpm dev                        # web :3000, realtime :4000
+pnpm dev                        # web :3100, realtime :4000
 pnpm test                       # tüm Vitest testleri
 pnpm lint && pnpm typecheck
 python3 scripts/build_questions.py content packages/shared/content/questions.json

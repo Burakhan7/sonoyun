@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String          @id @default(cuid())
+  nickname          String
+  avatarId          String // §18 listesindeki hayvan id'si
+  createdAt         DateTime        @default(now())
+  lastSeenAt        DateTime        @default(now())
+  acceptedTermsAt   DateTime?
+  nicknameChangedAt DateTime?
+  bannedUntil       DateTime?
+  deviceHash        String?
+  transferCodes     TransferCode[]
+  sentRequests      FriendRequest[] @relation("from")
+  recvRequests      FriendRequest[] @relation("to")
+
+  @@index([deviceHash])
+}
+
+model TransferCode {
+  code      String    @id
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  usedAt    DateTime?
+}
+
+model Match {
+  id         String    @id @default(cuid())
+  userAId    String
+  userBId    String
+  category   String
+  engine     String
+  winnerId   String?
+  scoreA     Int
+  scoreB     Int
+  harmony    Int? // ayna uyum yüzdesi
+  startedAt  DateTime  @default(now())
+  endedAt    DateTime?
+  chatRating Json? // {userId: 1|-1}
+
+  @@index([userAId])
+  @@index([userBId])
+}
+
+model FriendRequest {
+  id        String   @id @default(cuid())
+  fromId    String
+  toId      String
+  from      User     @relation("from", fields: [fromId], references: [id])
+  to        User     @relation("to", fields: [toId], references: [id])
+  matchId   String?
+  status    String   @default("pending") // pending|accepted|declined|cancelled
+  createdAt DateTime @default(now())
+
+  @@unique([fromId, toId])
+}
+
+model Friendship {
+  userLowId  String
+  userHighId String
+  createdAt  DateTime @default(now())
+
+  @@id([userLowId, userHighId])
+}
+
+model Block {
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  @@id([blockerId, blockedId])
+}
+
+model Conversation {
+  id        String               @id @default(cuid())
+  createdAt DateTime             @default(now())
+  members   ConversationMember[]
+  messages  Message[]
+}
+
+model ConversationMember {
+  conversationId String
+  userId         String
+  lastReadAt     DateTime     @default(now())
+  hidden         Boolean      @default(false)
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  @@id([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  body           String       @db.VarChar(500)
+  createdAt      DateTime     @default(now())
+  expiresAt      DateTime // createdAt + 24 saat
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@index([expiresAt])
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  reporterId String
+  reportedId String
+  matchId    String?
+  reason     String // taciz|kufur|spam|reşit-olmayan|diger
+  note       String?  @db.VarChar(300)
+  snapshot   Json // son 50 mesaj
+  status     String   @default("open")
+  createdAt  DateTime @default(now())
+
+  @@index([reportedId, status])
+}
+
+model AccessLog {
+  // 5651 trafik kaydı
+  id     BigInt   @id @default(autoincrement())
+  userId String?
+  ip     String
+  port   Int?
+  event  String // connect|disconnect|match|message
+  at     DateTime @default(now())
+
+  @@index([at])
+}
