@@ -1,8 +1,11 @@
 import prismaClient from '@prisma/client';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { Redis } from 'ioredis';
+import { createTokenService } from './auth.js';
 import { loadEnv } from './env.js';
+import { Presence } from './presence.js';
 import { buildServer } from './server.js';
+import { createPrismaUserStore } from './users.js';
 
 const { PrismaClient } = prismaClient;
 
@@ -10,7 +13,13 @@ const env = loadEnv();
 const prisma = new PrismaClient();
 const redis = new Redis(env.REDIS_URL);
 const redisSubscriber = redis.duplicate();
-const { app, io } = buildServer({ webOrigin: env.WEB_ORIGIN, logger: true });
+const { app, io } = buildServer({
+  webOrigin: env.WEB_ORIGIN,
+  tokens: createTokenService(env.JWT_SECRET),
+  users: createPrismaUserStore(prisma),
+  presence: new Presence(redis),
+  logger: true,
+});
 
 io.adapter(createAdapter(redis, redisSubscriber));
 

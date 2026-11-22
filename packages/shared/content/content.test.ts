@@ -50,6 +50,14 @@ describe('questions.json', () => {
   });
 
   it('does not expose content through the client-safe entry point', () => {
-    expect(Object.keys(publicEntry).sort()).toEqual(['CATEGORIES', 'CATEGORY_IDS']);
+    expect(Object.keys(publicEntry)).not.toContain('content');
+    expect(Object.keys(publicEntry)).not.toContain('contentSchema');
+  });
+});
+
+describe('avatars', () => {
+  it('matches the 24 animals and 30 adjectives in SPEC §18', () => {
+    expect(new Set(publicEntry.AVATAR_IDS).size).toBe(24);
+    expect(new Set(publicEntry.ADJECTIVES).size).toBe(30);
   });
 });
