@@ -10,7 +10,8 @@
     "start": "node --env-file-if-exists=.env dist/index.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "reset-matches": "tsx --env-file-if-exists=.env scripts/reset-recent.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
