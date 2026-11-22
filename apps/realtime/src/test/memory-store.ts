@@ -1,3 +1,4 @@
+import type { MatchStore } from '../rooms.js';
 import type { Identity, UserRecord, UserStore } from '../users.js';
 
 export class MemoryUserStore implements UserStore {
@@ -33,5 +34,23 @@ export class MemoryUserStore implements UserStore {
     if (!user || (user.nicknameChangedAt && user.nicknameChangedAt > cutoff)) return false;
     Object.assign(user, identity, { nicknameChangedAt: now });
     return true;
+  }
+}
+
+export class MemoryMatchStore implements MatchStore {
+  readonly created: Parameters<MatchStore['create']>[0][] = [];
+  readonly ended = new Map<string, Date>();
+  failNextCreate = false;
+
+  async create(match: Parameters<MatchStore['create']>[0]) {
+    if (this.failNextCreate) {
+      this.failNextCreate = false;
+      throw new Error('Match store failure');
+    }
+    this.created.push(match);
+  }
+
+  async end(id: string, endedAt: Date) {
+    this.ended.set(id, endedAt);
   }
 }

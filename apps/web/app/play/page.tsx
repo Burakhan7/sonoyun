@@ -1,5 +1,5 @@
-import { ComingSoon } from '@/components/ComingSoon';
+import { PlayClient } from '@/components/play/PlayClient';
 
 export default function PlayPage() {
-  return <ComingSoon title="Oyun" text="Eşleşme çok yakında burada olacak." />;
+  return <PlayClient />;
 }

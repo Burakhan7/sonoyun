@@ -63,6 +63,12 @@ export function resetSession() {
   writeToken(null);
 }
 
+/** Keeps the cached session current so other pages do not read a stale user. */
+function rememberUser(user: PublicUser) {
+  pendingSession = pendingSession?.then((session) => ({ ...session, user })) ?? null;
+  return user;
+}
+
 export class SessionExpiredError extends Error {}
 
 export async function acceptTerms(): Promise<PublicUser> {
@@ -72,7 +78,7 @@ export async function acceptTerms(): Promise<PublicUser> {
   });
   if (response.status === 401) throw new SessionExpiredError();
   if (!response.ok) throw new Error(`Accept terms failed: ${response.status}`);
-  return userResponseSchema.parse(await response.json()).user;
+  return rememberUser(userResponseSchema.parse(await response.json()).user);
 }
 
 export type IdentityRefreshResult =
@@ -86,5 +92,6 @@ export async function refreshIdentity(): Promise<IdentityRefreshResult> {
     return { status: 'limited', nextRefreshAt: limit.nextIdentityRefreshAt };
   }
   if (!response.ok) throw new Error(`Identity refresh failed: ${response.status}`);
-  return { status: 'updated', user: userResponseSchema.parse(await response.json()).user };
+  const user = rememberUser(userResponseSchema.parse(await response.json()).user);
+  return { status: 'updated', user };
 }
