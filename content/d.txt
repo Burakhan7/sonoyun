@@ -1,0 +1,347 @@
+# cat:gece
+M|Gece geç yatanlara genelde hangi kuş benzetmesi yapılır?|Baykuş|Kartal|Serçe|Leylek
+M|Uyumadan önce ekrana bakmanın uykuyu zorlaştırmasının sık söylenen nedeni nedir?|Mavi ışık|Ses|Isı|Titreşim
+M|Uykusuzluğun tıptaki adı nedir?|İnsomnia|Narkolepsi|Migren|Anemi
+M|Rüyalar üzerine çalışmalarıyla bilinen ünlü psikanalist kimdir?|Sigmund Freud|Albert Einstein|Charles Darwin|Isaac Newton
+M|'Uyku hormonu' olarak bilinen hormon hangisidir?|Melatonin|Adrenalin|İnsülin|Kortizol
+M|Horlama genelde neyden kaynaklanır?|Solunum yolunun daralmasından|Fazla su içmekten|Soğuktan|Rüyalardan
+M|Eskiden gece yön bulmak için en çok hangi yıldız kullanılırdı?|Kutup Yıldızı|Sirius|Güneş|Venüs
+M|Ay'ın Dünya'ya hep aynı yüzünü göstermesinin nedeni nedir?|Kendi ekseninde dönüşü ile yörünge süresinin eşit olması|Ay'ın hiç dönmemesi|Dünya'nın gölgesi|Güneş'in konumu
+M|Dolunay ayda yaklaşık kaç kez görülür?|Bir|İki|Üç|Dört
+M|Saat dilimi değişikliğinin yarattığı yorgunluğa ne denir?|Jet lag|Burnout|FOMO|İnsomnia
+M|Uyurgezerliğin tıbbi adı nedir?|Somnambulizm|Hipnoz|Narkolepsi|Apne
+M|Kısa ve dinçleştirici öğle uykusu için kullanılan İngilizce terim hangisidir?|Power nap|Night shift|Sleep mode|Day off
+T|Yetişkinler için genelde önerilen uyku süresi 7–9 saattir.|1
+T|REM, rüyaların yoğun görüldüğü uyku evresidir.|1
+T|Bebekler yetişkinlerden daha çok uyur.|1
+T|Kafeinin etkisi birkaç saat sürebilir.|1
+T|Uykuda vücut ısısı biraz düşer.|1
+T|Ay kendi ışığını üretir.|0
+T|Yıldızlar gündüz yok olur.|0
+T|Yunuslar beyinlerinin yarısıyla uyuyabilir.|1
+T|Saatleri bir saat ileri almak yaz saati uygulamasıdır.|1
+T|Türkiye 2016'dan beri kalıcı olarak UTC+3 saat dilimini kullanır.|1
+T|Kediler gece tamamen kördür.|0
+T|Herkes rüya görür ama çoğu rüya hatırlanmaz.|1
+E|İnsan ömrünün yaklaşık yüzde kaçını uykuda geçirir?|33|5|%
+E|Bir uyku döngüsü yaklaşık kaç dakika sürer?|90|15|dakika
+E|Bir gecede genelde kaç uyku döngüsü yaşanır?|5|1|döngü
+E|Bilinen en uzun uykusuzluk rekoru yaklaşık kaç gündür?|11|2|gün
+E|Ay, Dünya etrafındaki turunu yaklaşık kaç günde tamamlar?|27|2|gün
+E|Kuzey Yarımküre'de yılın en uzun günü Haziran'ın kaçıdır?|21|1|Haziran
+E|Kafeinin vücuttaki yarılanma süresi yaklaşık kaç saattir?|5|2|saat
+E|Güneş ışığı Dünya'ya yaklaşık kaç dakikada ulaşır?|8|1|dakika
+J|📱🌙👀3️⃣|Gece 3'te telefonda gezinmek|Sabah alarmı|Gece nöbeti|Erken kalkmak
+J|⏰😴🔁|Alarmı ertelemek|Erken kalkmak|Uykusuz kalmak|Şekerleme yapmak
+J|🍫🌙🚪🧊|Gece buzdolabı baskını|Kahvaltı|Market alışverişi|Diyet
+J|🦉🌙💻|Gece geç saate kadar çalışmak|Sabah sporu|Öğle uykusu|Erken yatmak
+J|🌕🐺|Dolunay|Güneş tutulması|Yeni ay|Gün doğumu
+J|😴💭🦄|Rüya görmek|Kâbus görmek|Uyurgezerlik|Horlamak
+J|🐑🔢😴|Koyun sayarak uyumaya çalışmak|Matematik çalışmak|Çiftlik işi|Yoklama almak
+J|☕☕☕😵|Kahveyle uyanık kalmak|Kahve falı|Kahvaltı|Çay saati
+A|Sabahçı|Gececi
+A|Tek alarm|Erteleye erteleye
+A|Gece atıştırmalık|Aç uyumak
+A|Işık açık|Zifiri karanlık
+A|Pencere açık|Pencere kapalı
+A|Yastık sert|Yastık yumuşak
+A|Battaniye|Yorgan
+A|Sessizlik|Beyaz gürültü
+A|Öğle uykusu|Hiç uyumamak
+A|Gün doğumu|Gün batımı
+A|Sırtüstü|Yan yatarak
+A|Gece yürüyüşü|Gece film
+A|Gece sohbeti|Erken yatmak
+A|Rüyayı hatırlamak|Hiç hatırlamamak
+A|Pijama|Eşofman
+A|Hafta sonu geç kalkmak|Hafta sonu erken kalkmak
+A|Telefonla uyumak|Telefonsuz uyumak
+A|Yıldız izlemek|Şehir ışıkları
+A|Gece kahvesi|Bitki çayı
+A|Tek yastık|Çok yastık
+L|Sabahçı mısın, gececi mi?
+L|Uyumadan önce son yaptığın şey?
+L|Kaç saat uyursun genelde?
+L|Alarmı kaç kez ertelersin?
+L|Gece en sevdiğin atıştırmalık?
+L|Uyurken müzik dinler misin?
+L|En son gördüğün rüyayı hatırlıyor musun?
+L|Hafta sonları kaçta kalkarsın?
+L|Gece yürüyüşünü sever misin?
+L|Yıldız izlemeyi sever misin?
+P|Gece 3'te aklına gelen en garip düşünce?
+P|Seni uyutmayan bir düşünce var mı?
+P|Gecenin hangi saati en verimli olduğun saat?
+P|Gece yalnız kalınca ne hissedersin?
+P|Hiç unutamadığın bir rüya var mı?
+P|Gece sohbetlerinde açıldığın oluyor mu?
+P|Uyku düzenin hayatını nasıl etkiliyor?
+P|Gecenin sessizliği sana ne düşündürür?
+P|Çocukken karanlıktan korkar mıydın?
+P|Gece seni en çok rahatlatan şey?
+B|En son ne zaman sabaha kadar uyumadın, neden?
+B|Hiç gördüğün bir rüyadan etkilenip bir karar verdin mi?
+B|Gece attığın ve sabah pişman olduğun mesaj?
+B|Uykunda konuşur musun, ne dediğini söylediler mi?
+B|Gece gizlice evden çıktığın oldu mu?
+B|Gece yarısı yaptığın en saçma alışveriş?
+B|Rüyanda gördüğün kişiye söyledin mi?
+B|Gece yarısı birini aradığın oldu mu?
+B|Uyuyakalıp kaçırdığın en önemli şey?
+B|Gece seni en çok korkutan şey ne?
+
+# cat:yasaydi
+A|Geçmişe gitmek|Geleceğe gitmek
+A|Uçabilmek|Görünmez olmak
+A|Hiç uyumamak|Hiç yemek yememek
+A|Bütün dilleri bilmek|Bütün enstrümanları çalmak
+A|Ünlü olmak|Zengin ama tanınmamak
+A|Denizin dibinde yaşamak|Uzayda yaşamak
+A|Zihin okumak|Geleceği görmek
+A|Her yere ışınlanmak|Zamanı durdurmak
+A|10 yıl erken emekli olmak|10 yıl daha genç olmak
+A|Kendi adanda yalnız|Kalabalık bir şehirde ünlü
+A|Hayvanlarla konuşmak|Bitkilerle konuşmak
+A|Hiç üşümemek|Hiç terlememek
+A|Her gün aynı yemeği yemek|Her gün aynı kıyafeti giymek
+A|Süper güç|Süper zekâ
+A|Ölümsüz olmak|Bir kez daha başlamak
+A|Mükemmel hafıza|Mükemmel sezgi
+A|İnternetsiz bir yıl|Müziksiz bir yıl
+A|Hep 20 derece|Hep mevsim değişimi
+A|Ejderha beslemek|Robot yardımcı
+A|Kendi filmini çekmek|Kendi oyununu yapmak
+A|Bir gün kral olmak|Bir gün süper kahraman olmak
+A|Hiç yalan söyleyememek|Hiç sır tutamamak
+A|Dünyayı gezmek|Hayalindeki evde yaşamak
+A|Dinozor çağında bir gün|Gelecekte bir gün
+A|Su altında nefes almak|Ateşe dayanıklı olmak
+A|Herkesin aklını okumak|Kimsenin aklını okuyamaması
+A|Her şarkıyı ilk seferde ezberlemek|Her yemeği ilk denemede yapmak
+A|Uzaylılarla tanışmak|Kayıp bir medeniyeti bulmak
+A|Bir ömür yaz|Bir ömür kış
+A|Bir yıl tatil|Bir yıl iki kat maaş
+A|Hiç trafiğe takılmamak|Hiç kuyrukta beklememek
+A|Çizgi film karakteri olmak|Video oyunu karakteri olmak
+A|Hiç hastalanmamak|Hiç yorulmamak
+A|Ünlü bir şef|Ünlü bir müzisyen
+A|Telefonun hiç şarjı bitmesin|İnternetin hiç kopmasın
+A|Bir günlüğüne başka biri olmak|Bir günlüğüne başka bir canlı olmak
+A|Rüyalarını kontrol etmek|Hiç kâbus görmemek
+A|Her dili konuşmak|Her hayvanla konuşmak
+A|Geçmişteki bir hatayı silmek|Gelecekten bir sır öğrenmek
+A|Ay'a gitmek|Okyanusun dibine inmek
+L|Bir gün dünyanın lideri olsan ilk ne yapardın?
+L|Bir hafta görünmez olsan ne yapardın?
+L|Bir süper gücün olsa ne olurdu?
+L|Bir günlüğüne herhangi biri olabilsen kim olurdun?
+L|Zaman makinen olsa hangi yıla giderdin?
+L|Bir hayvanla konuşabilsen hangisini seçerdin?
+L|Piyangodan büyük ikramiye çıksa ilk ne yapardın?
+L|Bir kitap ya da filmin içinde yaşayabilsen hangisi?
+L|Bir yeteneği anında öğrenebilsen hangisi?
+L|Kendi ülkeni kursan adı ne olurdu?
+P|Geçmişe tek bir mesaj gönderebilsen kime, ne yazardın?
+P|Hayatını film yapsalar adı ne olurdu?
+P|Bir kararını geri alabilsen hangisi olurdu?
+P|On yıl sonraki kendine ne söylemek isterdin?
+P|Hayatta tek bir şeyi değiştirebilsen ne olurdu?
+P|Bir gün hiçbir sorumluluğun olmasa nasıl geçirirdin?
+P|Bir kişiyle yeniden tanışabilsen kimi seçerdin?
+P|Hiç korkun olmasa ne yapardın?
+P|Bir yılın kalsa neleri yapardın?
+P|Çocukluk hayallerinden birini gerçekleştirebilsen hangisi?
+B|Yarın her şeyi bırakıp başka biri olabilsen kim olurdun?
+B|Birinin aklını bir günlüğüne okuyabilsen kimi seçerdin?
+B|Hiç yakalanmayacağını bilsen yapacağın bir şey?
+B|Bir ünlüyle yer değiştirebilsen kim olurdu?
+B|Hayatından birini silebilsen silerdin mi?
+B|Geçmişte birine söylemediğin şeyi şimdi söyleyebilsen ne derdin?
+B|Bir gün boyunca herkes sana evet dese ne isterdin?
+B|Bir sırrını herkes öğrense hangisi en kötü olurdu?
+B|Görünmez olsan ilk kimi gizlice izlerdin?
+B|Zamanı geri sarabilsen hangi ana dönerdin?
+
+# cat:dizi_film
+M|'Yeşilçam' neyi ifade eder?|Türk sinemasının klasik dönemi ve sektörü|Bir dizi adı|Bir film festivali|Bir sinema salonu
+M|Oscar'da 'En İyi Film' ödülünü kazanan ilk Korece film hangisidir?|Parasite|Oldboy|Squid Game|Train to Busan
+M|'Hababam Sınıfı'nda Kemal Sunal'ın canlandırdığı karakter kimdir?|İnek Şaban|Damat Ferit|Güdük Necmi|Tulum Hayri
+M|'Hababam Sınıfı'nda Kel Mahmut'u kim canlandırdı?|Münir Özkul|Adile Naşit|Şener Şen|Halit Akçatepe
+M|'Titanic' filminin yönetmeni kimdir?|James Cameron|Steven Spielberg|Christopher Nolan|Martin Scorsese
+M|'Inception' filminin yönetmeni kimdir?|Christopher Nolan|James Cameron|Quentin Tarantino|Ridley Scott
+M|'Breaking Bad'deki kimya öğretmeninin adı nedir?|Walter White|Jesse Pinkman|Saul Goodman|Hank Schrader
+M|'Game of Thrones' hangi kitap serisine dayanır?|Buz ve Ateşin Şarkısı|Yüzüklerin Efendisi|The Witcher|Narnia Günlükleri
+M|'Ezel' dizisinin başrol oyuncusu kimdir?|Kenan İmirzalıoğlu|Kıvanç Tatlıtuğ|Halit Ergenç|Engin Akyürek
+M|'Kurtlar Vadisi'nin ana karakteri kimdir?|Polat Alemdar|Behzat Ç.|Ezel Bayraktar|Yaman Koper
+M|Netflix'in ilk Türk orijinal dizisi hangisidir?|Hakan: Muhafız|Atiye|Love 101|Bir Başkadır
+M|'Star Wars'ta Darth Vader'ın oğlu kimdir?|Luke Skywalker|Han Solo|Obi-Wan Kenobi|Anakin Skywalker
+T|'Muhteşem Yüzyıl' Kanuni Sultan Süleyman dönemini anlatır.|1
+T|'Friends' dizisi New York'ta geçer.|1
+T|'Kurtlar Vadisi' bir komedi dizisidir.|0
+T|'Avatar' (2009) dünya gişe rekorları kırdı.|1
+T|'Harry Potter' film serisi 8 filmden oluşur.|1
+T|'Toy Story', tamamen bilgisayar animasyonuyla yapılan ilk uzun metraj filmdir.|1
+T|Kemal Sunal 'Hababam Sınıfı'nda öğretmeni canlandırdı.|0
+T|'The Office' dizisinin orijinali İngiliz yapımıdır.|1
+T|'Stranger Things' 1980'lerde geçer.|1
+T|'Diriliş: Ertuğrul' Ertuğrul Gazi'yi anlatır.|1
+T|'Squid Game' bir Japon dizisidir.|0
+T|'Joker' (2019) filminde Joker'i Joaquin Phoenix canlandırdı.|1
+E|James Cameron'ın 'Titanic' filmi hangi yıl vizyona girdi?|1997|2|yıl
+E|'Harry Potter ve Felsefe Taşı' filmi hangi yıl çıktı?|2001|2|yıl
+E|İlk 'Hababam Sınıfı' filmi hangi yıl çıktı?|1975|3|yıl
+E|İlk 'Avatar' filmi hangi yıl çıktı?|2009|2|yıl
+E|'Yüzüklerin Efendisi: Kralın Dönüşü' kaç Oscar kazandı?|11|2|Oscar
+E|'Friends' kaç sezon sürdü?|10|1|sezon
+E|'Game of Thrones' kaç sezon sürdü?|8|1|sezon
+E|'Breaking Bad' ilk kez hangi yıl yayınlandı?|2008|2|yıl
+J|🦁👑🌅|Aslan Kral|Madagaskar|Zootropolis|Tarzan
+J|🧙‍♂️💍🌋|Yüzüklerin Efendisi|Harry Potter|Narnia Günlükleri|Eragon
+J|🚢🧊💔|Titanic|Jaws|Avatar|Piyanist
+J|🦖🏝️🧬|Jurassic Park|King Kong|Godzilla|Avatar
+J|🕷️🧑🏙️|Örümcek Adam|Batman|Süpermen|Iron Man
+J|🧪👨‍🏫💰|Breaking Bad|Narcos|Ozark|Dexter
+J|🦈🌊😱|Jaws|Titanic|Moby Dick|Kayıp Balık Nemo
+J|👓⚡🧹|Harry Potter|Narnia Günlükleri|Percy Jackson|Matilda
+A|Dizi|Film
+A|Sinema|Evde izlemek
+A|Korku|Komedi
+A|Yerli yapım|Yabancı yapım
+A|Altyazı|Dublaj
+A|Bir oturuşta bitirmek|Haftada bir bölüm
+A|Romantik|Aksiyon
+A|Mutlu son|Açık son
+A|Animasyon|Belgesel
+A|Patlamış mısır|Cips
+A|Kitabı|Filmi
+A|Spoiler duymak|Hiç bilmeden izlemek
+A|Eski filmler|Yeni filmler
+A|Kahraman|Kötü karakter
+A|Fragman izlemek|Sürpriz izlemek
+A|Bilim kurgu|Fantastik
+A|Gerçek hikâye|Kurgu
+A|Kısa dizi|Uzun dizi
+A|Sinemada ön sıra|Sinemada arka sıra
+A|Tek başına izlemek|Arkadaşlarla izlemek
+L|Şu an ne izliyorsun?
+L|Tekrar tekrar izleyebileceğin film hangisi?
+L|En sevdiğin dizi hangisi?
+L|Korku filmi izleyebilir misin?
+L|En son sinemaya ne zaman gittin?
+L|En sevdiğin Yeşilçam filmi?
+L|Hangi dizinin finali seni hayal kırıklığına uğrattı?
+L|En sevdiğin animasyon filmi?
+L|Altyazı mı dublaj mı?
+L|Bir dizi önerin var mı?
+P|Hangi dizinin içinde yaşamak isterdin?
+P|Seni en çok etkileyen film sahnesi?
+P|Kendini hangi karakterle özdeşleştiriyorsun?
+P|Hayatını değiştiren bir film var mı?
+P|Çocukken izleyip korktuğun film?
+P|Bir film karakteriyle bir gün geçirebilsen kim olurdu?
+P|Hangi filmi ilk kez izliyormuş gibi yeniden izlemek isterdin?
+P|Bir film çeksen konusu ne olurdu?
+P|Seni en çok güldüren film ya da dizi?
+P|Sevdiğin biriyle izlediğin ve unutamadığın film?
+B|Herkesin sevdiği ama senin hiç sevmediğin yapım?
+B|Bir filmde ağladığını kimse bilmiyor mu?
+B|Bir dizi yüzünden sabahladığın oldu mu?
+B|Utanarak izlediğin dizi hangisi?
+B|Birine spoiler verip ortamı mahvettiğin oldu mu?
+B|Bir film karakterine aşık olduğun oldu mu?
+B|Bir diziyi bitirdikten sonra yaşadığın boşluk hissi?
+B|İzlemeden izledim dediğin film var mı?
+B|Sinemada yaptığın en utanç verici şey?
+B|Hangi film karakterinin kötü yanı sende de var?
+
+# cat:oyun
+M|Minecraft'ı ilk geliştiren stüdyo hangisidir?|Mojang|Valve|Epic Games|Ubisoft
+M|'Valorant' hangi şirketin oyunudur?|Riot Games|Blizzard|EA|Activision
+M|Türk stüdyosu TaleWorlds hangi oyun serisiyle bilinir?|Mount & Blade|The Witcher|Total War|Age of Empires
+M|Tetris'in yaratıcısı kimdir?|Alexey Pajitnov|Shigeru Miyamoto|Hideo Kojima|Gabe Newell
+M|Mario'nun kardeşinin adı nedir?|Luigi|Wario|Toad|Yoshi
+M|Counter-Strike hangi oyunun modu olarak başladı?|Half-Life|Quake|Doom|Unreal Tournament
+M|'The Witcher' serisinin ana karakteri kimdir?|Geralt|Ciri|Yennefer|Dandelion
+M|Fortnite'ı geliştiren şirket hangisidir?|Epic Games|Valve|Riot Games|Blizzard
+M|GTA'nın açılımı nedir?|Grand Theft Auto|Great Theft Action|Game Time Arena|Grand Tour Auto
+M|Steam platformunun sahibi hangi şirkettir?|Valve|Epic Games|Ubisoft|Sony
+M|League of Legends hangi oyun türündedir?|MOBA|FPS|Yarış|Spor
+M|Pokémon serisinin elektrik tipindeki maskotu hangisidir?|Pikachu|Charmander|Bulbasaur|Squirtle
+T|Tetris, Sovyetler Birliği'nde geliştirildi.|1
+T|Minecraft dünyası bloklardan oluşur.|1
+T|Nintendo bir Japon şirketidir.|1
+T|PlayStation, Microsoft'un oyun konsoludur.|0
+T|Xbox, Microsoft'un oyun konsoludur.|1
+T|The Sims bir yaşam simülasyonu oyunudur.|1
+T|Among Us'ta 'impostor' hain oyuncudur.|1
+T|Pac-Man ilk kez 2000'lerde çıktı.|0
+T|Zelda serisinde oynanan ana karakterin adı Zelda'dır.|0
+T|Candy Crush bir eşleştirme bulmaca oyunudur.|1
+T|Royal Match, Türk şirketi Dream Games'in oyunudur.|1
+T|Okey bir masa oyunudur.|1
+E|İlk 'Super Mario Bros.' hangi yıl çıktı?|1985|2|yıl
+E|İlk PlayStation hangi yıl çıktı?|1994|2|yıl
+E|Minecraft'ın tam sürümü hangi yıl çıktı?|2011|2|yıl
+E|GTA V hangi yıl çıktı?|2013|2|yıl
+E|Pac-Man hangi yıl çıktı?|1980|3|yıl
+E|Tetris hangi yıl geliştirildi?|1984|3|yıl
+E|Nintendo hangi yıl kuruldu?|1889|10|yıl
+E|World of Warcraft hangi yıl çıktı?|2004|2|yıl
+J|🟡👻🍒|Pac-Man|Tetris|Space Invaders|Frogger
+J|🍄👨‍🔧👸|Super Mario|Zelda|Sonic|Donkey Kong
+J|🧱⛏️🐷|Minecraft|Roblox|Terraria|Fortnite
+J|🍬🍭💥|Candy Crush|Subway Surfers|Clash of Clans|Angry Birds
+J|🚗🏙️🚓|GTA|FIFA|The Sims|Tetris
+J|🔴🔵🧑‍🚀🔪|Among Us|Fall Guys|Fortnite|Minecraft
+J|🐦😡🐷|Angry Birds|Flappy Bird|Cut the Rope|Plants vs. Zombies
+J|⚔️🐎🏰🇹🇷|Mount & Blade|FIFA|Candy Crush|Tetris
+A|PC|Konsol
+A|Tek oyunculu|Çok oyunculu
+A|Hikâye|Rekabet
+A|Mobil|Masaüstü
+A|Klavye-fare|Kol
+A|Açık dünya|Doğrusal oyun
+A|FPS|Strateji
+A|Kooperatif|Rakip
+A|Retro|Yeni nesil
+A|Kolay mod|Zor mod
+A|Kulaklıkla|Hoparlörle
+A|Online|Offline
+A|Oyun izlemek|Oyun oynamak
+A|Bedava oyun|Ücretli oyun
+A|Masa oyunu|Video oyunu
+A|Okey|Tavla
+A|Yarış|Spor
+A|Bulmaca|Aksiyon
+A|Gece oynamak|Gündüz oynamak
+A|Karakter yaratmak|Hazır karakter
+L|Şu an hangi oyunu oynuyorsun?
+L|Hayatında ilk oynadığın oyun?
+L|PC mi konsol mu mobil mi?
+L|En sevdiğin oyun türü?
+L|Günde kaç saat oyun oynarsın?
+L|En sevdiğin masa oyunu?
+L|Bir oyun önerin var mı?
+L|Oyun yayıncısı izler misin?
+L|En sevdiğin oyun müziği?
+L|Okey mi tavla mı?
+P|Bir oyun karakteri olsan hangisi olurdu?
+P|Hangi oyun sana en çok şey hissettirdi?
+P|Oyun sayesinde edindiğin bir arkadaşlık var mı?
+P|Çocukken oynadığın ve hâlâ özlediğin oyun?
+P|Bir oyun yapsan konusu ne olurdu?
+P|Oyunlar sana bir şey öğretti mi?
+P|Zor bir günün ardından hangi oyunu açarsın?
+P|Hangi oyun dünyasında yaşamak isterdin?
+P|Bir oyunda en gurur duyduğun başarın?
+P|Ailenle oynadığın bir oyun var mı?
+B|Bir oyunda kaybedince yaptığın en kötü şey?
+B|Bir oyun yüzünden sabahladığın oldu mu, hangisi?
+B|Oyunda hile kullandığın oldu mu?
+B|Oyuna gerçek para harcadığın en çok miktar?
+B|Bir oyun yüzünden biriyle kavga ettin mi?
+B|Oyunda trolleyip birini sinirlendirdiğin oldu mu?
+B|Bir oyun için önemli bir şeyi ektiğin oldu mu?
+B|Bir oyunda kızdığın için kolu ya da klavyeyi fırlattın mı?
+B|Oyun oynarken biri seni yakalayınca utandığın an?
+B|En çok rage yaptığın oyun hangisi?

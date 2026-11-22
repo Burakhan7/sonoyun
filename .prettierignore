@@ -1,0 +1,15 @@
+node_modules
+dist
+.next
+.turbo
+coverage
+pnpm-lock.yaml
+next-env.d.ts
+
+# Generated or authored content
+packages/shared/content/questions.json
+apps/realtime/prisma/migrations
+content
+docs
+AGENTS.md
+scripts/build_questions.py

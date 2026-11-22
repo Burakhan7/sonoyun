@@ -1,0 +1,367 @@
+# cat:internet
+M|'LOL' neyin kısaltmasıdır?|Laughing Out Loud|Lots Of Love|Look Out Late|Level One Loot
+M|GIF neyin kısaltmasıdır?|Graphics Interchange Format|Global Image File|Graphic Internet Frame|General Image Format
+M|'DM' neyin kısaltmasıdır?|Direct Message|Daily Message|Digital Mail|Data Mode
+M|Wi-Fi ne işe yarar?|Kablosuz ağ bağlantısı|Dosya sıkıştırma|Kablolu internet|Uydu yayını
+M|URL nedir?|Web adresi|Şifre|Uygulama|Dosya türü
+M|Spam nedir?|İstenmeyen mesaj|Virüs|Yedek dosya|Şifre
+M|'Emoji' kelimesi hangi dilden gelir?|Japonca|Çince|İngilizce|Korece
+M|Hashtag için kullanılan sembol hangisidir?|#|@|&|*
+M|FOMO ne demektir?|Bir şeyleri kaçırma korkusu|Hızlı internet|Bir oyun terimi|Bir mesaj türü
+M|Influencer kimdir?|Sosyal medya fenomeni|Yazılımcı|Moderatör|Reklam ajansı
+M|CAPTCHA'nın amacı nedir?|İnsan ile botu ayırt etmek|Şifre saklamak|Reklam göstermek|Hız ölçmek
+M|Story paylaşımları genelde ne kadar süre görünür?|24 saat|1 saat|1 hafta|Süresiz
+T|YouTube'a yüklenen ilk video 'Me at the zoo' 2005'te yüklendi.|1
+T|WhatsApp'ta mavi tik mesajın okunduğunu gösterir.|1
+T|Google bir arama motorudur.|1
+T|'@' işaretine Türkçede 'et' denir.|1
+T|WhatsApp'ı Meta (Facebook) satın almıştır.|1
+T|İlk e-posta 1990'larda gönderildi.|0
+T|Bluetooth adını bir Viking kralından alır.|1
+T|TikTok bir Japon uygulamasıdır.|0
+T|Instagram'ı Meta (Facebook) satın almıştır.|1
+T|'Meme' kelimesini ilk kullanan Richard Dawkins'tir.|1
+T|'Phishing' bir dolandırıcılık yöntemidir.|1
+T|Wikipedia'yı yalnızca belirli kişiler düzenleyebilir.|0
+E|Twitter'ın (X) ilk karakter sınırı kaçtı?|140|20|karakter
+E|Wikipedia hangi yıl kuruldu?|2001|2|yıl
+E|Instagram hangi yıl yayına girdi?|2010|2|yıl
+E|İlk e-posta hangi yıl gönderildi?|1971|5|yıl
+E|Twitter hangi yıl kuruldu?|2006|2|yıl
+E|'Googol' sayısı 10 üzeri kaçtır?|100|10|üs
+E|Bir byte kaç bittir?|8|1|bit
+E|WhatsApp hangi yıl kuruldu?|2009|2|yıl
+J|🔋1️⃣%😱|Şarjın bitmek üzere olması|Wi-Fi şifresini unutmak|Mesajın görüldü kalması|Ekranın kırılması
+J|📶❌😤|İnternetin kopması|Şarjın bitmesi|Ekranın kırılması|Hesabın çalınması
+J|👀✔️✔️💬❌|Görüldü atılmak|Spam almak|Engellenmek|Mesajın silinmesi
+J|🔑❓😵|Şifreyi unutmak|Hesap açmak|Şifre değiştirmek|İki adımlı doğrulama
+J|📱👆♾️|Sonsuz kaydırma|Ekran görüntüsü|Telefonu kapatmak|Uygulama silmek
+J|🎥🔴👋|Canlı yayın|Story|Fotoğraf|Sesli mesaj
+J|🐦➡️❌|Twitter'ın adının X olması|Kuş gribi|Bir oyun|Kuşların göçü
+J|🤳✨🪄|Filtreli selfie|Fotoğraf makinesi|Ekran görüntüsü|Video arama
+A|Sesli mesaj|Yazılı mesaj
+A|Instagram|TikTok
+A|Görüldü atmak|Hemen cevaplamak
+A|Meme göndermek|Sticker göndermek
+A|Bildirim açık|Bildirim kapalı
+A|Karanlık mod|Aydınlık mod
+A|Android|iPhone
+A|Story atmak|Gönderi paylaşmak
+A|Yorum yazmak|Sadece beğenmek
+A|Gizli hesap|Açık hesap
+A|YouTube|Netflix
+A|Grup sohbeti|Birebir sohbet
+A|Emoji|Kelime
+A|Fotoğraf|Video
+A|Kulaklıkla video|Altyazıyla video
+A|Telefon|Bilgisayar
+A|Mesajı okumak|Bildirimden okumak
+A|Uzun mesaj|Kısa mesaj
+A|Arşivlemek|Silmek
+A|Takip etmek|Takip edilmek
+L|Telefonundaki en saçma uygulama ne?
+L|En son güldüğün meme neydi?
+L|Günde kaç saat telefonda geçiriyorsun?
+L|En çok kullandığın uygulama hangisi?
+L|Takip ettiğin en sevdiğin hesap türü?
+L|Karanlık mod mu aydınlık mod mu?
+L|Hangi emojiyi en çok kullanırsın?
+L|Sesli mesajcı mısın yazıcı mı?
+L|İnternette en son öğrendiğin ilginç şey?
+L|Bir trende katıldığın oldu mu?
+P|İnternette geçirdiğin en verimsiz gün nasıldı?
+P|Sosyal medyayı bıraksan en çok neyi özlerdin?
+P|İnternet olmasaydı hayatın nasıl olurdu?
+P|İnternetten tanışıp gerçek hayatta arkadaş olduğun biri var mı?
+P|Paylaşıp sonra sildiğin bir şey var mı?
+P|Sosyal medyada kendini olduğun gibi mi gösteriyorsun?
+P|İnternette seni en çok mutlu eden şey ne?
+P|Bir gün dijital detoks yapsan ne yapardın?
+P|İnternette yaşadığın en tatlı an?
+P|İnternetin sana öğrettiği bir beceri?
+B|Arama geçmişindeki en tuhaf şey ne?
+B|Birini gizlice stalkladığın oldu mu?
+B|Yanlış kişiye mesaj attığın oldu mu?
+B|Story'ne bakmasını beklediğin biri var mı?
+B|İnternette biriyle kavga ettiğin oldu mu?
+B|Bir paylaşımı yanlışlıkla beğenip panik yaptığın oldu mu?
+B|Ekran süresi raporunu görünce utandığın oldu mu?
+B|İnternette sahte hesap açtığın oldu mu?
+B|En son kimin profiline baktın?
+B|Telefonunu biri karıştırsa en çok neyden utanırdın?
+
+# cat:sehir
+M|İstanbul'da iki yakayı denizin altından bağlayan raylı sistem hangisidir?|Marmaray|Metrobüs|Teleferik|Füniküler
+M|45 plakası hangi ile aittir?|Manisa|Kahramanmaraş|Kütahya|Malatya
+M|06 plakası hangi ile aittir?|Ankara|Antalya|Adana|Aydın
+M|35 plakası hangi ile aittir?|İzmir|Kayseri|Kocaeli|Isparta
+M|16 plakası hangi ile aittir?|Bursa|Bolu|Denizli|Bilecik
+M|07 plakası hangi ile aittir?|Antalya|Ankara|Adana|Afyonkarahisar
+M|İstanbul Boğazı'nın üzerine yapılan ilk köprü hangisidir?|15 Temmuz Şehitler Köprüsü|Fatih Sultan Mehmet Köprüsü|Yavuz Sultan Selim Köprüsü|Galata Köprüsü
+M|Ankara'nın simgelerinden olan Atatürk'ün anıt mezarı hangisidir?|Anıtkabir|Galata Kulesi|Saat Kulesi|Kız Kulesi
+M|İzmir Karataş'taki ünlü tarihi yapı hangisidir?|Tarihi Asansör|Teleferik|Füniküler|Kız Kulesi
+M|Kapalıçarşı hangi şehirdedir?|İstanbul|Bursa|Ankara|Edirne
+M|Türkiye'de metrobüs ilk kez hangi şehirde kullanıldı?|İstanbul|Ankara|İzmir|Bursa
+M|Eskişehir'in ortasından akan akarsu hangisidir?|Porsuk Çayı|Sakarya Nehri|Kızılırmak|Gediz Nehri
+T|İzmir Saat Kulesi Konak Meydanı'ndadır.|1
+T|İstanbul'un plaka kodu 34'tür.|1
+T|Manisa, Spil Dağı ile bilinir.|1
+T|Ankara Türkiye'nin en kalabalık şehridir.|0
+T|Bursa, Uludağ'ın eteklerindedir.|1
+T|Kordon İzmir'dedir.|1
+T|Trabzon Ege Bölgesi'ndedir.|0
+T|İstanbul'daki Tünel, dünyanın en eski yeraltı füniküler hatlarındandır.|1
+T|Eskişehir'de Porsuk Çayı'nda gondol turu yapılabilir.|1
+T|Konya, Mevlana Müzesi ile bilinir.|1
+T|Antalya Akdeniz kıyısındadır.|1
+T|Kayseri, Erciyes Dağı'nın eteğindedir.|1
+E|İstanbul Boğazı yaklaşık kaç kilometre uzunluğundadır?|31|4|km
+E|Türkiye'nin nüfusu yaklaşık kaç milyondur?|85|5|milyon
+E|İstanbul'un nüfusu yaklaşık kaç milyondur?|15.6|2|milyon
+E|15 Temmuz Şehitler Köprüsü hangi yıl açıldı?|1973|3|yıl
+E|Marmaray hangi yıl açıldı?|2013|2|yıl
+E|İstanbul'daki tarihi Tünel hangi yıl açıldı?|1875|10|yıl
+E|Ankara hangi yıl başkent oldu?|1923|1|yıl
+E|Türkiye'de kaç büyükşehir belediyesi vardır?|30|2|belediye
+J|🚋❤️🏙️|İstiklal'deki nostaljik tramvay|Metrobüs|Vapur|Dolmuş
+J|⛴️🫖🐦|Vapurda çay içip martı izlemek|Uçak yolculuğu|Tren yolculuğu|Otobüs yolculuğu
+J|🚌😤⏰|Trafikte beklemek|Erken varmak|Yürüyüş yapmak|Bisiklete binmek
+J|🌉🌊🌃|Boğaz manzarası|Kapadokya|Pamukkale|Uludağ
+J|🚕🟡|Taksi|Dolmuş|Metrobüs|Minibüs
+J|🚇💳📲|Toplu taşıma kartı basmak|Market alışverişi|Banka işlemi|Bilet iadesi
+J|🛶🌳🏙️|Eskişehir Porsuk'ta gondol|Kapadokya balon turu|Boğaz turu|Abant Gölü
+J|🚡🏔️🌲|Uludağ teleferiği|Metro|Tramvay|Füniküler
+A|Metro|Otobüs
+A|Büyük şehir|Küçük kasaba
+A|Yürüyerek|Taksiyle
+A|Merkez|Sakin semt
+A|Vapur|Köprü
+A|Apartman|Müstakil ev
+A|Bisiklet|Scooter
+A|Sahil|Park
+A|Gece hayatı|Sabah kahvaltısı
+A|Kafe|Ev
+A|İstanbul|İzmir
+A|Ankara|Eskişehir
+A|Kalabalık sokak|Boş sokak
+A|Tarihi semt|Modern semt
+A|Yürüyen merdiven|Merdiven
+A|Pencere kenarı koltuk|Ayakta yolculuk
+A|AVM|Çarşı
+A|Rüzgârlı şehir|Yağmurlu şehir
+A|Kendi arabası|Toplu taşıma
+A|Gökdelen|Tarihi bina
+L|Hangi şehirde yaşıyorsun ya da büyüdün?
+L|Yaşadığın şehrin en sevdiğin köşesi?
+L|Şehrinin en meşhur yemeği ne?
+L|En sık kullandığın ulaşım aracı?
+L|Şehrinde en sevdiğin mevsim?
+L|Hiç yaşamadığın ama merak ettiğin şehir?
+L|Yürüyüş yapmayı en sevdiğin yer?
+L|Şehrinde en sevdiğin kafe?
+L|Sabah işe ya da okula nasıl gidiyorsun?
+L|Şehrinin en güzel manzarası nereden görülür?
+P|Toplu taşımada başına gelen en garip şey?
+P|Hiç taşınmak istediğin bir şehir var mı?
+P|Büyüdüğün şehri özlüyor musun?
+P|Şehrinde değiştirmek istediğin bir şey?
+P|Kendini 'evinde' hissettiğin şehir hangisi?
+P|Taşındığın bir şehirde yaşadığın ilk gün nasıldı?
+P|Şehirde kaybolduğun oldu mu?
+P|Hangi semtte yaşamak senin hayalin?
+P|Doğduğun şehirle ilgili en güzel anın?
+P|Şehir hayatı mı köy hayatı mı, neden?
+B|Şehrinde 'turistler bilmesin' dediğin gizli bir yer?
+B|Bir şehirde yalnız kalsan ilk ne yapardın?
+B|Toplu taşımada rezil olduğun an?
+B|Yanlış otobüse binip nereye gittin?
+B|Gece yarısı şehirde yaptığın en çılgın şey?
+B|Şehrinle ilgili herkesin bildiği ama yanlış olan şey?
+B|Bir şehirden kaçarcasına taşındığın oldu mu?
+B|Kendi şehrinde turist gibi gezdiğin oldu mu?
+B|Toplu taşımada birini gizlice dinlediğin oldu mu?
+B|Şehrinin en kötü özelliği ne, dürüst ol?
+
+# cat:kultur
+M|'Damlaya damlaya …' atasözünü tamamla.|göl olur|deniz olur|taşar|biter
+M|Hıdırellez hangi tarihte kutlanır?|5–6 Mayıs|21 Mart|23 Nisan|1 Eylül
+M|'Ayağını yorganına göre …' atasözünü tamamla.|uzat|kıs|ört|sar
+M|'Komşu komşunun … muhtaçtır' atasözünü tamamla.|külüne|ekmeğine|suyuna|tuzuna
+M|'Ak akçe kara gün …' atasözünü tamamla.|içindir|gelir|biter|yetmez
+M|Kına gecesi genelde hangi etkinlikten önce yapılır?|Düğün|Bayram|Mezuniyet|Doğum günü
+M|Nevruz hangi tarihte kutlanır?|21 Mart|5 Mayıs|1 Ocak|29 Ekim
+M|Ebru nedir?|Su üzerine boyayla yapılan bir sanat|Halı dokuma tekniği|Bir çini türü|Bir hat yazısı
+M|Mehter takımı hangi dönemle özdeşleşmiştir?|Osmanlı|Bizans|Roma|Cumhuriyet
+M|Zeybek hangi bölgenin halk oyunudur?|Ege|Karadeniz|Doğu Anadolu|Marmara
+M|Horon hangi bölgenin halk oyunudur?|Karadeniz|Ege|İç Anadolu|Akdeniz
+M|Halay en çok hangi bölgelerle özdeşleşir?|Doğu ve Güneydoğu Anadolu|Ege ve Marmara|Karadeniz|Trakya
+T|Nasreddin Hoca, Akşehir ile özdeşleşmiştir.|1
+T|Karagöz ve Hacivat bir gölge oyunudur.|1
+T|Yunus Emre bir halk ozanı ve şairdir.|1
+T|Dede Korkut Hikâyeleri bir halk hikâyeleri derlemesidir.|1
+T|Kurban Bayramı dört gündür.|1
+T|Ramazan Bayramı'na Şeker Bayramı da denir.|1
+T|Türk hamamında kese yapılır.|1
+T|Nazar boncuğu genellikle kırmızı renktedir.|0
+T|Cumhuriyet Bayramı 29 Ekim'de kutlanır.|1
+T|23 Nisan, Ulusal Egemenlik ve Çocuk Bayramı'dır.|1
+T|Âşık Veysel bir halk ozanıdır.|1
+T|Kırkpınar Güreşleri Konya'da yapılır.|0
+E|Mimar Sinan'ın Selimiye Camii hangi yıl tamamlandı?|1575|10|yıl
+E|İstanbul hangi yıl fethedildi?|1453|5|yıl
+E|Malazgirt Savaşı hangi yıl yapıldı?|1071|10|yıl
+E|Ayasofya'nın bugünkü yapısı hangi yıl tamamlandı?|537|20|yıl
+E|Atatürk hangi yıl doğdu?|1881|2|yıl
+E|Topkapı Sarayı hangi yıl müzeye dönüştürüldü?|1924|3|yıl
+E|Soyadı Kanunu hangi yıl çıkarıldı?|1934|2|yıl
+E|Karagöz UNESCO listesine hangi yıl girdi?|2009|2|yıl
+J|🧿|Nazar boncuğu|Göz damlası|Mavi küpe|Pusula
+J|👰💃🌿|Kına gecesi|Nişan|Mezuniyet|Doğum günü
+J|🍬👋👴|Bayramda el öpüp şeker almak|Doğum günü|Yılbaşı|Karne günü
+J|🌹🌳📝|Hıdırellez'de gül ağacına dilek asmak|Yılbaşı|Doğum günü|Sevgililer Günü
+J|☕🔮|Kahve falı|Tarot|El falı|Yıldız falı
+J|🎭🕯️👥|Karagöz ve Hacivat|Opera|Bale|Sinema
+J|🛁🧽🔥|Türk hamamı|Sauna|Kaplıca|Yüzme havuzu
+J|🌙🥁🍽️|Sahur davulcusu|Mehter|Düğün|Bando
+A|Çay|Türk kahvesi
+A|Bayramda gezmek|Bayramda tatil
+A|Düğünde oynamak|Masada oturmak
+A|Akraba ziyareti|Arkadaş buluşması
+A|Mangal|Piknik sepeti
+A|Kahve falı|Fal yok
+A|Halay|Zeybek
+A|Horon|Çiftetelli
+A|Nasreddin Hoca|Keloğlan
+A|Karagöz|Hacivat
+A|Kına gecesi|Bekarlığa veda
+A|Bayram harçlığı|Bayram şekeri
+A|Türk hamamı|Sauna
+A|Türkü|Şarkı
+A|Ramazan pidesi|Simit
+A|Köy düğünü|Salon düğünü
+A|Aşure|Sütlaç
+A|Lokum|Baklava
+A|Bayram sabahı erken|Bayram sabahı geç
+A|Masal dinlemek|Masal anlatmak
+L|Bayramlarda en sevdiğin şey ne?
+L|Akrabaların sorduğu en klasik soru ne?
+L|En sevdiğin atasözü ya da deyim?
+L|Halay çekmeyi bilir misin?
+L|Kahve falına inanır mısın?
+L|En sevdiğin türkü hangisi?
+L|Ailende en çok kutlanan gün hangisi?
+L|Bayram sabahı ilk ne yaparsın?
+L|Hangi geleneksel tatlıyı seversin?
+L|Düğünlerde masa mı pist mi?
+P|Ailenden aldığın ve sevdiğin bir gelenek?
+P|Hangi geleneğin devam etmesini istersin?
+P|Büyüklerinden öğrendiğin en değerli şey?
+P|Kendi çocuklarına aktarmak istediğin bir gelenek?
+P|Bayramların eskisi gibi olmadığını düşünüyor musun?
+P|Bir düğünde yaşadığın en duygusal an?
+P|Ailende anlatılan en ilginç hikâye?
+P|Kültürel olarak seni en çok temsil eden şey?
+P|Başka bir kültürden aldığın bir alışkanlık var mı?
+P|Dedenden ya da ninenden aklında kalan bir söz?
+B|Hangi geleneği bitirmek isterdin?
+B|Bir düğünde yaşadığın en komik an?
+B|Ailende kimseye anlatamadığın bir fikrin var mı?
+B|Akrabalardan kaçmak için yaptığın en yaratıcı bahane?
+B|Bayram harçlığını en çok kimden alırdın?
+B|Bir aile yemeğinde patlak veren en büyük tartışma?
+B|Kına gecesinde ya da düğünde rezil olduğun oldu mu?
+B|Kahve falında sana söylenen ve çıkan bir şey oldu mu?
+B|Ailenin sana en çok baskı yaptığı konu ne?
+B|Akrabalara söylemek istediğin ama söyleyemediğin şey?
+
+# cat:alisveris
+M|Barkodu 868 veya 869 ile başlayan ürünler hangi ülkenin kodunu taşır?|Türkiye|Almanya|Çin|İtalya
+M|Etikette üstü çizili fiyat genelde neyi gösterir?|İndirim öncesi fiyatı|Kargo ücretini|Taksit tutarını|KDV'yi
+M|Fatura nedir?|Satışı gösteren resmi belge|Garanti belgesi|İade formu|Sipariş notu
+M|KDV'nin açılımı nedir?|Katma Değer Vergisi|Kazanç Devlet Vergisi|Kurumsal Değer Vergisi|Kâr Dağıtım Vergisi
+M|Türkiye'de yeni ürünlerde yasal garanti süresi en az kaç yıldır?|2|1|3|5
+M|Kargo takip numarası ne işe yarar?|Paketin nerede olduğunu görmek|İndirim almak|Faturayı ödemek|Ürünü iade etmek
+M|Kupon kodu ne işe yarar?|İndirim almak|Kargoyu takip etmek|Şifre sıfırlamak|Garanti uzatmak
+M|Black Friday hangi ayda olur?|Kasım|Aralık|Ekim|Ocak
+M|Euro'nun sembolü hangisidir?|€|£|$|¥
+M|Sterlin hangi ülkenin para birimidir?|Birleşik Krallık|ABD|Kanada|Avustralya
+M|Yen hangi ülkenin para birimidir?|Japonya|Çin|Kore|Tayland
+M|Kapıda ödeme ne demektir?|Ürünü teslim alırken ödemek|Önceden ödemek|Taksitle ödemek|Kuponla ödemek
+T|İnternetten alınan çoğu üründe 14 gün içinde cayma hakkı vardır.|1
+T|Taksit, bir ödemenin parçalara bölünerek yapılmasıdır.|1
+T|İade için genelde fiş veya fatura istenir.|1
+T|Euro, Avrupa Birliği'ne üye tüm ülkelerde kullanılır.|0
+T|Kredi kartı ile banka kartı aynı şeydir.|0
+T|İkinci el ürünler 'sıfır' ürün olarak satılır.|0
+T|Kapalıçarşı dünyanın en eski kapalı çarşılarından biridir.|1
+T|Semt pazarlarında pazarlık yaygındır.|1
+T|Türkiye'deki IBAN numaraları TR ile başlar.|1
+T|İade edilen ürünün kargo ücretini her durumda müşteri öder.|0
+T|Adres çubuğundaki kilit simgesi şifreli bağlantıyı gösterir.|1
+T|Türk lirası sembolü ₺'dir.|1
+E|Türk lirasından altı sıfır hangi yıl atıldı?|2005|1|yıl
+E|₺ sembolü hangi yıl kabul edildi?|2012|1|yıl
+E|Amazon hangi yıl kuruldu?|1994|2|yıl
+E|eBay hangi yıl kuruldu?|1995|2|yıl
+E|Türkiye'de bir IBAN kaç karakterden oluşur?|26|2|karakter
+E|Bir kredi kartı numarası genelde kaç hanelidir?|16|2|hane
+E|Standart EAN-13 barkod kaç hanelidir?|13|1|hane
+E|Kapalıçarşı'nın yapımına yaklaşık hangi yıl başlandı?|1461|15|yıl
+J|🛒➡️😴❌|Ürünleri sepette unutmak|İade etmek|Kargo beklemek|Kupon kullanmak
+J|📦🚚⏳|Kargo beklemek|Taşınmak|İade etmek|Market alışverişi
+J|🏷️🔥%|Büyük indirim|Zam|Vergi|Tükendi
+J|💳💸😱|Kart ekstresi şoku|Maaş günü|Para bulmak|Hediye almak
+J|🧾↩️📦|Ürün iadesi|Yeni sipariş|Kargo takibi|Fatura ödemek
+J|🍅🧺🗣️|Semt pazarı|AVM|Online alışveriş|Kuyumcu
+J|🛍️🛍️🛍️🏬|AVM gezmesi|Pazar alışverişi|Online sipariş|Market kuyruğu
+J|🤝💬💰|Pazarlık|Kredi çekmek|Bağış yapmak|Fatura ödemek
+A|Mağaza|Online
+A|İndirimi beklemek|Hemen almak
+A|Nakit|Kart
+A|Marka|Uygun fiyat
+A|Liste yapmak|Gezerken karar vermek
+A|Semt pazarı|Süpermarket
+A|Hediye almak|Hediye vermek
+A|Biriktirmek|Harcamak
+A|Kıyafet|Teknoloji
+A|Deneme kabini|Evde denemek
+A|Yeni ürün|İkinci el
+A|AVM|Çarşı
+A|Tek başına alışveriş|Arkadaşla alışveriş
+A|Kargo beklemek|Mağazadan almak
+A|Pazarlık yapmak|Etiket fiyatı
+A|Sepete atıp unutmak|Hemen ödemek
+A|Kupon avcısı|Umursamaz
+A|Fiş saklamak|Fişi atmak
+A|Hediye kartı|Nakit hediye
+A|Kara Cuma|Yılbaşı indirimi
+L|Son aldığın şey ne?
+L|En sevdiğin mağaza ya da site?
+L|Alışverişte nakit mi kart mı?
+L|İndirim kollar mısın?
+L|Alışverişi sever misin, nefret mi edersin?
+L|En son kendine aldığın hediye?
+L|Online mı mağaza mı?
+L|Market alışverişinde ilk aldığın şey?
+L|En çok neye para harcıyorsun?
+L|Koleksiyon yaptığın bir şey var mı?
+P|Pişman olduğun en saçma alışveriş?
+P|1 milyon bulsan ilk ne alırdın?
+P|Seni gerçekten mutlu eden en iyi alışverişin?
+P|Para biriktirmeyi nasıl yapıyorsun?
+P|İlk maaşınla ne aldın ya da alacaksın?
+P|Hiç bir şeyi uzun süre bekleyip sonunda aldın mı?
+P|Para harcarken seni en çok ne düşündürür?
+P|Ailenden para konusunda öğrendiğin bir şey?
+P|Sence parayla mutluluk alınır mı?
+P|En anlamlı hediye aldığın an?
+B|Sepette bekleyen ama alamadığın ürün ne?
+B|Birine aldığın en kötü hediye neydi?
+B|Gizlice aldığın ve kimseye söylemediğin bir şey?
+B|Hiç bir ürünü kullanıp iade ettin mi?
+B|Pazarlıkta rezil olduğun an?
+B|Bir alışverişte bütçeyi en çok aştığın an?
+B|Gelen hediyeyi başkasına hediye ettiğin oldu mu?
+B|Kartın reddedildiğinde ne hissettin?
+B|Hiç bir indirim için saatlerce kuyrukta bekledin mi?
+B|En gereksiz harcaman neydi, dürüst ol?

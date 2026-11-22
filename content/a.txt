@@ -1,0 +1,367 @@
+# cat:mutfak
+M|İskender kebap en çok hangi şehirle özdeşleşmiştir?|Bursa|Adana|Gaziantep|Konya
+M|Menemen adını aldığı Menemen ilçesi hangi ildedir?|İzmir|Manisa|Aydın|Muğla
+M|Künefe geleneksel olarak hangi peynirle yapılır?|Tuzsuz künefe peyniri|Eski kaşar|Tulum peyniri|Lor
+M|Baklava denince akla ilk gelen şehir hangisidir?|Gaziantep|Trabzon|Edirne|Sinop
+M|Pişmaniye en çok hangi ille özdeşleşmiştir?|Kocaeli|Bolu|Afyonkarahisar|Bursa
+M|Afyonkarahisar'ın meşhur ürünlerinden biri hangisidir?|Kaymak|Fındık|Çay|Zeytin
+M|Hamsi en çok hangi bölgeyle özdeşleşir?|Karadeniz|Ege|İç Anadolu|Doğu Anadolu
+M|Sushi hangi ülkenin mutfağına aittir?|Japonya|Çin|Kore|Tayland
+M|Guacamole'nin ana malzemesi nedir?|Avokado|Patlıcan|Nohut|Kabak
+M|Humusun ana malzemesi nedir?|Nohut|Mercimek|Fasulye|Bulgur
+M|Paella hangi ülkenin yemeğidir?|İspanya|İtalya|Portekiz|Meksika
+M|Tiramisu hangi ülkenin tatlısıdır?|İtalya|Fransa|Avusturya|İsviçre
+T|Mantı, Kayseri mutfağıyla özdeşleşmiş bir yemektir.|1
+T|Domates aslen Amerika kıtasından dünyaya yayılmıştır.|1
+T|Patates Güney Amerika kökenlidir.|1
+T|Kahve bitkisinin anavatanı Etiyopya bölgesi olarak bilinir.|1
+T|Lahmacun geleneksel olarak fırında pişirilir.|1
+T|Bal doğru saklanırsa çok uzun süre bozulmaz.|1
+T|Mozzarella aslen bir Fransız peyniridir.|0
+T|Simitin üzerine genellikle haşhaş serpilir.|0
+T|Ayran yoğurt, su ve tuzla yapılır.|1
+T|Wasabi Japon mutfağına aittir.|1
+T|Geleneksel tavuk göğsü tatlısında tavuk eti kullanılır.|1
+T|Sütlaç fırında da yapılabilir.|1
+E|Türk kahvesi kültürü UNESCO Somut Olmayan Kültürel Miras listesine hangi yıl girdi?|2013|2|yıl
+E|Keşkek geleneği UNESCO listesine hangi yıl girdi?|2011|2|yıl
+E|Manisa Mesir Macunu Festivali UNESCO listesine hangi yıl girdi?|2012|2|yıl
+E|Su deniz seviyesinde kaç °C'de kaynar?|100|5|°C
+E|Bir yemek kaşığı yaklaşık kaç ml'dir?|15|5|ml
+E|Orta boy bir yumurta yaklaşık kaç gramdır?|58|10|gram
+E|Margherita pizzanın ortaya çıktığı kabul edilen yıl?|1889|10|yıl
+E|Bir düzine kaç adettir?|12|1|adet
+J|🍆🥩🍅|Karnıyarık|Menemen|Lahmacun|Mantı
+J|🍳🍅🌶️|Menemen|Omlet|Haşlanmış yumurta|Kumpir
+J|🥔🧀🌽|Kumpir|Patates püresi|Mısır gevreği|Börek
+J|🍕🇮🇹|Pizza|Döner|Paella|Sushi
+J|🐟🥖🌊|Balık ekmek|Midye dolma|Hamsi pilav|Kokoreç
+J|🥟🧄🥛|Mantı|Gözleme|Sigara böreği|Pide
+J|🍉🧀☀️|Karpuz-peynir|Meyve salatası|Smoothie|Kahvaltı tabağı
+J|☕🍬🇹🇷|Kahve yanında lokum|Çay ve simit|Sahlep ve tarçın|Boza ve leblebi
+A|Menemen soğanlı|Menemen soğansız
+A|Tatlı|Tuzlu
+A|Ev yemeği|Dışarıda yemek
+A|Çay|Kahve
+A|Pizza|Lahmacun
+A|Çorba|Salata
+A|Acılı|Acısız
+A|Kahvaltı|Akşam yemeği
+A|Döner|Pide
+A|Baklava|Sütlaç
+A|Pilav|Makarna
+A|Ketçap|Mayonez
+A|Meyve|Çikolata
+A|Yemek yapmak|Bulaşık yıkamak
+A|Ayran|Kola
+A|Simit|Poğaça
+A|Mantı|İçli köfte
+A|Su böreği|Sigara böreği
+A|Fast food|Sokak lezzeti
+A|Kızartma|Fırın
+L|Hayatında yediğin en iyi şey neydi, nerede?
+L|Hiç yemem dediğin bir yemek var mı?
+L|Kahvaltıda olmazsa olmazın ne?
+L|En sevdiğin sokak lezzeti hangisi?
+L|Yemek yapmayı sever misin, en iyi yaptığın şey ne?
+L|Tatlıcı mısın tuzlucu mu?
+L|En son nerede dışarıda yemek yedin, nasıldı?
+L|Gece canın çekince ne yersin?
+L|Hiç denemediğin ama merak ettiğin bir mutfak var mı?
+L|Çayını nasıl içersin?
+P|Sadece bir yemek yiyebilsen ömür boyu ne olurdu, neden?
+P|Senin için 'ev' kokusu hangi yemek?
+P|Ailende kimin yemekleri efsanedir?
+P|Hangi yemek sana bir anıyı hatırlatıyor?
+P|Kendi restoranını açsan ne tür bir yer olurdu?
+P|Moralin bozukken ne yemek istersin?
+P|Bir yemeği sevmeye başladığın an hangisiydi?
+P|Biriyle tanışmak için en iyi yemek mekânı neresidir sence?
+P|Yemekle ilgili sahip olduğun tuhaf bir alışkanlık var mı?
+P|Seyahatte yediğin ve unutamadığın yemek?
+B|Mutfakta yaşadığın en büyük felaket neydi?
+B|Birine yemek yapmak istesen hangi yemeği yapardın, kime?
+B|Yemeğini beğenmediğin birine yalan söyleyip 'çok güzel' dedin mi?
+B|Bir yemek yüzünden hiç kavga ettin mi?
+B|Hiç birinin yemeğinden gizlice yedin mi?
+B|En utanç verici yemek siparişin neydi?
+B|Bir buluşmada yemekle ilgili rezil olduğun oldu mu?
+B|İtiraf et: hangi yemeği tencereden yersin?
+B|Hayatında yaptığın en garip yemek kombinasyonu ne?
+B|Bir yemek uğruna gittiğin en uzak yer neresi?
+
+# cat:muzik
+M|Hangisi bir Barış Manço şarkısıdır?|Gülpembe|Firuze|Şımarık|Bir Derdim Var
+M|Türkiye Eurovision'u hangi yıl kazandı?|2003|2001|2005|1999
+M|Türkiye'ye Eurovision birinciliğini getiren sanatçı kimdir?|Sertab Erener|Sezen Aksu|Ajda Pekkan|Hadise
+M|'Bir Derdim Var' hangi grubun şarkısıdır?|mor ve ötesi|Duman|maNga|Athena
+M|Bağlama hangi çalgı ailesindendir?|Telli|Vurmalı|Nefesli|Tuşlu
+M|Ney nasıl bir çalgıdır?|Nefesli|Telli|Vurmalı|Tuşlu
+M|'Megastar' lakabıyla bilinen sanatçı kimdir?|Tarkan|Mustafa Sandal|Kenan Doğulu|Murat Boz
+M|'Süperstar' lakabıyla bilinen sanatçı kimdir?|Ajda Pekkan|Sezen Aksu|Nilüfer|Hande Yener
+M|'Minik Serçe' lakabıyla bilinen sanatçı kimdir?|Sezen Aksu|Ajda Pekkan|Sertab Erener|Candan Erçetin
+M|The Beatles hangi şehirde kuruldu?|Liverpool|Manchester|Londra|Birmingham
+M|Bir orkestrayı yöneten kişiye ne denir?|Şef|Solist|Bestekâr|Aranjör
+M|Standart bir klasik gitarda kaç tel vardır?|6|4|5|7
+T|Standart bir piyanoda 88 tuş bulunur.|1
+T|Bağlama vurmalı bir çalgıdır.|0
+T|Mozart Avusturyalı bir bestecidir.|1
+T|Beethoven ileri yaşlarında işitme kaybı yaşamıştır.|1
+T|Darbuka vurmalı bir çalgıdır.|1
+T|Keman yaylı bir çalgıdır.|1
+T|maNga, Eurovision 2010'da ikinci oldu.|1
+T|Zeki Müren 'Sanat Güneşi' olarak anılır.|1
+T|Michael Jackson 'Pop'un Kralı' olarak anılır.|1
+T|Do-re-mi dizisinde 7 temel nota vardır.|1
+T|Elvis Presley İngiliz bir şarkıcıdır.|0
+T|Kontrbas kemandan daha küçük bir çalgıdır.|0
+E|Tarkan'ın 'Ölürüm Sana' albümü hangi yıl çıktı?|1997|2|yıl
+E|The Beatles hangi yıl kuruldu?|1960|3|yıl
+E|Mozart hangi yıl doğdu?|1756|10|yıl
+E|Bir oktavda kaç yarım ses vardır?|12|1|yarım ses
+E|Zeki Müren hangi yıl vefat etti?|1996|2|yıl
+E|MTV yayına hangi yıl başladı?|1981|2|yıl
+E|Eurovision ilk kez hangi yıl düzenlendi?|1956|3|yıl
+E|Türkiye Eurovision'a ilk kez hangi yıl katıldı?|1975|2|yıl
+J|😘💋🕺|Tarkan – Şımarık|Sezen Aksu – Firuze|MFÖ – Ele Güne Karşı|mor ve ötesi – Bir Derdim Var
+J|🎸🔥🤘|Rock|Caz|Klasik müzik|Arabesk
+J|🎻🎼🎩|Klasik müzik|Rap|Halk müziği|Pop
+J|🎤🧢🎧|Rap|Opera|Türk sanat müziği|Caz
+J|🎷🌃🎹|Caz|Rock|Halk müziği|Metal
+J|🌹🎙️💔|Arabesk|Disko|Rap|Caz
+J|🪩🕺✨|Disko|Opera|Halk müziği|Blues
+J|🥁⚔️🐎|Mehter|Bando|Caz|Rock
+A|Kulaklık|Hoparlör
+A|Konser|Festival
+A|Türkçe pop|Yabancı müzik
+A|Eski şarkılar|Yeni çıkanlar
+A|Şarkı söylemek|Dans etmek
+A|Spotify|YouTube
+A|Rock|Pop
+A|Rap|Arabesk
+A|Duşta şarkı|Arabada şarkı
+A|Akustik|Elektronik
+A|Sözlü|Enstrümantal
+A|Gitar|Piyano
+A|Karaoke|Dinleyici olmak
+A|Hüzünlü şarkı|Hareketli şarkı
+A|Playlist hazırlamak|Karışık çalmak
+A|Canlı performans|Stüdyo kaydı
+A|Yerli rap|Yabancı rap
+A|Sabah müziği|Gece müziği
+A|Plak|Dijital
+A|Tek sanatçı|Grup
+L|Şu an en çok dinlediğin şarkı ne?
+L|Hangi sanatçının konserine ışınlanmak isterdin?
+L|Spor yaparken ne dinlersin?
+L|En son keşfettiğin şarkı ne?
+L|Bir enstrüman çalabilseydin hangisi olurdu?
+L|Yol şarkın hangisi?
+L|En sevdiğin müzik türü ne?
+L|Hiç konsere gittin mi, hangisi?
+L|Sabah uyanınca açtığın şarkı?
+L|Hangi şarkının sözlerini ezbere bilirsin?
+P|Utandığın ama gizlice dinlediğin şarkı hangisi?
+P|Hangi şarkı seni belli bir anıya götürüyor?
+P|Hayatının film müziği olsa hangi şarkı olurdu?
+P|Çocukken dinlediğin ve hâlâ sevdiğin şarkı?
+P|Moralin bozukken hangi şarkıyı açarsın?
+P|Bir şarkı yüzünden birine aşık olduğun oldu mu?
+P|Ailende müzik zevki en iyi olan kim?
+P|Bir şarkı yazacak olsan konusu ne olurdu?
+P|Hangi sanatçıyla bir gün geçirmek isterdin?
+P|Seni en çok motive eden şarkı?
+B|Biri playlistini açsa seninle ilgili ne öğrenir?
+B|En son hangi şarkıda ağladın ya da duygulandın?
+B|Karaokede en çok rezil olduğun an?
+B|Hiç birine şarkı ithaf ettin mi?
+B|Eski sevgiliyi hatırlatan şarkı var mı?
+B|Kimsenin bilmediği bir müzik yeteneğin var mı?
+B|Herkesin sevdiği ama senin dayanamadığın şarkı?
+B|Bir konserde yaptığın en çılgın şey?
+B|Birinin müzik zevkine bakıp yargıladığın oldu mu?
+B|Sahneye çıksan hangi şarkıyı söylerdin?
+
+# cat:nostalji
+M|Tamagotchi neydi?|Dijital sanal evcil hayvan oyuncağı|Bir şeker markası|Bir çizgi film|Bir el konsolu oyunu
+M|MSN Messenger'da karşı tarafın penceresini sallayan özelliğin adı neydi?|Titreşim|Ping|Dürtme|Zil
+M|Tazolar genelde neyin içinden çıkardı?|Cips paketleri|Gazeteler|Süt kutuları|Ders kitapları
+M|Nokia 3310'un efsane oyunu hangisidir?|Yılan|Tetris|Pac-Man|Mario
+M|Eski tuşlu telefonlarda T9 ne işe yarardı?|Tuşlarla hızlı yazı yazmak|Fotoğraf çekmek|Müzik dinlemek|Arama kaydetmek
+M|90'larda internete bağlanırken çıkan cızırtılı ses neden çıkardı?|Çevirmeli modem|Faks makinesi|Kablosuz modem|Bluetooth
+M|Atari salonlarında oyun oynamak için genelde ne kullanılırdı?|Jeton|Kart|QR kod|Bilet
+M|Winamp ne tür bir programdı?|Müzik çalar|İnternet tarayıcısı|Antivirüs|Oyun
+M|hi5 ne tür bir siteydi?|Sosyal ağ|Arama motoru|Oyun sitesi|E-ticaret
+M|Ankesörlü telefonlarda arama yapmak için ne kullanılırdı?|Jeton veya telefon kartı|Kredi kartı|SIM kart|QR kod
+M|Walkman'i üreten şirket hangisidir?|Sony|Philips|Nokia|Samsung
+M|Nokia hangi ülkenin şirketidir?|Finlandiya|İsveç|Japonya|Almanya
+T|Klasik 3,5 inçlik disket yaklaşık 1,44 MB veri saklar.|1
+T|YTL (Yeni Türk Lirası) 2005 yılında kullanılmaya başlandı.|1
+T|DVD, VHS kasetlerden önce çıktı.|0
+T|İlk SMS 1990'ların başında gönderildi.|1
+T|Windows 95 adını çıktığı yıldan aldı.|1
+T|Euro banknotları 2002'de tedavüle girdi.|1
+T|MSN Messenger'ın yerini Skype aldı.|1
+T|Pokémon kartları 90'ların sonunda çok popülerdi.|1
+T|PlayStation 2, PlayStation 3'ten önce çıktı.|1
+T|Tetris ilk kez 2000'lerde çıktı.|0
+T|Kasetlerin A ve B olmak üzere iki yüzü vardı.|1
+T|Y2K korkusu 2000 yılına geçişle ilgiliydi.|1
+E|Türkiye'de GSM ile cep telefonu hizmeti hangi yıl başladı?|1994|2|yıl
+E|İlk iPhone hangi yıl tanıtıldı?|2007|2|yıl
+E|Google hangi yıl kuruldu?|1998|2|yıl
+E|Facebook hangi yıl kuruldu?|2004|2|yıl
+E|YouTube hangi yıl kuruldu?|2005|2|yıl
+E|Nokia 3310 hangi yıl çıktı?|2000|2|yıl
+E|MSN Messenger hangi yıl çıktı?|1999|2|yıl
+E|Standart bir CD'ye yaklaşık kaç dakika müzik sığar?|80|6|dakika
+J|📼⏪✏️|Kaseti kalemle geri sarmak|Disket formatlamak|Walkman tamir etmek|CD yazdırmak
+J|💾|Disket|Kaset|CD|Flash bellek
+J|🐍📱|Yılan oyunu|Tetris|Angry Birds|Candy Crush
+J|🕹️🪙|Atari salonu|İnternet kafe|Lunapark|Bilardo salonu
+J|💿🔥|CD yazdırmak|Disket formatlamak|DVD izlemek|Kaset kopyalamak
+J|🎞️📸🏪|Fotoğrafları fotoğrafçıda bastırmak|Polaroid çekmek|Selfie çekmek|Video kaydetmek
+J|⌨️💻🏪|İnternet kafe|Atari salonu|Kırtasiye|Bilgisayar dersi
+J|🎧📼🚶|Walkman|iPod|Radyo|Telsiz
+A|Atari salonu|İnternet kafe
+A|Kaset|CD
+A|Çizgi film|Sokak oyunu
+A|Tazo|Sticker albümü
+A|MSN|Facebook
+A|Saklambaç|Yakan top
+A|Misket|Uçurtma
+A|Tuşlu telefon|Kapaklı telefon
+A|Sabah çizgi filmleri|Akşam dizileri
+A|Yılan|Tetris
+A|Gazoz kapağı|Sakız resmi
+A|Bakkal|Market
+A|Mahalle maçı|Bilgisayar oyunu
+A|Kaset kiralamak|TV'de film beklemek
+A|Mektup|SMS
+A|Atari|PlayStation
+A|İp atlama|Seksek
+A|Okul pikniği|Okul gezisi
+A|Ankesörlü telefon|Ev telefonu
+A|Radyo|Walkman
+L|Çocukken en sevdiğin çizgi film hangisiydi?
+L|Çocukken en sevdiğin oyuncak neydi?
+L|İlk cep telefonun hangisiydi?
+L|Çocukken en sevdiğin atıştırmalık neydi?
+L|Mahallede en çok oynadığın oyun?
+L|İlk bilgisayarını hatırlıyor musun?
+L|MSN kullanıcı adın ne kadar utanç vericiydi?
+L|Çocukken koleksiyon yaptığın bir şey var mıydı?
+L|Bayramlarda en sevdiğin şey neydi?
+L|İlk oynadığın video oyunu?
+P|Çocukken çok istediğin ama alınmayan şey neydi?
+P|Çocukluğundan bir günü tekrar yaşayabilsen hangisi olurdu?
+P|Küçükken büyüyünce ne olacağını söylerdin, ne kadar yaklaştın?
+P|Çocukluğunda seni en çok etkileyen kişi kimdi?
+P|Çocukken korktuğun ama şimdi güldüğün şey?
+P|En sevdiğin çocukluk anın?
+P|Çocukluk arkadaşınla hâlâ görüşüyor musun?
+P|Küçükken yaşadığın ev nasıldı?
+P|Çocukken kendine verdiğin bir söz var mıydı?
+P|Çocukluğundan geri getirmek istediğin bir şey?
+B|Çocukken yaptığın ve hâlâ kimsenin bilmediği bir yaramazlık?
+B|Çocukken en büyük yalanın neydi?
+B|Okuldan kaçtığın oldu mu, ne yaptın?
+B|Çocukken başına gelen en utanç verici an?
+B|Ailene söylemeden gizlice yaptığın bir şey?
+B|Çocukken birinin oyuncağını kırıp sakladığın oldu mu?
+B|İlk aşkını hatırlıyor musun?
+B|Çocukken en çok ceza aldığın olay?
+B|Küçükken inandığın en saçma şey?
+B|Eski fotoğraflarında en çok neye gülüyorsun?
+
+# cat:okul
+M|Türkiye'de üniversite giriş sınavını hangi kurum düzenler?|ÖSYM|YÖK|MEB|TÜBİTAK
+M|Bir üniversitede 'dekan' neyin yöneticisidir?|Fakülte|Bölüm|Rektörlük|Yurt
+M|YÖK'ün açılımı nedir?|Yükseköğretim Kurulu|Yüksek Öğrenim Kurumu|Yeni Öğretim Kurulu|Yükseköğretim Komisyonu
+M|Bir üniversitenin en üst yöneticisi kimdir?|Rektör|Dekan|Müdür|Bölüm başkanı
+M|Lisans eğitimi genelde kaç yıl sürer?|4|2|3|6
+M|Ön lisans eğitimi genelde kaç yıl sürer?|2|1|3|4
+M|Erasmus nedir?|Öğrenci değişim programı|Bir burs sınavı|Bir yurt adı|Bir öğrenci kulübü
+M|Türk alfabesinde kaç harf vardır?|29|26|28|30
+M|DNA'nın açılımı nedir?|Deoksiribonükleik asit|Dinamik nükleik asit|Doğal ribo asit|Dijital nükleer asit
+M|Suyun kimyasal formülü nedir?|H2O|CO2|O2|H2O2
+M|Güneş Sistemi'nin en büyük gezegeni hangisidir?|Jüpiter|Satürn|Dünya|Neptün
+M|Yalnızca Türkiye topraklarından akan en uzun nehir hangisidir?|Kızılırmak|Fırat|Sakarya|Dicle
+T|Pi sayısı yaklaşık 3,14'tür.|1
+T|ÖSYM'nin açılımı Ölçme, Seçme ve Yerleştirme Merkezi'dir.|1
+T|Işık sesten daha hızlı yayılır.|1
+T|Dünya Güneş'in etrafında döner.|1
+T|Mars, Güneş'e en yakın gezegendir.|0
+T|Bir üçgenin iç açıları toplamı 180 derecedir.|1
+T|Asal sayılar yalnızca 1'e ve kendisine bölünür.|1
+T|1 bir asal sayıdır.|0
+T|Yetişkin bir insanda 206 kemik bulunur.|1
+T|Atatürk Nutuk'u 1927'de okudu.|1
+T|Ses boşlukta yayılamaz.|1
+T|Fotosentez hayvanlarda gerçekleşir.|0
+E|Türkiye'de kaç il vardır?|81|2|il
+E|Işık saniyede yaklaşık kaç kilometre yol alır?|300000|20000|km
+E|Dünya'nın yaşı yaklaşık kaç milyar yıldır?|4.5|0.5|milyar yıl
+E|Cumhuriyet hangi yıl ilan edildi?|1923|1|yıl
+E|Bir yılda kaç hafta vardır?|52|1|hafta
+E|Periyodik tabloda kaç element vardır?|118|4|element
+E|Dik açı kaç derecedir?|90|5|derece
+E|Ay'ın Dünya'ya ortalama uzaklığı kaç kilometredir?|384000|30000|km
+J|📚☕🌙😵|Final haftası|Mezuniyet|Bahar şenliği|Kayıt haftası
+J|🎓🎉📸|Mezuniyet|Kayıt günü|Final sınavı|Bahar şenliği
+J|📝🤫👀|Kopya çekmek|Not tutmak|Ödev yapmak|Sunum hazırlamak
+J|📖🤫🪑|Kütüphane|Kantin|Amfi|Yurt
+J|🧪🥽🔬|Laboratuvar|Kütüphane|Spor salonu|Kantin
+J|🛏️🏢🍜|Yurt|Kütüphane|Kantin|Amfi
+J|🎪🎶🌸|Bahar şenliği|Mezuniyet|Final haftası|Oryantasyon
+J|⏰😴🏃|Derse geç kalmak|Erken kalkmak|Spor yapmak|Sınava girmek
+A|Ön sıra|Arka sıra
+A|Sabah dersi|Akşam dersi
+A|Grup ödevi|Tek başına ödev
+A|Kantin|Yemekhane
+A|Son gece çalışmak|Haftalar öncesinden
+A|Yurt|Ev
+A|Sözlü sınav|Yazılı sınav
+A|Kütüphane|Kafe
+A|Defter|Tablet
+A|Online ders|Yüz yüze ders
+A|Sayısal|Sözel
+A|Kulüp|Spor takımı
+A|Erasmus|Staj
+A|Not almak|Kayıt dinlemek
+A|Kalem|Tükenmez
+A|Test|Klasik soru
+A|Matematik|Edebiyat
+A|Sunum yapmak|Rapor yazmak
+A|Teneffüste kantin|Teneffüste bahçe
+A|Mezuniyet töreni|Mezuniyet gezisi
+L|En sevdiğin ders hangisiydi?
+L|Okuldan aklında kalan en saçma kural?
+L|Hangi bölümü okuyorsun ya da okudun?
+L|Ders çalışırken ne dinlersin?
+L|Okulun en sevdiğin yeri neresiydi?
+L|En sevdiğin kantin ürünü?
+L|Okulda hangi kulüpteydin?
+L|En kolay geçtiğin ders hangisi?
+L|Okul servisiyle mi gidip gelirdin?
+L|Okulda en sevdiğin gün hangisiydi?
+P|Hayatına en çok dokunan öğretmen kimdi, neden?
+P|Bölüm ya da okul seçerken başka ne olabilirdi?
+P|Okul hayatında en gurur duyduğun an?
+P|Sınav stresiyle nasıl baş edersin?
+P|Okulda en yakın arkadaşınla nasıl tanıştın?
+P|Okulda kendini en yalnız hissettiğin dönem?
+P|Okulda öğrenmediğin ama keşke öğretselerdi dediğin şey?
+P|Tekrar öğrenci olsan neyi farklı yapardın?
+P|Bir dersi bırakmayı hiç düşündün mü?
+P|Okulun sana kattığı en önemli şey ne?
+B|Okulda başına gelen en utanç verici an?
+B|Kopya çektiğin oldu mu, nasıl bitti?
+B|Bir hocaya yaptığın en büyük hata?
+B|Derste uyuyakaldığın oldu mu?
+B|Okulda gizlice hoşlandığın biri var mıydı?
+B|Disiplin cezası aldığın oldu mu?
+B|Sınavda yazdığın en saçma cevap?
+B|Ödevini başkasına yaptırdığın oldu mu?
+B|Okulda en çok kavga ettiğin kişi?
+B|Okul yıllığına ne yazılmasını isterdin?
