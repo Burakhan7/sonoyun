@@ -13,7 +13,7 @@ import type { TokenService } from './auth.js';
 import { clientIp } from './client-ip.js';
 import { Matchmaker } from './matchmaking.js';
 import type { Presence } from './presence.js';
-import { RoomService, type MatchStore } from './rooms.js';
+import { RoomService, type MatchStore, type RoomTimings } from './rooms.js';
 import { registerApiRoutes } from './routes.js';
 import { isBanned, type UserStore } from './users.js';
 
@@ -30,6 +30,8 @@ const ERROR_MESSAGES = {
   [SOCKET_ERROR_CODES.termsRequired]: 'Devam etmek için kuralları onaylamalısın.',
   [SOCKET_ERROR_CODES.alreadyQueued]: 'Başka bir sekmede zaten rakip arıyorsun.',
   [SOCKET_ERROR_CODES.inRoom]: 'Zaten bir oyundasın.',
+  [SOCKET_ERROR_CODES.noActiveGame]: 'Devam eden bir oyunun yok.',
+  [SOCKET_ERROR_CODES.gameFailed]: 'Oyun başlatılamadı. Lütfen yeni bir oyun dene.',
   [SOCKET_ERROR_CODES.internal]: 'Bir sorun oluştu, lütfen tekrar dene.',
 } as const;
 
@@ -45,7 +47,7 @@ export interface ServerOptions {
   logger?: boolean;
   broadcastIntervalMs?: number;
   matchTickMs?: number;
-  spinMs?: number;
+  timings?: RoomTimings;
 }
 
 interface SocketData {
@@ -65,7 +67,7 @@ export function buildServer({
   logger = false,
   broadcastIntervalMs = BROADCAST_INTERVAL_MS,
   matchTickMs = MATCH_TICK_MS,
-  spinMs,
+  timings,
 }: ServerOptions) {
   const app = Fastify({ logger, trustProxy });
   const io = new Server<
@@ -84,9 +86,14 @@ export function buildServer({
     redis,
     users,
     matches,
-    spinMs,
+    timings,
     onError: logFailure,
-    notifyMatch: (socketId, payload) => io.to(socketId).emit('match:found', payload),
+    send: (socketId, event, payload) => {
+      (io.to(socketId) as unknown as { emit(name: string, data: unknown): void }).emit(
+        event,
+        payload,
+      );
+    },
   });
   const matchmaker = new Matchmaker(redis, (roomId, a, b) => rooms.create(roomId, a, b), {
     allowSameIp,
@@ -161,7 +168,30 @@ export function buildServer({
       });
     });
 
+    socket.on('game:answer', (payload) => {
+      const parsed = clientEventSchemas['game:answer'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      const { roundNo, answer, prediction } = parsed.data;
+      try {
+        rooms.answer(userId, socket.id, roundNo, {
+          answer,
+          ...(prediction ? { prediction } : {}),
+        });
+      } catch (error) {
+        logFailure(error);
+        sendError(SOCKET_ERROR_CODES.internal);
+      }
+    });
+
+    socket.on('game:resume', (payload) => {
+      if (!clientEventSchemas['game:resume'].safeParse(payload).success) {
+        return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      }
+      if (!rooms.resume(userId, socket.id)) sendError(SOCKET_ERROR_CODES.noActiveGame);
+    });
+
     socket.on('disconnect', () => {
+      rooms.handleDisconnect(userId, socket.id);
       presence.disconnect(userId).catch(logFailure);
       enqueue(() => matchmaker.leave(userId, socket.id));
     });

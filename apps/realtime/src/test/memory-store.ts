@@ -1,4 +1,4 @@
-import type { MatchStore } from '../rooms.js';
+import type { MatchOutcome, MatchStore } from '../rooms.js';
 import type { Identity, UserRecord, UserStore } from '../users.js';
 
 export class MemoryUserStore implements UserStore {
@@ -40,6 +40,7 @@ export class MemoryUserStore implements UserStore {
 export class MemoryMatchStore implements MatchStore {
   readonly created: Parameters<MatchStore['create']>[0][] = [];
   readonly ended = new Map<string, Date>();
+  readonly outcomes = new Map<string, MatchOutcome | undefined>();
   failNextCreate = false;
 
   async create(match: Parameters<MatchStore['create']>[0]) {
@@ -50,7 +51,8 @@ export class MemoryMatchStore implements MatchStore {
     this.created.push(match);
   }
 
-  async end(id: string, endedAt: Date) {
+  async end(id: string, endedAt: Date, outcome?: MatchOutcome) {
+    this.outcomes.set(id, outcome);
     this.ended.set(id, endedAt);
   }
 }

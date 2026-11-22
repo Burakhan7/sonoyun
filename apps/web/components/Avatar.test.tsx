@@ -11,4 +11,11 @@ describe('Avatar', () => {
     expect(html).toContain('/avatars/tilki@2x.webp 2x');
     expect(html).toContain('background-color:#F7B9A0');
   });
+
+  it('keeps the fallback emoji under the image', () => {
+    const html = renderToStaticMarkup(<Avatar id="tilki" />);
+
+    expect(html).toContain('🦊');
+    expect(html.indexOf('🦊')).toBeLessThan(html.indexOf('<img'));
+  });
 });

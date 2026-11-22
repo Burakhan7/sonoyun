@@ -15,6 +15,7 @@ export {
   opponentSchema,
   publicCardSchema,
   publicQuestionSchema,
+  roundAnswerSchema,
   serverEventSchemas,
 } from './events.js';
 export type {
@@ -25,6 +26,7 @@ export type {
   Opponent,
   PublicCard,
   PublicQuestion,
+  RoundAnswer,
   ServerEventPayload,
   ServerToClientEvents,
 } from './events.js';
