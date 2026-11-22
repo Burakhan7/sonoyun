@@ -12,7 +12,8 @@
     "lint": "turbo run lint && prettier --check .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "dev:reset-matches": "pnpm --filter realtime reset-matches"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
