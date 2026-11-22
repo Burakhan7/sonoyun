@@ -16,6 +16,7 @@ export interface UserRecord {
   acceptedTermsAt: Date | null;
   nicknameChangedAt: Date | null;
   bannedUntil: Date | null;
+  deviceHash?: string | null;
 }
 
 export interface UserStore {

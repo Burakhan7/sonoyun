@@ -1,13 +1,25 @@
 import { z } from 'zod';
 
-const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().min(1).max(65535).default(4000),
-  WEB_ORIGIN: z.string().url().default('http://localhost:3100'),
-  DATABASE_URL: z.string().url(),
-  REDIS_URL: z.string().url(),
-  JWT_SECRET: z.string().min(32),
-});
+const booleanFlag = z
+  .enum(['true', 'false'])
+  .default('false')
+  .transform((value) => value === 'true');
+
+const envSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    PORT: z.coerce.number().int().min(1).max(65535).default(4000),
+    WEB_ORIGIN: z.string().url().default('http://localhost:3100'),
+    DATABASE_URL: z.string().url(),
+    REDIS_URL: z.string().url(),
+    JWT_SECRET: z.string().min(32),
+    MATCH_ALLOW_SAME_IP: booleanFlag,
+    TRUST_PROXY: booleanFlag,
+  })
+  .refine((env) => env.NODE_ENV !== 'production' || !env.MATCH_ALLOW_SAME_IP, {
+    message: 'MATCH_ALLOW_SAME_IP must not be enabled in production',
+    path: ['MATCH_ALLOW_SAME_IP'],
+  });
 
 export type Env = z.infer<typeof envSchema>;
 
