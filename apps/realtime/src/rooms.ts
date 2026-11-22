@@ -1,6 +1,20 @@
+import { randomInt } from 'node:crypto';
 import type { PrismaClient } from '@prisma/client';
 import type { Redis } from 'ioredis';
-import { ENGINES, opponentSchema, type CategoryId, type EngineId, type MatchFound } from 'shared';
+import {
+  ENGINES,
+  SOCKET_ERROR_CODES,
+  opponentSchema,
+  serverEventSchemas,
+  type CategoryId,
+  type EngineId,
+  type MatchFound,
+  type ServerEventPayload,
+} from 'shared';
+import { content } from 'shared/content';
+import type { AnswerInput } from './games/engine.js';
+import { GAME_ENGINES } from './games/index.js';
+import { GameSession, type GameResult, type OpenRound } from './games/session.js';
 import { ACTIVE_TTL_SECONDS, activeKey, type Candidate } from './matchmaking.js';
 import { gamesTodayKey } from './presence.js';
 import { pickCategory, pickEngine } from './selection.js';
@@ -8,12 +22,16 @@ import type { UserRecord, UserStore } from './users.js';
 
 export const ACTIVE_ROOMS_KEY = 'rooms:active';
 export const SPIN_MS = 3_000;
+export const ROUND_GAP_MS = 2_000;
+export const RECONNECT_MS = 15_000;
+export const SEEN_LIMIT = 200;
 
 const RECENT_CATEGORY_LIMIT = 3;
 const STATS_TTL_SECONDS = 3 * 24 * 60 * 60;
 
 const roomKey = (roomId: string) => `room:${roomId}`;
 export const recentCategoriesKey = (userId: string) => `mm:cats:${userId}`;
+export const seenKey = (userId: string) => `seen:${userId}`;
 
 const RELEASE_ACTIVE_SCRIPT = `
 if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) end
@@ -38,6 +56,13 @@ export function canTransition(from: RoomState, to: RoomState): boolean {
   return TRANSITIONS[from].includes(to);
 }
 
+export interface MatchOutcome {
+  winnerId: string | null;
+  scoreA: number;
+  scoreB: number;
+  harmony?: number;
+}
+
 export interface MatchStore {
   create(match: {
     id: string;
@@ -46,7 +71,7 @@ export interface MatchStore {
     category: CategoryId;
     engine: EngineId;
   }): Promise<void>;
-  end(id: string, endedAt: Date): Promise<void>;
+  end(id: string, endedAt: Date, outcome?: MatchOutcome): Promise<void>;
 }
 
 export function createPrismaMatchStore(prisma: PrismaClient): MatchStore {
@@ -54,8 +79,8 @@ export function createPrismaMatchStore(prisma: PrismaClient): MatchStore {
     async create(match) {
       await prisma.match.create({ data: { ...match, scoreA: 0, scoreB: 0 } });
     },
-    async end(id, endedAt) {
-      await prisma.match.updateMany({ where: { id }, data: { endedAt } });
+    async end(id, endedAt, outcome) {
+      await prisma.match.updateMany({ where: { id }, data: { endedAt, ...outcome } });
     },
   };
 }
@@ -66,34 +91,83 @@ export interface LiveRoom {
   state: RoomState;
   category: CategoryId;
   engine: EngineId;
+  sockets: Map<string, string>;
+  found: Map<string, MatchFound>;
+  forfeitTimers: Map<string, NodeJS.Timeout>;
+  session?: GameSession;
+  finished: boolean;
   timer?: NodeJS.Timeout;
+}
+
+export interface RoomTimings {
+  spinMs?: number;
+  gapMs?: number;
+  reconnectMs?: number;
+  /** Test override for every round's duration. */
+  roundMs?: number;
 }
 
 export interface RoomServiceOptions {
   redis: Redis;
   users: UserStore;
   matches: MatchStore;
-  notifyMatch: (socketId: string, payload: MatchFound) => void;
+  send: (socketId: string, event: keyof typeof serverEventSchemas, payload: unknown) => void;
   onError: (error: unknown) => void;
-  spinMs?: number;
+  timings?: RoomTimings;
 }
 
 export class RoomService {
   readonly rooms = new Map<string, LiveRoom>();
+  private readonly byUser = new Map<string, LiveRoom>();
   private readonly redis: Redis;
   private readonly users: UserStore;
   private readonly matches: MatchStore;
-  private readonly notifyMatch: RoomServiceOptions['notifyMatch'];
+  private readonly sendRaw: RoomServiceOptions['send'];
   private readonly onError: RoomServiceOptions['onError'];
   private readonly spinMs: number;
+  private readonly gapMs: number;
+  private readonly reconnectMs: number;
+  private readonly roundMs?: number;
 
   constructor(options: RoomServiceOptions) {
     this.redis = options.redis;
     this.users = options.users;
     this.matches = options.matches;
-    this.notifyMatch = options.notifyMatch;
+    this.sendRaw = options.send;
     this.onError = options.onError;
-    this.spinMs = options.spinMs ?? SPIN_MS;
+    this.spinMs = options.timings?.spinMs ?? SPIN_MS;
+    this.gapMs = options.timings?.gapMs ?? ROUND_GAP_MS;
+    this.reconnectMs = options.timings?.reconnectMs ?? RECONNECT_MS;
+    this.roundMs = options.timings?.roundMs;
+  }
+
+  /** Every payload passes its strict schema, so an answer field can never slip out. */
+  private send<E extends keyof typeof serverEventSchemas>(
+    socketId: string | undefined,
+    event: E,
+    payload: ServerEventPayload<E>,
+  ) {
+    if (!socketId) return;
+    const schema = serverEventSchemas[event] as unknown as { parse(value: unknown): unknown };
+    this.sendRaw(socketId, event, schema.parse(payload));
+  }
+
+  private broadcast<E extends keyof typeof serverEventSchemas>(
+    room: LiveRoom,
+    event: E,
+    payload: ServerEventPayload<E>,
+  ) {
+    for (const player of room.players) this.send(room.sockets.get(player), event, payload);
+  }
+
+  private schedule(room: LiveRoom, delayMs: number, task: () => Promise<void> | void) {
+    clearTimeout(room.timer);
+    room.timer = setTimeout(() => {
+      Promise.resolve()
+        .then(task)
+        .catch((error: unknown) => this.onError(error));
+    }, delayMs);
+    room.timer.unref();
   }
 
   async create(roomId: string, a: Candidate, b: Candidate): Promise<void> {
@@ -135,24 +209,34 @@ export class RoomService {
     }
     await pipeline.exec();
 
+    const rules = ENGINES[engine].rule;
     const room: LiveRoom = {
       id: roomId,
       players: [a.userId, b.userId],
       state: 'MATCHED',
       category,
       engine,
+      sockets: new Map([
+        [a.userId, a.socketId],
+        [b.userId, b.socketId],
+      ]),
+      found: new Map([
+        [a.userId, { roomId, opponent: toOpponent(userB), category, engine, rules }],
+        [b.userId, { roomId, opponent: toOpponent(userA), category, engine, rules }],
+      ]),
+      forfeitTimers: new Map(),
+      finished: false,
     };
     this.rooms.set(roomId, room);
+    this.byUser.set(a.userId, room);
+    this.byUser.set(b.userId, room);
 
-    const rules = ENGINES[engine].rule;
-    this.notifyMatch(a.socketId, { roomId, opponent: toOpponent(userB), category, engine, rules });
-    this.notifyMatch(b.socketId, { roomId, opponent: toOpponent(userA), category, engine, rules });
+    for (const player of room.players) {
+      this.send(room.sockets.get(player), 'match:found', room.found.get(player)!);
+    }
 
     await this.transition(room, 'SPIN');
-    room.timer = setTimeout(() => {
-      this.afterSpin(room).catch(this.onError);
-    }, this.spinMs);
-    room.timer.unref();
+    this.schedule(room, this.spinMs, () => this.startGame(room));
   }
 
   async transition(room: LiveRoom, next: RoomState): Promise<void> {
@@ -163,17 +247,158 @@ export class RoomService {
     if (next !== 'ENDED') await this.redis.hset(roomKey(room.id), 'state', next);
   }
 
-  // Game engines arrive in Sprint 3; until then a room closes right after the spin.
-  private async afterSpin(room: LiveRoom) {
-    await this.transition(room, 'PLAYING');
-    await this.end(room);
+  private async startGame(room: LiveRoom) {
+    if (room.finished) return;
+    try {
+      await this.transition(room, 'PLAYING');
+      room.session = await this.createSession(room);
+    } catch (error) {
+      room.finished = true;
+      this.broadcast(room, 'error', {
+        code: SOCKET_ERROR_CODES.gameFailed,
+        message: 'Oyun başlatılamadı. Lütfen yeni bir oyun dene.',
+      });
+      await this.end(room);
+      throw error;
+    }
+    if (room.finished) return;
+    this.startRound(room);
   }
 
-  async end(room: LiveRoom): Promise<void> {
-    if (room.state === 'ENDED') return;
+  private async createSession(room: LiveRoom) {
+    const [seenA, seenB] = await Promise.all(
+      room.players.map((player) => this.redis.lrange(seenKey(player), 0, SEEN_LIMIT - 1)),
+    );
+    const engine = GAME_ENGINES[room.engine];
+    const rounds = engine.createRounds({
+      category: room.category,
+      seen: new Set([...(seenA ?? []), ...(seenB ?? [])]),
+      random: randomInt,
+      data: content,
+    });
+
+    const pipeline = this.redis.pipeline();
+    for (const player of room.players) {
+      for (const { question } of rounds) pipeline.lpush(seenKey(player), question.id);
+      pipeline.ltrim(seenKey(player), 0, SEEN_LIMIT - 1);
+    }
+    await pipeline.exec();
+    return new GameSession(engine, rounds, room.players, this.roundMs);
+  }
+
+  private roundPayload(
+    room: LiveRoom,
+    round: OpenRound,
+    userId: string,
+  ): ServerEventPayload<'round:start'> {
+    return {
+      roundNo: round.roundNo,
+      total: round.total,
+      question: round.question,
+      endsAt: new Date(round.endsAt).toISOString(),
+      remainingMs: Math.max(0, Math.round(round.durationMs)),
+      scores: { ...room.session!.scores },
+      answered: room.session!.hasAnswered(userId),
+    };
+  }
+
+  private startRound(room: LiveRoom) {
+    const round = room.session!.startRound(Date.now());
+    for (const player of room.players) {
+      this.send(room.sockets.get(player), 'round:start', this.roundPayload(room, round, player));
+    }
+    this.schedule(room, round.durationMs, () => this.closeRound(room));
+  }
+
+  private closeRound(room: LiveRoom) {
+    if (room.finished) return;
+    const result = room.session!.closeRound();
+    if (!result) return;
+    this.broadcast(room, 'round:result', result);
+    this.schedule(room, this.gapMs, () =>
+      room.session!.hasNextRound ? this.startRound(room) : this.finish(room),
+    );
+  }
+
+  /** Records a player's answer. Returns false for late, repeated or invalid answers. */
+  answer(userId: string, socketId: string, roundNo: number, input: AnswerInput): boolean {
+    const room = this.byUser.get(userId);
+    if (!room?.session || room.finished || room.sockets.get(userId) !== socketId) return false;
+
+    const accepted = room.session.submit(userId, roundNo, input, Date.now());
+    if (accepted && room.session.allAnswered) this.closeRound(room);
+    return accepted;
+  }
+
+  /** Re-attaches a player to their running game after a reload or reconnect. */
+  resume(userId: string, socketId: string): boolean {
+    const room = this.byUser.get(userId);
+    if (!room || room.finished) return false;
+
+    clearTimeout(room.forfeitTimers.get(userId));
+    room.forfeitTimers.delete(userId);
+    room.sockets.set(userId, socketId);
+
+    this.send(socketId, 'match:found', room.found.get(userId)!);
+    if (room.session?.isOpen) {
+      this.send(
+        socketId,
+        'round:start',
+        this.roundPayload(room, room.session.currentRound(), userId),
+      );
+    }
+    return true;
+  }
+
+  /** Starts the reconnect window when the socket playing the game drops. */
+  handleDisconnect(userId: string, socketId: string) {
+    const room = this.byUser.get(userId);
+    if (!room || room.finished || room.sockets.get(userId) !== socketId) return;
+
+    room.sockets.delete(userId);
+    const timer = setTimeout(() => {
+      this.forfeit(room, userId).catch((error: unknown) => this.onError(error));
+    }, this.reconnectMs);
+    timer.unref();
+    room.forfeitTimers.set(userId, timer);
+  }
+
+  private async forfeit(room: LiveRoom, userId: string) {
+    if (room.finished) return;
+    const opponent = room.players.find((player) => player !== userId)!;
+    await this.finish(room, room.sockets.has(opponent) ? opponent : null);
+  }
+
+  private async finish(room: LiveRoom, forfeitWinner?: string | null) {
+    if (room.finished) return;
+    room.finished = true;
     clearTimeout(room.timer);
+
+    const [a, b] = room.players;
+    const result: GameResult = room.session
+      ? room.session.result(forfeitWinner)
+      : { winnerId: forfeitWinner ?? null, scores: { [a]: 0, [b]: 0 }, forfeit: true };
+
+    this.broadcast(room, 'game:over', result);
+    await this.end(room, {
+      winnerId: result.winnerId,
+      scoreA: result.scores[a] ?? 0,
+      scoreB: result.scores[b] ?? 0,
+      ...(result.harmony === undefined ? {} : { harmony: result.harmony }),
+    });
+  }
+
+  async end(room: LiveRoom, outcome?: MatchOutcome): Promise<void> {
+    if (room.state === 'ENDED') return;
+    room.finished = true;
+    clearTimeout(room.timer);
+    room.forfeitTimers.forEach((timer) => clearTimeout(timer));
+    room.forfeitTimers.clear();
     await this.transition(room, 'ENDED');
     this.rooms.delete(room.id);
+    for (const player of room.players) {
+      if (this.byUser.get(player) === room) this.byUser.delete(player);
+    }
 
     const pipeline = this.redis.pipeline();
     pipeline.del(roomKey(room.id));
@@ -182,7 +407,7 @@ export class RoomService {
       pipeline.eval(RELEASE_ACTIVE_SCRIPT, 1, activeKey(userId), room.id);
     }
     await pipeline.exec();
-    await this.matches.end(room.id, new Date());
+    await this.matches.end(room.id, new Date(), outcome);
   }
 
   /** Keeps live rooms and their players' locks from expiring. */

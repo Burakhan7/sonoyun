@@ -18,6 +18,8 @@ export const SOCKET_ERROR_CODES = {
   termsRequired: 'terms_required',
   alreadyQueued: 'already_queued',
   inRoom: 'in_room',
+  noActiveGame: 'no_active_game',
+  gameFailed: 'game_failed',
   internal: 'internal',
 } as const;
 
@@ -55,6 +57,15 @@ export const publicQuestionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('ayna'), id, a: z.string(), b: z.string() }).strict(),
 ]);
 
+export const roundAnswerSchema = z
+  .object({
+    answer: z.union([z.string(), z.number(), z.null()]),
+    prediction: z.enum(['a', 'b']).nullable(),
+    points: z.number().int().nonnegative(),
+    isCorrect: z.boolean().nullable(),
+  })
+  .strict();
+
 export const clientEventSchemas = {
   'queue:join': empty,
   'queue:leave': empty,
@@ -78,6 +89,8 @@ export const clientEventSchemas = {
     .object({ userId: id, reason: z.enum(REPORT_REASONS), note: z.string().max(300).optional() })
     .strict(),
   'invite:create': z.object({ friendId: id }).strict(),
+  // Not in SPEC §14: restores a running game after a reload or reconnect (SPEC §5.4).
+  'game:resume': empty,
 } as const;
 
 export const onlineCountSchema = z
@@ -106,13 +119,17 @@ export const serverEventSchemas = {
       total: z.number().int().positive(),
       question: publicQuestionSchema,
       endsAt: timestamp,
+      // Additions to SPEC §14: clock-independent timer and state for resumed games.
+      remainingMs: z.number().int().nonnegative(),
+      scores,
+      answered: z.boolean(),
     })
     .strict(),
   'round:result': z
     .object({
       roundNo: z.number().int().positive(),
       correct: z.union([z.number(), z.boolean(), z.null()]),
-      answers: z.record(id, z.unknown()),
+      answers: z.record(id, roundAnswerSchema),
       scores,
     })
     .strict(),
@@ -121,6 +138,7 @@ export const serverEventSchemas = {
       winnerId: id.nullable(),
       scores,
       harmony: z.number().int().min(0).max(100).optional(),
+      forfeit: z.boolean().optional(),
     })
     .strict(),
   'cards:offer': z
@@ -168,4 +186,5 @@ export type OnlineCount = z.infer<typeof onlineCountSchema>;
 export type MatchFound = ServerEventPayload<'match:found'>;
 export type Opponent = z.infer<typeof opponentSchema>;
 export type PublicQuestion = z.infer<typeof publicQuestionSchema>;
+export type RoundAnswer = z.infer<typeof roundAnswerSchema>;
 export type PublicCard = z.infer<typeof publicCardSchema>;

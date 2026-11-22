@@ -9,6 +9,8 @@ const config = {
         ink: '#23201B',
         muted: '#6B655A',
         accent: '#C2410C',
+        success: '#15803D',
+        danger: '#B91C1C',
       },
       minHeight: { touch: '44px' },
       minWidth: { touch: '44px' },

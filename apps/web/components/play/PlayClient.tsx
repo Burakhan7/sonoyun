@@ -4,30 +4,34 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  CATEGORIES,
-  ENGINES,
   SOCKET_AUTH_ERRORS,
   SOCKET_ERROR_CODES,
   serverEventSchemas,
   type MatchFound,
+  type PublicUser,
   type ServerEventPayload,
 } from 'shared';
-import { Avatar } from '@/components/Avatar';
 import { createChime, flashTitle } from '@/lib/notify';
 import { loadSession } from '@/lib/session';
 import { connectSocket, type AppSocket } from '@/lib/socket';
 import { CategorySpin } from './CategorySpin';
+import { GameOver } from './GameOver';
+import { GameScreen, type AnswerPayload, type RoundResult, type RoundStart } from './GameScreen';
 
 const NOBODY_AFTER_SEC = 60;
 const CALM_HINT_AFTER_SEC = 20;
-const SPIN_MS = 3_000;
 
-type Phase = 'connecting' | 'searching' | 'nobody' | 'spinning' | 'ready' | 'blocked';
+type Phase =
+  'connecting' | 'searching' | 'nobody' | 'spinning' | 'playing' | 'finished' | 'blocked';
 
 const primaryButton =
   'flex min-h-touch w-full items-center justify-center rounded-xl bg-accent px-4 py-3 font-semibold text-white';
 const secondaryButton =
   'flex min-h-touch w-full items-center justify-center rounded-xl border-2 border-ink px-4 py-3 font-semibold';
+
+function isInGame(phase: Phase) {
+  return phase === 'spinning' || phase === 'playing';
+}
 
 function formatElapsed(totalSeconds: number) {
   const minutes = Math.floor(totalSeconds / 60);
@@ -42,13 +46,17 @@ export function PlayClient() {
   const [match, setMatch] = useState<MatchFound | null>(null);
   const [blockedMessage, setBlockedMessage] = useState('');
   const [notifying, setNotifying] = useState(false);
+  const [me, setMe] = useState<PublicUser | null>(null);
+  const [round, setRound] = useState<RoundStart | null>(null);
+  const [roundResult, setRoundResult] = useState<RoundResult | null>(null);
+  const [deadline, setDeadline] = useState(0);
+  const [gameOver, setGameOver] = useState<ServerEventPayload<'game:over'> | null>(null);
 
   const phaseRef = useRef<Phase>('connecting');
   const socketRef = useRef<AppSocket | null>(null);
   const notifyRef = useRef(false);
   const chimeRef = useRef<(() => void) | null>(null);
   const stopFlashRef = useRef<(() => void) | null>(null);
-  const spinTimerRef = useRef<number | undefined>(undefined);
 
   const setPhase = useCallback((next: Phase) => {
     phaseRef.current = next;
@@ -58,6 +66,9 @@ export function PlayClient() {
   const startSearch = useCallback(() => {
     setWaitingSec(0);
     setMatch(null);
+    setRound(null);
+    setRoundResult(null);
+    setGameOver(null);
     setPhase('searching');
     const socket = socketRef.current;
     if (socket?.connected) socket.emit('queue:join', {});
@@ -74,15 +85,19 @@ export function PlayClient() {
     };
 
     loadSession()
-      .then(({ token }) => {
+      .then(({ token, user }) => {
         if (cancelled) return;
+        setMe(user);
 
         // The server enforces 18+ consent on queue:join and answers with terms_required.
         const socket = connectSocket(token);
         socketRef.current = socket;
 
         const onConnect = () => {
-          if (phaseRef.current === 'connecting' || phaseRef.current === 'searching') startSearch();
+          if (phaseRef.current === 'searching') startSearch();
+          else if (phaseRef.current === 'connecting' || isInGame(phaseRef.current)) {
+            socket.emit('game:resume', {});
+          }
         };
         const onConnectError = (error: Error) => {
           if (error.message === SOCKET_AUTH_ERRORS.banned) {
@@ -115,15 +130,42 @@ export function PlayClient() {
             setNotifying(false);
           }
           setMatch(parsed.data);
-          setPhase('spinning');
-          window.clearTimeout(spinTimerRef.current);
-          spinTimerRef.current = window.setTimeout(() => setPhase('ready'), SPIN_MS);
+          setGameOver(null);
+          // A resumed game receives round:start right after this and skips the spin.
+          if (phaseRef.current !== 'playing') setPhase('spinning');
+        };
+        const onRoundStart = (payload: RoundStart) => {
+          const parsed = serverEventSchemas['round:start'].safeParse(payload);
+          if (!parsed.success) return;
+          setRound(parsed.data);
+          setRoundResult(null);
+          setDeadline(Date.now() + parsed.data.remainingMs);
+          setPhase('playing');
+        };
+        const onRoundResult = (payload: RoundResult) => {
+          const parsed = serverEventSchemas['round:result'].safeParse(payload);
+          if (parsed.success) setRoundResult(parsed.data);
+        };
+        const onGameOver = (payload: ServerEventPayload<'game:over'>) => {
+          const parsed = serverEventSchemas['game:over'].safeParse(payload);
+          if (!parsed.success) return;
+          setGameOver(parsed.data);
+          setPhase('finished');
         };
         const onError = (payload: ServerEventPayload<'error'>) => {
           const parsed = serverEventSchemas.error.safeParse(payload);
           if (!parsed.success) return;
-          if (parsed.data.code === SOCKET_ERROR_CODES.termsRequired) router.replace('/');
-          else if (phaseRef.current === 'searching') block(parsed.data.message);
+          const { code, message } = parsed.data;
+          if (code === SOCKET_ERROR_CODES.termsRequired) {
+            router.replace('/');
+          } else if (code === SOCKET_ERROR_CODES.noActiveGame) {
+            if (phaseRef.current === 'connecting') startSearch();
+            else if (isInGame(phaseRef.current)) block('Bağlantın koptuğu için oyun sona erdi.');
+          } else if (code === SOCKET_ERROR_CODES.gameFailed) {
+            block(message);
+          } else if (phaseRef.current === 'searching') {
+            block(message);
+          }
         };
 
         socket.on('connect', onConnect);
@@ -131,6 +173,9 @@ export function PlayClient() {
         socket.on('online:count', onCount);
         socket.on('queue:status', onStatus);
         socket.on('match:found', onMatch);
+        socket.on('round:start', onRoundStart);
+        socket.on('round:result', onRoundResult);
+        socket.on('game:over', onGameOver);
         socket.on('error', onError);
         detach = () => {
           socket.off('connect', onConnect);
@@ -138,11 +183,14 @@ export function PlayClient() {
           socket.off('online:count', onCount);
           socket.off('queue:status', onStatus);
           socket.off('match:found', onMatch);
+          socket.off('round:start', onRoundStart);
+          socket.off('round:result', onRoundResult);
+          socket.off('game:over', onGameOver);
           socket.off('error', onError);
           if (phaseRef.current === 'searching') socket.emit('queue:leave', {});
         };
 
-        if (socket.connected) startSearch();
+        if (socket.connected) socket.emit('game:resume', {});
       })
       .catch(() => {
         if (!cancelled) block('Sunucuya bağlanılamadı. Lütfen tekrar dene.');
@@ -151,7 +199,6 @@ export function PlayClient() {
     return () => {
       cancelled = true;
       detach();
-      window.clearTimeout(spinTimerRef.current);
       stopFlashRef.current?.();
     };
   }, [router, setPhase, startSearch]);
@@ -175,6 +222,10 @@ export function PlayClient() {
     startSearch();
   };
 
+  const sendAnswer = (payload: AnswerPayload) => {
+    if (round) socketRef.current?.emit('game:answer', { roundNo: round.roundNo, ...payload });
+  };
+
   const invite = async () => {
     const url = window.location.origin;
     const text = 'Önce oyun, sonra sohbet! Gel bir el oynayalım:';
@@ -194,7 +245,11 @@ export function PlayClient() {
   };
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center gap-6 px-4 py-6 text-center">
+    <main
+      className={`mx-auto flex min-h-dvh w-full max-w-md flex-col items-center gap-6 px-4 text-center ${
+        phase === 'playing' ? '' : 'justify-center py-6'
+      }`}
+    >
       {phase === 'connecting' && <p className="text-muted">Bağlanıyor…</p>}
 
       {phase === 'searching' && (
@@ -248,29 +303,20 @@ export function PlayClient() {
 
       {phase === 'spinning' && match && <CategorySpin match={match} />}
 
-      {phase === 'ready' && match && (
-        <>
-          <Avatar id={match.opponent.avatarId} size={72} />
-          <div>
-            <h1 className="text-2xl font-bold">{match.opponent.nickname} ile eşleştin</h1>
-            <p className="mt-2 text-muted">
-              {CATEGORIES.find((category) => category.id === match.category)?.emoji}{' '}
-              {CATEGORIES.find((category) => category.id === match.category)?.name} ·{' '}
-              {ENGINES[match.engine].name}
-            </p>
-            <p className="mt-3 text-sm text-muted">
-              Oyun ekranı henüz hazır değil, çok yakında burada oynayacaksın.
-            </p>
-          </div>
-          <div className="flex w-full flex-col gap-3">
-            <button type="button" onClick={startSearch} className={primaryButton}>
-              Yeni oyun
-            </button>
-            <Link href="/" className="flex min-h-touch items-center justify-center underline">
-              Ana sayfaya dön
-            </Link>
-          </div>
-        </>
+      {phase === 'playing' && match && round && me && (
+        <GameScreen
+          key={round.roundNo}
+          me={me}
+          match={match}
+          round={round}
+          result={roundResult}
+          deadline={deadline}
+          onAnswer={sendAnswer}
+        />
+      )}
+
+      {phase === 'finished' && match && gameOver && me && (
+        <GameOver me={me} match={match} result={gameOver} onNewGame={startSearch} />
       )}
 
       {phase === 'blocked' && (
