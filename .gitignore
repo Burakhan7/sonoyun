@@ -13,3 +13,7 @@ next-env.d.ts
 .DS_Store
 Thumbs.db
 *.log
+
+# Large originals stay local; only the optimized webp files are deployed.
+apps/web/public/avatars/raw/*
+!apps/web/public/avatars/raw/.gitkeep
