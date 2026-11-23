@@ -28,6 +28,7 @@ const { app, io } = buildServer({
   users: createPrismaUserStore(prisma),
   matches: createPrismaMatchStore(prisma),
   moderationStore: createPrismaModerationStore(prisma),
+  prisma,
   wordFilter: createWordFilter(wordList),
   internalSecret: env.INTERNAL_API_SECRET,
   guestLimitPerHour: env.GUEST_LIMIT_PER_HOUR,

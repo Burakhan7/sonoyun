@@ -120,6 +120,8 @@ export interface LiveRoom {
   pickEndsAt: number;
   pinned: ChatStart['pinned'];
   chatEndsAt: number;
+  /** A friends' room from an invite: its chat has no time limit (SPEC §5.8). */
+  friendly: boolean;
   timer?: NodeJS.Timeout;
 }
 
@@ -203,7 +205,12 @@ export class RoomService {
     room.timer.unref();
   }
 
-  async create(roomId: string, a: Candidate, b: Candidate): Promise<void> {
+  async create(
+    roomId: string,
+    a: Candidate,
+    b: Candidate,
+    { friendly = false }: { friendly?: boolean } = {},
+  ): Promise<void> {
     const [userA, userB, recentA, recentB] = await Promise.all([
       this.users.findById(a.userId),
       this.users.findById(b.userId),
@@ -265,6 +272,7 @@ export class RoomService {
       pickEndsAt: 0,
       pinned: [],
       chatEndsAt: 0,
+      friendly,
     };
     this.rooms.set(roomId, room);
     this.byUser.set(a.userId, room);
@@ -449,14 +457,19 @@ export class RoomService {
     room.pinned = pinned;
 
     await this.transition(room, 'CHATTING');
-    room.chatEndsAt = Date.now() + this.chatMs;
-    await this.chat.markChatEnd(room.id, room.chatEndsAt);
+    if (room.friendly) {
+      room.chatEndsAt = Number.POSITIVE_INFINITY;
+    } else {
+      room.chatEndsAt = Date.now() + this.chatMs;
+      await this.chat.markChatEnd(room.id, room.chatEndsAt);
+    }
     if ((room.state as RoomState) !== 'CHATTING') return;
     this.broadcast(room, 'chat:start', this.chatStartPayload(room));
-    this.schedule(room, this.chatMs, () => this.endChat(room, 'timeout'));
+    if (!room.friendly) this.schedule(room, this.chatMs, () => this.endChat(room, 'timeout'));
   }
 
   private chatStartPayload(room: LiveRoom): ChatStart {
+    if (room.friendly) return { pinned: room.pinned, endsAt: null, remainingMs: null };
     return {
       pinned: room.pinned,
       endsAt: new Date(room.chatEndsAt).toISOString(),

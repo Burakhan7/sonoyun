@@ -1,5 +1,5 @@
-import { ComingSoon } from '@/components/ComingSoon';
+import { MessagesClient } from '@/components/social/MessagesClient';
 
 export default function MessagesPage() {
-  return <ComingSoon title="Mesajlar" text="Mesajların çok yakında burada olacak." />;
+  return <MessagesClient />;
 }

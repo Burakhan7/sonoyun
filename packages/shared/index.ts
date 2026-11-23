@@ -24,6 +24,7 @@ export type {
   ChatStart,
   ClientEventPayload,
   ClientToServerEvents,
+  DirectMessage,
   MatchFound,
   OnlineCount,
   Opponent,
@@ -36,9 +37,28 @@ export type {
   SocketErrorCode,
 } from './events.js';
 export {
+  conversationSummarySchema,
+  conversationsResponseSchema,
+  directMessageSchema,
+  friendRequestSchema,
+  friendSchema,
+  friendsResponseSchema,
   guestResponseSchema,
   identityLimitResponseSchema,
+  messagesPageSchema,
   publicUserSchema,
+  transferCodeResponseSchema,
+  transferRedeemSchema,
+  unreadResponseSchema,
   userResponseSchema,
 } from './api.js';
-export type { GuestResponse, PublicUser } from './api.js';
+export type {
+  ConversationSummary,
+  Friend,
+  FriendRequestEntry,
+  FriendsResponse,
+  GuestResponse,
+  MessagesPage,
+  PublicUser,
+  TransferCodeResponse,
+} from './api.js';

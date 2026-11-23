@@ -30,7 +30,12 @@ export class ChatService {
     private readonly filter: WordFilter,
   ) {}
 
-  async prepare(userId: string, body: string, now = Date.now()): Promise<PreparedMessage> {
+  async prepare(
+    userId: string,
+    body: string,
+    now = Date.now(),
+    { allowContact = false }: { allowContact?: boolean } = {},
+  ): Promise<PreparedMessage> {
     if (await this.redis.exists(muteKey(userId))) {
       return { ok: false, code: SOCKET_ERROR_CODES.muted };
     }
@@ -38,7 +43,9 @@ export class ChatService {
     if (!withinSecond || !(await this.limiter.hit(RATE_RULES.chatBurst, userId, now))) {
       return { ok: false, code: SOCKET_ERROR_CODES.rateLimited };
     }
-    if (containsContactInfo(body)) return { ok: false, code: SOCKET_ERROR_CODES.contactBlocked };
+    if (!allowContact && containsContactInfo(body)) {
+      return { ok: false, code: SOCKET_ERROR_CODES.contactBlocked };
+    }
 
     const { text, masked } = this.filter.mask(body);
     if (masked) await this.recordMaskedMessage(userId, now);

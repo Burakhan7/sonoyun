@@ -13,7 +13,10 @@ export const RATE_RULES = {
   chatPerSecond: { name: 'chat1', limit: 1, windowMs: 1_000 },
   chatBurst: { name: 'chat10', limit: 6, windowMs: 10_000 },
   report: { name: 'report', limit: 10, windowMs: 24 * 60 * 60 * 1000 },
-  account: { name: 'account', limit: 60, windowMs: 60_000 },
+  account: { name: 'account', limit: 120, windowMs: 60_000 },
+  friendRequest: { name: 'friend', limit: 20, windowMs: 60 * 60 * 1000 },
+  transferRedeem: { name: 'transfer', limit: 10, windowMs: 15 * 60 * 1000 },
+  invite: { name: 'invite', limit: 20, windowMs: 60 * 60 * 1000 },
 } as const satisfies Record<string, RateRule>;
 
 const SLIDING_WINDOW_SCRIPT = `

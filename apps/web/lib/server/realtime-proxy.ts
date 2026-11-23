@@ -25,12 +25,18 @@ export async function proxyToRealtime(request: NextRequest, path: string) {
   const authorization =
     request.headers.get('authorization') ??
     (cookieStore.has(COOKIE_NAME) ? `Bearer ${cookieStore.get(COOKIE_NAME)?.value}` : null);
+  const requestBody = request.method === 'POST' ? await request.text() : '';
 
   let upstream: Response;
   try {
-    upstream = await fetch(`${realtimeUrl()}${path}`, {
-      method: 'POST',
-      headers: { ...(authorization ? { authorization } : {}), ...internalHeaders(request) },
+    upstream = await fetch(`${realtimeUrl()}${path}${request.nextUrl.search}`, {
+      method: request.method,
+      headers: {
+        ...(authorization ? { authorization } : {}),
+        ...(requestBody ? { 'content-type': 'application/json' } : {}),
+        ...internalHeaders(request),
+      },
+      ...(requestBody ? { body: requestBody } : {}),
       cache: 'no-store',
     });
   } catch {

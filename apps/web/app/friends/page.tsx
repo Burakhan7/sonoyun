@@ -1,5 +1,5 @@
-import { ComingSoon } from '@/components/ComingSoon';
+import { FriendsClient } from '@/components/social/FriendsClient';
 
 export default function FriendsPage() {
-  return <ComingSoon title="Arkadaşlar" text="Arkadaş listen çok yakında burada olacak." />;
+  return <FriendsClient />;
 }

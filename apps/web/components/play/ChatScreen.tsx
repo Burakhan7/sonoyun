@@ -23,6 +23,7 @@ const REPORT_OPTIONS: { value: ReportReason; label: string }[] = [
   { value: 'diger', label: 'Diğer' },
 ];
 
+export type FriendState = 'none' | 'sent' | 'incoming' | 'friends';
 export type ChatEndReason = ServerEventPayload<'chat:ended'>['reason'];
 
 interface ChatScreenProps {
@@ -30,7 +31,8 @@ interface ChatScreenProps {
   match: MatchFound;
   winnerId: string | null;
   pinned: ChatStart['pinned'];
-  deadline: number;
+  /** Null in a friends' room, whose chat has no time limit. */
+  deadline: number | null;
   messages: ChatMessage[];
   opponentTyping: boolean;
   ended: ChatEndReason | null;
@@ -48,6 +50,10 @@ interface ChatScreenProps {
   onBlock: () => void;
   onRate: (value: 1 | -1) => void;
   onNewGame: () => void;
+  friendState: FriendState;
+  friendConversationId: string | null;
+  onAddFriend: () => void;
+  onAcceptFriend: () => void;
 }
 
 function formatClock(ms: number) {
@@ -163,9 +169,15 @@ export function ChatScreen(props: ChatScreenProps) {
     onBlock,
     onRate,
     onNewGame,
+    friendState,
+    friendConversationId,
+    onAddFriend,
+    onAcceptFriend,
   } = props;
   const [draft, setDraft] = useState('');
-  const [remaining, setRemaining] = useState(() => Math.max(0, deadline - Date.now()));
+  const [remaining, setRemaining] = useState(() =>
+    deadline === null ? Number.POSITIVE_INFINITY : Math.max(0, deadline - Date.now()),
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [rating, setRating] = useState<1 | -1 | null>(null);
@@ -173,7 +185,7 @@ export function ChatScreen(props: ChatScreenProps) {
   const lastSentRef = useRef('');
 
   useEffect(() => {
-    if (ended) return;
+    if (ended || deadline === null) return;
     const update = () => setRemaining(Math.max(0, deadline - Date.now()));
     update();
     const interval = window.setInterval(update, 250);
@@ -207,6 +219,35 @@ export function ChatScreen(props: ChatScreenProps) {
     onRate(value);
   };
 
+  const friendAction = (variant: 'inline' | 'panel') => {
+    const className =
+      variant === 'inline'
+        ? 'inline-flex min-h-touch items-center px-1 font-bold underline'
+        : 'flex min-h-touch items-center justify-center rounded-xl border-2 border-ink px-2 text-center text-sm font-semibold';
+    if (friendState === 'friends') {
+      return friendConversationId ? (
+        <Link href={`/messages/${friendConversationId}`} className={className}>
+          Arkadaşsınız ✓ Mesaj at
+        </Link>
+      ) : (
+        <span className={className}>Arkadaşsınız ✓</span>
+      );
+    }
+    if (friendState === 'sent') return <span className={className}>İstek gönderildi ✓</span>;
+    if (friendState === 'incoming') {
+      return (
+        <button type="button" onClick={onAcceptFriend} className={className}>
+          {match.opponent.nickname} seni eklemek istiyor → Kabul et
+        </button>
+      );
+    }
+    return (
+      <button type="button" onClick={onAddFriend} className={className}>
+        Arkadaş ekle
+      </button>
+    );
+  };
+
   const menuItem = 'flex min-h-touch w-full items-center px-4 text-left text-sm font-semibold';
 
   return (
@@ -214,7 +255,7 @@ export function ChatScreen(props: ChatScreenProps) {
       <header className="relative flex items-center gap-2 border-b border-ink/10 py-2">
         <Avatar id={match.opponent.avatarId} size={40} />
         <p className="min-w-0 flex-1 truncate font-semibold">{match.opponent.nickname}</p>
-        {!ended && (
+        {!ended && deadline !== null && (
           <span
             role="timer"
             aria-label="Kalan süre"
@@ -234,6 +275,18 @@ export function ChatScreen(props: ChatScreenProps) {
         </button>
         {menuOpen && (
           <div className="absolute right-0 top-full z-40 w-48 overflow-hidden rounded-xl border border-ink/10 bg-white shadow-lg">
+            {friendState === 'none' && (
+              <button
+                type="button"
+                className={menuItem}
+                onClick={() => {
+                  setMenuOpen(false);
+                  onAddFriend();
+                }}
+              >
+                Arkadaş ekle
+              </button>
+            )}
             <button
               type="button"
               disabled={reported}
@@ -290,7 +343,13 @@ export function ChatScreen(props: ChatScreenProps) {
           role="status"
           className="bg-danger/10 px-2 py-1 text-center text-xs font-semibold text-danger"
         >
-          Süre bitiyor. Sohbetin devamı için arkadaş olma özelliği çok yakında.
+          Süre bitiyor — sohbet devam etsin mi? {friendAction('inline')}
+        </p>
+      )}
+
+      {!warning && !ended && friendState === 'incoming' && (
+        <p role="status" className="bg-accent/10 px-2 text-center text-xs font-semibold">
+          {friendAction('inline')}
         </p>
       )}
 
@@ -347,13 +406,7 @@ export function ChatScreen(props: ChatScreenProps) {
             ))}
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              disabled
-              className="min-h-touch rounded-xl border-2 border-ink/20 px-2 text-sm font-semibold text-muted"
-            >
-              Arkadaş ekle (yakında)
-            </button>
+            {friendAction('panel')}
             <button
               type="button"
               onClick={onNewGame}

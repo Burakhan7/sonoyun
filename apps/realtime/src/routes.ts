@@ -4,6 +4,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { readBearerToken, type TokenService } from './auth.js';
 import { clientIp } from './client-ip.js';
 import { RATE_RULES, type RateLimiter } from './ratelimit.js';
+import { registerSocialRoutes, type SocialRouteDeps } from './social-routes.js';
 import {
   IDENTITY_REFRESH_MS,
   nextIdentityRefreshAt,
@@ -21,6 +22,7 @@ export interface ApiDeps {
   trustProxy?: boolean;
   /** Proves a request came from the web app, whose forwarded client IP can then be trusted. */
   internalSecret?: string;
+  social?: Pick<SocialRouteDeps, 'friends' | 'dm' | 'transfers' | 'onFriendRemoved'>;
 }
 
 const DEFAULT_GUEST_LIMIT_PER_HOUR = 30;
@@ -35,6 +37,7 @@ export function registerApiRoutes(
     guestLimitPerHour = DEFAULT_GUEST_LIMIT_PER_HOUR,
     trustProxy = false,
     internalSecret,
+    social,
   }: ApiDeps,
 ) {
   function requestIp(request: FastifyRequest) {
@@ -132,4 +135,8 @@ export function registerApiRoutes(
     }
     return { user: toPublicUser(updated, now) };
   });
+
+  if (social) {
+    registerSocialRoutes(app, { ...social, tokens, users, limiter, requestIp, requireUser });
+  }
 }
