@@ -1,3 +1,4 @@
+import type { ModerationStore, NewReport } from '../moderation.js';
 import type { MatchOutcome, MatchStore } from '../rooms.js';
 import type { Identity, UserRecord, UserStore } from '../users.js';
 
@@ -41,6 +42,7 @@ export class MemoryMatchStore implements MatchStore {
   readonly created: Parameters<MatchStore['create']>[0][] = [];
   readonly ended = new Map<string, Date>();
   readonly outcomes = new Map<string, MatchOutcome | undefined>();
+  readonly ratings = new Map<string, Record<string, number>>();
   failNextCreate = false;
 
   async create(match: Parameters<MatchStore['create']>[0]) {
@@ -54,5 +56,30 @@ export class MemoryMatchStore implements MatchStore {
   async end(id: string, endedAt: Date, outcome?: MatchOutcome) {
     this.outcomes.set(id, outcome);
     this.ended.set(id, endedAt);
+  }
+
+  async rate(id: string, userId: string, value: 1 | -1) {
+    this.ratings.set(id, { ...this.ratings.get(id), [userId]: value });
+  }
+}
+
+export class MemoryModerationStore implements ModerationStore {
+  readonly reports: (NewReport & { createdAt: Date })[] = [];
+  readonly blocks: [string, string][] = [];
+  now = () => new Date();
+
+  async createReport(report: NewReport) {
+    this.reports.push({ ...report, createdAt: this.now() });
+  }
+
+  async countRecentReporters(reportedId: string, since: Date) {
+    const recent = this.reports.filter(
+      (report) => report.reportedId === reportedId && report.createdAt >= since,
+    );
+    return new Set(recent.map((report) => report.reporterId)).size;
+  }
+
+  async createBlock(blockerId: string, blockedId: string) {
+    this.blocks.push([blockerId, blockedId]);
   }
 }

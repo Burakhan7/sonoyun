@@ -149,6 +149,12 @@ export class Matchmaker {
     await this.redis.eval(LEAVE_SCRIPT, 2, QUEUE_KEY, ticketKey(userId), userId, socketId);
   }
 
+  /** Removes a user from the queue regardless of which socket holds the ticket. */
+  async remove(userId: string): Promise<void> {
+    this.localTickets.delete(userId);
+    await this.redis.multi().zrem(QUEUE_KEY, userId).del(ticketKey(userId)).exec();
+  }
+
   /** Keeps this instance's queue tickets alive; tickets of a crashed instance expire. */
   async heartbeat(): Promise<void> {
     if (this.localTickets.size === 0) return;

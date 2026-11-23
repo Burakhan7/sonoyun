@@ -3,8 +3,8 @@ import { clientEventSchemas, publicQuestionSchema, serverEventSchemas } from './
 
 describe('event contract', () => {
   it('defines every event in SPEC §14', () => {
-    expect(Object.keys(clientEventSchemas)).toHaveLength(15);
-    expect(Object.keys(serverEventSchemas)).toHaveLength(15);
+    expect(Object.keys(clientEventSchemas)).toHaveLength(16);
+    expect(Object.keys(serverEventSchemas)).toHaveLength(16);
   });
 
   it.each([

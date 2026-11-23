@@ -1,5 +1,9 @@
+import { createHash, timingSafeEqual } from 'node:crypto';
+import { isIP } from 'node:net';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { readBearerToken, type TokenService } from './auth.js';
+import { clientIp } from './client-ip.js';
+import { RATE_RULES, type RateLimiter } from './ratelimit.js';
 import {
   IDENTITY_REFRESH_MS,
   nextIdentityRefreshAt,
@@ -12,9 +16,45 @@ import {
 export interface ApiDeps {
   tokens: TokenService;
   users: UserStore;
+  limiter?: RateLimiter;
+  guestLimitPerHour?: number;
+  trustProxy?: boolean;
+  /** Proves a request came from the web app, whose forwarded client IP can then be trusted. */
+  internalSecret?: string;
 }
 
-export function registerApiRoutes(app: FastifyInstance, { tokens, users }: ApiDeps) {
+const DEFAULT_GUEST_LIMIT_PER_HOUR = 30;
+const sha256 = (value: string) => createHash('sha256').update(value).digest();
+
+export function registerApiRoutes(
+  app: FastifyInstance,
+  {
+    tokens,
+    users,
+    limiter,
+    guestLimitPerHour = DEFAULT_GUEST_LIMIT_PER_HOUR,
+    trustProxy = false,
+    internalSecret,
+  }: ApiDeps,
+) {
+  function requestIp(request: FastifyRequest) {
+    const secret = request.headers['x-internal-secret'];
+    const forwarded = request.headers['x-client-ip'];
+    if (
+      internalSecret &&
+      typeof secret === 'string' &&
+      timingSafeEqual(sha256(secret), sha256(internalSecret)) &&
+      typeof forwarded === 'string' &&
+      isIP(forwarded)
+    ) {
+      return forwarded;
+    }
+    return clientIp(
+      { address: request.socket.remoteAddress ?? request.ip, headers: request.headers },
+      trustProxy,
+    );
+  }
+
   async function findRequestUser(request: FastifyRequest) {
     const token = readBearerToken(request.headers.authorization);
     if (!token) return null;
@@ -28,6 +68,10 @@ export function registerApiRoutes(app: FastifyInstance, { tokens, users }: ApiDe
     const session = await findRequestUser(request);
     if (!session) {
       await reply.code(401).send({ code: 'unauthorized' });
+      return null;
+    }
+    if (limiter && !(await limiter.hit(RATE_RULES.account, session.user.id))) {
+      await reply.code(429).send({ code: 'rate_limited' });
       return null;
     }
     return session.user;
@@ -44,6 +88,13 @@ export function registerApiRoutes(app: FastifyInstance, { tokens, users }: ApiDe
     const now = new Date();
     const session = await findRequestUser(request);
     if (session) return { token: session.token, user: toPublicUser(session.user, now) };
+
+    if (limiter) {
+      const rule = { name: 'guest', limit: guestLimitPerHour, windowMs: 60 * 60 * 1000 };
+      if (!(await limiter.hit(rule, requestIp(request)))) {
+        return reply.code(429).send({ code: 'rate_limited' });
+      }
+    }
 
     const user = await users.create(randomIdentity());
     const token = await tokens.sign(user.id);

@@ -7,12 +7,17 @@ import {
   handshakeAuthSchema,
   type ClientToServerEvents,
   type ServerToClientEvents,
+  type SocketErrorCode,
 } from 'shared';
+import { createWordFilter, type WordFilter } from 'shared/filter';
 import { Server } from 'socket.io';
 import type { TokenService } from './auth.js';
+import { ChatService } from './chat.js';
 import { clientIp } from './client-ip.js';
 import { Matchmaker } from './matchmaking.js';
+import { ModerationService, type ModerationStore } from './moderation.js';
 import type { Presence } from './presence.js';
+import { RATE_RULES, RateLimiter } from './ratelimit.js';
 import { RoomService, type MatchStore, type RoomTimings } from './rooms.js';
 import { registerApiRoutes } from './routes.js';
 import { isBanned, type UserStore } from './users.js';
@@ -22,8 +27,9 @@ const HEARTBEAT_INTERVAL_MS = 10_000;
 const SWEEP_INTERVAL_MS = 15_000;
 const MATCH_TICK_MS = 500;
 const QUEUE_STATUS_INTERVAL_MS = 1_000;
+const TYPING_INTERVAL_MS = 1_000;
 
-const ERROR_MESSAGES = {
+const ERROR_MESSAGES: Record<SocketErrorCode, string> = {
   [SOCKET_ERROR_CODES.invalidPayload]: 'Geçersiz istek.',
   [SOCKET_ERROR_CODES.unauthorized]: 'Oturumun geçersiz.',
   [SOCKET_ERROR_CODES.banned]: 'Hesabın geçici olarak kısıtlandı.',
@@ -32,8 +38,15 @@ const ERROR_MESSAGES = {
   [SOCKET_ERROR_CODES.inRoom]: 'Zaten bir oyundasın.',
   [SOCKET_ERROR_CODES.noActiveGame]: 'Devam eden bir oyunun yok.',
   [SOCKET_ERROR_CODES.gameFailed]: 'Oyun başlatılamadı. Lütfen yeni bir oyun dene.',
+  [SOCKET_ERROR_CODES.rateLimited]: 'Çok hızlı gidiyorsun, biraz bekle.',
+  [SOCKET_ERROR_CODES.contactBlocked]: 'Link ve iletişim bilgisi paylaşılamaz.',
+  [SOCKET_ERROR_CODES.muted]: 'Dil kuralları nedeniyle 10 dakika mesaj gönderemezsin.',
+  [SOCKET_ERROR_CODES.matchSuspended]: 'Hesabın inceleme nedeniyle 24 saat eşleşmeye kapalı.',
+  [SOCKET_ERROR_CODES.chatClosed]: 'Sohbet sona erdi.',
+  [SOCKET_ERROR_CODES.cardsRejected]: 'Kart seçimi geçersiz.',
+  [SOCKET_ERROR_CODES.notAllowed]: 'Bu işlem yapılamıyor.',
   [SOCKET_ERROR_CODES.internal]: 'Bir sorun oluştu, lütfen tekrar dene.',
-} as const;
+};
 
 export interface ServerOptions {
   webOrigin: string;
@@ -42,6 +55,10 @@ export interface ServerOptions {
   presence: Presence;
   redis: Redis;
   matches: MatchStore;
+  moderationStore: ModerationStore;
+  wordFilter?: WordFilter;
+  internalSecret?: string;
+  guestLimitPerHour?: number;
   allowSameIp?: boolean;
   trustProxy?: boolean;
   logger?: boolean;
@@ -62,6 +79,10 @@ export function buildServer({
   presence,
   redis,
   matches,
+  moderationStore,
+  wordFilter = createWordFilter([]),
+  internalSecret,
+  guestLimitPerHour,
   allowSameIp = false,
   trustProxy = false,
   logger = false,
@@ -82,10 +103,13 @@ export function buildServer({
 
   const logFailure = (error: unknown) => app.log.error(error);
 
+  const limiter = new RateLimiter(redis);
+  const chat = new ChatService(redis, limiter, wordFilter);
   const rooms = new RoomService({
     redis,
     users,
     matches,
+    chat,
     timings,
     onError: logFailure,
     send: (socketId, event, payload) => {
@@ -98,9 +122,16 @@ export function buildServer({
   const matchmaker = new Matchmaker(redis, (roomId, a, b) => rooms.create(roomId, a, b), {
     allowSameIp,
   });
+  const moderation = new ModerationService({
+    redis,
+    store: moderationStore,
+    chat,
+    limiter,
+    removeFromQueue: (userId) => matchmaker.remove(userId),
+  });
 
   app.get('/health', async () => ({ status: 'ok' }));
-  registerApiRoutes(app, { tokens, users });
+  registerApiRoutes(app, { tokens, users, limiter, guestLimitPerHour, trustProxy, internalSecret });
 
   io.use(async (socket, next) => {
     try {
@@ -124,7 +155,7 @@ export function buildServer({
 
   io.on('connection', (socket) => {
     const { userId, ip } = socket.data;
-    const sendError = (code: keyof typeof ERROR_MESSAGES) =>
+    const sendError = (code: SocketErrorCode) =>
       socket.emit('error', { code, message: ERROR_MESSAGES[code] });
 
     // Runs a socket's queue actions in arrival order so a quick join + leave cannot reorder.
@@ -146,6 +177,12 @@ export function buildServer({
         if (!user) return void sendError(SOCKET_ERROR_CODES.unauthorized);
         if (isBanned(user, new Date())) return void sendError(SOCKET_ERROR_CODES.banned);
         if (!user.acceptedTermsAt) return void sendError(SOCKET_ERROR_CODES.termsRequired);
+        if (await moderation.isSuspended(userId)) {
+          return void sendError(SOCKET_ERROR_CODES.matchSuspended);
+        }
+        if (!(await limiter.hit(RATE_RULES.queueJoin, userId))) {
+          return void sendError(SOCKET_ERROR_CODES.rateLimited);
+        }
 
         const result = await matchmaker.join(userId, {
           socketId: socket.id,
@@ -187,7 +224,73 @@ export function buildServer({
       if (!clientEventSchemas['game:resume'].safeParse(payload).success) {
         return void sendError(SOCKET_ERROR_CODES.invalidPayload);
       }
-      if (!rooms.resume(userId, socket.id)) sendError(SOCKET_ERROR_CODES.noActiveGame);
+      enqueue(async () => {
+        if (!(await rooms.resume(userId, socket.id))) sendError(SOCKET_ERROR_CODES.noActiveGame);
+      });
+    });
+
+    socket.on('cards:pick', (payload) => {
+      const parsed = clientEventSchemas['cards:pick'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        const accepted = await rooms.pick(userId, socket.id, parsed.data.cardIds);
+        if (!accepted) sendError(SOCKET_ERROR_CODES.cardsRejected);
+      });
+    });
+
+    socket.on('chat:send', (payload) => {
+      const parsed = clientEventSchemas['chat:send'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        const refused = await rooms.sendMessage(userId, socket.id, parsed.data.body);
+        if (refused) sendError(refused);
+      });
+    });
+
+    let lastTypingAt = 0;
+    socket.on('chat:typing', (payload) => {
+      if (!clientEventSchemas['chat:typing'].safeParse(payload).success) return;
+      const now = Date.now();
+      if (now - lastTypingAt < TYPING_INTERVAL_MS) return;
+      lastTypingAt = now;
+      rooms.typing(userId, socket.id);
+    });
+
+    socket.on('chat:leave', (payload) => {
+      if (!clientEventSchemas['chat:leave'].safeParse(payload).success) {
+        return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      }
+      enqueue(() => rooms.leaveChat(userId, socket.id));
+    });
+
+    socket.on('chat:rate', (payload) => {
+      const parsed = clientEventSchemas['chat:rate'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(() => matches.rate(parsed.data.roomId, userId, parsed.data.value));
+    });
+
+    socket.on('user:report', (payload) => {
+      const parsed = clientEventSchemas['user:report'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        const result = await moderation.report(userId, parsed.data);
+        if (result.ok) {
+          socket.emit('moderation:result', { action: 'report', userId: parsed.data.userId });
+        } else {
+          sendError(result.code);
+        }
+      });
+    });
+
+    socket.on('user:block', (payload) => {
+      const parsed = clientEventSchemas['user:block'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        const result = await moderation.block(userId, parsed.data.userId);
+        if (!result.ok) return void sendError(result.code);
+        socket.emit('moderation:result', { action: 'block', userId: parsed.data.userId });
+        await rooms.closeForBlock(userId, parsed.data.userId);
+      });
     });
 
     socket.on('disconnect', () => {

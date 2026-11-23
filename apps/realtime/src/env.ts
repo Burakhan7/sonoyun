@@ -15,10 +15,16 @@ const envSchema = z
     JWT_SECRET: z.string().min(32),
     MATCH_ALLOW_SAME_IP: booleanFlag,
     TRUST_PROXY: booleanFlag,
+    INTERNAL_API_SECRET: z.string().min(32).optional(),
+    GUEST_LIMIT_PER_HOUR: z.coerce.number().int().positive().default(30),
   })
   .refine((env) => env.NODE_ENV !== 'production' || !env.MATCH_ALLOW_SAME_IP, {
     message: 'MATCH_ALLOW_SAME_IP must not be enabled in production',
     path: ['MATCH_ALLOW_SAME_IP'],
+  })
+  .refine((env) => env.NODE_ENV !== 'production' || Boolean(env.INTERNAL_API_SECRET), {
+    message: 'INTERNAL_API_SECRET is required in production',
+    path: ['INTERNAL_API_SECRET'],
   });
 
 export type Env = z.infer<typeof envSchema>;

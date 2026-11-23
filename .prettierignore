@@ -13,3 +13,4 @@ content
 docs
 AGENTS.md
 scripts/build_questions.py
+apps/realtime/badwords.tr.txt
