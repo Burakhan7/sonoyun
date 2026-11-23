@@ -2,10 +2,6 @@
 
 Zamanı gelince yapılacak işler. Yapılan madde bu listeden silinir.
 
-## İçerik (senden bekleniyor)
-
-- [ ] Gemini ile 24 avatar görselini üret ve `apps/web/public/avatars/raw/{id}.png` olarak ekle (`docs/GEMINI_AVATARS.md`), sonra `pnpm tsx scripts/optimize-avatars.ts` çalıştır. Görseller gelene kadar yedek emoji gösterilir.
-
 ## Sprint 6 (lansman öncesi zorunlu)
 - [ ] `/admin` paneli: açık raporlar, snapshot görüntüleme, ban/unban. "Reşit olmadığını düşünüyorum" raporları öncelikli listelensin; otomatik 24 saat eşleşme kısıtı buradan kaldırılabilsin.
 - [ ] `AccessLog` kayıtları (5651): bağlantı, eşleşme ve mesaj olaylarında IP + port + zaman damgası.

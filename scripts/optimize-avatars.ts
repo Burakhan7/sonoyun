@@ -1,4 +1,4 @@
-// Converts avatars/raw/{id}.png into {id}.webp (256 px) and {id}@2x.webp (512 px). See SPEC §18.
+// Converts avatars/raw/{id}.png or .jpg into {id}.webp (256 px) and {id}@2x.webp (512 px). See SPEC §18.
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -6,6 +6,7 @@ import sharp from 'sharp';
 import { AVATAR_IDS } from '../packages/shared/avatars.ts';
 
 const QUALITY = 85;
+const SOURCE_EXTENSIONS = ['png', 'jpg', 'jpeg'];
 const SIZES = [
   { width: 256, suffix: '' },
   { width: 512, suffix: '@2x' },
@@ -21,8 +22,10 @@ const missing: string[] = [];
 let converted = 0;
 
 for (const id of AVATAR_IDS) {
-  const source = join(rawDir, `${id}.png`);
-  if (!existsSync(source)) {
+  const source = SOURCE_EXTENSIONS.map((extension) => join(rawDir, `${id}.${extension}`)).find(
+    (candidate) => existsSync(candidate),
+  );
+  if (!source) {
     missing.push(id);
     continue;
   }
