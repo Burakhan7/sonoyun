@@ -13,6 +13,13 @@ function realtimeUrl() {
   );
 }
 
+/** Lets the realtime service rate-limit by the visitor's IP instead of this server's. */
+function internalHeaders(request: NextRequest): Record<string, string> {
+  const secret = process.env.INTERNAL_API_SECRET;
+  const clientIp = request.headers.get('x-real-ip');
+  return secret && clientIp ? { 'x-internal-secret': secret, 'x-client-ip': clientIp } : {};
+}
+
 export async function proxyToRealtime(request: NextRequest, path: string) {
   const cookieStore = await cookies();
   const authorization =
@@ -23,7 +30,7 @@ export async function proxyToRealtime(request: NextRequest, path: string) {
   try {
     upstream = await fetch(`${realtimeUrl()}${path}`, {
       method: 'POST',
-      headers: authorization ? { authorization } : {},
+      headers: { ...(authorization ? { authorization } : {}), ...internalHeaders(request) },
       cache: 'no-store',
     });
   } catch {

@@ -260,9 +260,9 @@ Tüm oyunlar **sunucu otoriterdir**: doğru cevap istemciye tur bitmeden gönder
 |---|---|---|---|---|
 | `mc` | Hızlı Bilgi | 4 şıklı soru, 12 sn | 5 | Doğru = 100 + kalan sn × 5. Yanlış = 0 |
 | `emoji` | Emoji Tahmin | Emojilerden yapımı/kavramı bul, 4 şık, 15 sn | 5 | `mc` ile aynı |
-| `estimate` | Yaklaşık | Sayı gir (yıl, metre, adet…), 15 sn | 3 | Rakibe göre daha yakın olan turu alır (1 puan). Tam isabet +1 bonus. Eşitlikte önce gönderen alır |
+| `estimate` | Yaklaşık | Sayı gir (yıl, metre, adet…), 15 sn | 3 | Rakibe göre daha yakın olan turu alır (1 puan). Tam isabet (birebir doğru cevap; içerikteki `tolerance` bonus vermez) +1 bonus. Eşitlikte önce gönderen alır |
 | `tf` | Doğru mu Yanlış mı | Hızlı D/Y, 6 sn | 7 | Doğru = 1; önce doğru cevaplayan +1 bonus |
-| `mixed` | Karışık Tur | Kategorideki mc/emoji/estimate/tf'den 5 soru karışık | 5 | Her soru kendi kuralıyla, toplam puan |
+| `mixed` | Karışık Tur | Kategorideki mc/emoji/estimate/tf'den 5 soru karışık | 5 | Her soru kendi süresi ve kuralıyla oynanır; **turu kazanan 1 puan alır** (eşitlikte önce cevaplayan) |
 | `ayna` | Ayna (Bu mu Şu mu) | Her turda iki şık. Oyuncu hem **kendi seçimini** yapar hem de **rakibin ne seçeceğini tahmin eder**, 10 sn | 5 | Doğru tahmin = 1 puan. Ayrıca **uyum yüzdesi** = aynı seçim yapılan tur / toplam tur |
 
 **Kategori → motor eşlemesi**

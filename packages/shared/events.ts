@@ -20,6 +20,13 @@ export const SOCKET_ERROR_CODES = {
   inRoom: 'in_room',
   noActiveGame: 'no_active_game',
   gameFailed: 'game_failed',
+  rateLimited: 'rate_limited',
+  contactBlocked: 'contact_blocked',
+  muted: 'muted',
+  matchSuspended: 'match_suspended',
+  chatClosed: 'chat_closed',
+  cardsRejected: 'cards_rejected',
+  notAllowed: 'not_allowed',
   internal: 'internal',
 } as const;
 
@@ -91,6 +98,8 @@ export const clientEventSchemas = {
   'invite:create': z.object({ friendId: id }).strict(),
   // Not in SPEC §14: restores a running game after a reload or reconnect (SPEC §5.4).
   'game:resume': empty,
+  // Not in SPEC §14: stores the internal 👍/👎 quality signal from SPEC §5.7.
+  'chat:rate': z.object({ roomId: id, value: z.union([z.literal(1), z.literal(-1)]) }).strict(),
 } as const;
 
 export const onlineCountSchema = z
@@ -111,6 +120,8 @@ export const serverEventSchemas = {
       category: z.enum(CATEGORY_IDS),
       engine: z.enum(ENGINE_IDS),
       rules: z.string().min(1),
+      // Addition to SPEC §14: tells the client to restore the game instead of replaying the spin.
+      resumed: z.boolean().optional(),
     })
     .strict(),
   'round:start': z
@@ -146,12 +157,17 @@ export const serverEventSchemas = {
       cards: z.array(publicCardSchema),
       pickCount: z.number().int().positive(),
       endsAt: timestamp,
+      // Additions to SPEC §14: clock-independent timer and picks restored after a reconnect.
+      remainingMs: z.number().int().nonnegative(),
+      picked: z.array(id),
     })
     .strict(),
   'chat:start': z
     .object({
-      pinned: z.array(z.object({ byUserId: id, card: publicCardSchema }).strict()),
+      // byUserId is null for the extra card the system adds after a tie (SPEC §5.5).
+      pinned: z.array(z.object({ byUserId: id.nullable(), card: publicCardSchema }).strict()),
       endsAt: timestamp,
+      remainingMs: z.number().int().nonnegative(),
     })
     .strict(),
   'chat:message': z.object({ id, senderId: id, body: z.string(), at: timestamp }).strict(),
@@ -165,6 +181,8 @@ export const serverEventSchemas = {
       message: z.object({ id, senderId: id, body: z.string(), at: timestamp }).strict(),
     })
     .strict(),
+  // Not in SPEC §14: confirms a report or block to the user who sent it.
+  'moderation:result': z.object({ action: z.enum(['report', 'block']), userId: id }).strict(),
   error: z.object({ code: z.string().min(1), message: z.string() }).strict(),
 } as const;
 
@@ -182,6 +200,11 @@ export type ServerToClientEvents = {
   [E in keyof ServerSchemas]: (payload: ServerEventPayload<E>) => void;
 };
 
+export type SocketErrorCode = (typeof SOCKET_ERROR_CODES)[keyof typeof SOCKET_ERROR_CODES];
+export type ChatStart = ServerEventPayload<'chat:start'>;
+export type ChatMessage = ServerEventPayload<'chat:message'>;
+export type CardsOffer = ServerEventPayload<'cards:offer'>;
+export type ReportReason = (typeof REPORT_REASONS)[number];
 export type OnlineCount = z.infer<typeof onlineCountSchema>;
 export type MatchFound = ServerEventPayload<'match:found'>;
 export type Opponent = z.infer<typeof opponentSchema>;

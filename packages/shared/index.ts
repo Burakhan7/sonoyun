@@ -19,6 +19,9 @@ export {
   serverEventSchemas,
 } from './events.js';
 export type {
+  CardsOffer,
+  ChatMessage,
+  ChatStart,
   ClientEventPayload,
   ClientToServerEvents,
   MatchFound,
@@ -26,9 +29,11 @@ export type {
   Opponent,
   PublicCard,
   PublicQuestion,
+  ReportReason,
   RoundAnswer,
   ServerEventPayload,
   ServerToClientEvents,
+  SocketErrorCode,
 } from './events.js';
 export {
   guestResponseSchema,

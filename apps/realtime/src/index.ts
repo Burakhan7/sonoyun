@@ -1,9 +1,12 @@
 import prismaClient from '@prisma/client';
+import { readFile } from 'node:fs/promises';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { Redis } from 'ioredis';
+import { createWordFilter, parseWordList } from 'shared/filter';
 import { createTokenService } from './auth.js';
 import { loadEnv } from './env.js';
 import { loadBlocks } from './matchmaking.js';
+import { createPrismaModerationStore } from './moderation.js';
 import { Presence } from './presence.js';
 import { createPrismaMatchStore } from './rooms.js';
 import { buildServer } from './server.js';
@@ -15,11 +18,19 @@ const env = loadEnv();
 const prisma = new PrismaClient();
 const redis = new Redis(env.REDIS_URL);
 const redisSubscriber = redis.duplicate();
+// Resolves to apps/realtime from both src/ and dist/. The list never reaches the client.
+const wordList = parseWordList(
+  await readFile(new URL('../badwords.tr.txt', import.meta.url), 'utf8'),
+);
 const { app, io } = buildServer({
   webOrigin: env.WEB_ORIGIN,
   tokens: createTokenService(env.JWT_SECRET),
   users: createPrismaUserStore(prisma),
   matches: createPrismaMatchStore(prisma),
+  moderationStore: createPrismaModerationStore(prisma),
+  wordFilter: createWordFilter(wordList),
+  internalSecret: env.INTERNAL_API_SECRET,
+  guestLimitPerHour: env.GUEST_LIMIT_PER_HOUR,
   presence: new Presence(redis),
   redis,
   allowSameIp: env.MATCH_ALLOW_SAME_IP,

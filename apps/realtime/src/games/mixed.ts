@@ -13,6 +13,31 @@ import { createTfRound } from './tf.js';
 
 const QUIZ_TYPES = ['mc', 'emoji', 'estimate', 'tf'] as const;
 
+/** Question types award very different points, so a mixed round is worth 1 point to its winner. */
+export function withRoundWinnerScoring(round: GameRound): GameRound {
+  return {
+    ...round,
+    score(context) {
+      const outcomes = round.score(context);
+      const points = (player: string) => outcomes[player]?.points ?? 0;
+      const arrival = [...context.answers.keys()];
+      const [winner] = [...context.players]
+        .filter((player) => points(player) > 0)
+        .sort((a, b) => points(b) - points(a) || arrival.indexOf(a) - arrival.indexOf(b));
+
+      return Object.fromEntries(
+        context.players.map((player) => [
+          player,
+          {
+            points: player === winner ? 1 : 0,
+            isCorrect: outcomes[player]?.isCorrect ?? false,
+          },
+        ]),
+      );
+    },
+  };
+}
+
 function createRound(question: QuizQuestion, random: EngineInput['random']): GameRound {
   switch (question.type) {
     case 'mc':
@@ -50,7 +75,7 @@ export const mixedEngine: GameEngine = {
     );
 
     return shuffled([...oneOfEach, ...extra], input.random).map((question) =>
-      createRound(question, input.random),
+      withRoundWinnerScoring(createRound(question, input.random)),
     );
   },
 };

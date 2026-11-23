@@ -43,7 +43,7 @@ export const ENGINES: Record<EngineId, EngineDefinition> = {
   mixed: {
     id: 'mixed',
     name: 'Karışık Tur',
-    rule: 'Her turda farklı bir soru tipi seni bekliyor.',
+    rule: 'Her turda farklı bir soru tipi var; turu kazanan 1 puan alır.',
     rounds: 5,
     roundSeconds: null,
   },

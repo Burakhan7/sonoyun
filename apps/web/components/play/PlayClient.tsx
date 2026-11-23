@@ -7,22 +7,43 @@ import {
   SOCKET_AUTH_ERRORS,
   SOCKET_ERROR_CODES,
   serverEventSchemas,
+  type CardsOffer,
+  type ChatMessage,
+  type ChatStart,
   type MatchFound,
   type PublicUser,
+  type ReportReason,
   type ServerEventPayload,
 } from 'shared';
 import { createChime, flashTitle } from '@/lib/notify';
 import { loadSession } from '@/lib/session';
 import { connectSocket, type AppSocket } from '@/lib/socket';
+import { CardPicker } from './CardPicker';
 import { CategorySpin } from './CategorySpin';
+import { ChatScreen, type ChatEndReason } from './ChatScreen';
 import { GameOver } from './GameOver';
 import { GameScreen, type AnswerPayload, type RoundResult, type RoundStart } from './GameScreen';
 
 const NOBODY_AFTER_SEC = 60;
 const CALM_HINT_AFTER_SEC = 20;
+const TYPING_VISIBLE_MS = 2_500;
+const TYPING_SEND_INTERVAL_MS = 1_500;
+const MESSAGE_REFUSAL_CODES = new Set<string>([
+  SOCKET_ERROR_CODES.rateLimited,
+  SOCKET_ERROR_CODES.contactBlocked,
+  SOCKET_ERROR_CODES.muted,
+]);
 
 type Phase =
-  'connecting' | 'searching' | 'nobody' | 'spinning' | 'playing' | 'finished' | 'blocked';
+  | 'connecting'
+  | 'searching'
+  | 'nobody'
+  | 'spinning'
+  | 'playing'
+  | 'finished'
+  | 'picking'
+  | 'chatting'
+  | 'blocked';
 
 const primaryButton =
   'flex min-h-touch w-full items-center justify-center rounded-xl bg-accent px-4 py-3 font-semibold text-white';
@@ -30,7 +51,7 @@ const secondaryButton =
   'flex min-h-touch w-full items-center justify-center rounded-xl border-2 border-ink px-4 py-3 font-semibold';
 
 function isInGame(phase: Phase) {
-  return phase === 'spinning' || phase === 'playing';
+  return ['spinning', 'playing', 'finished', 'picking', 'chatting'].includes(phase);
 }
 
 function formatElapsed(totalSeconds: number) {
@@ -51,12 +72,29 @@ export function PlayClient() {
   const [roundResult, setRoundResult] = useState<RoundResult | null>(null);
   const [deadline, setDeadline] = useState(0);
   const [gameOver, setGameOver] = useState<ServerEventPayload<'game:over'> | null>(null);
+  const [offer, setOffer] = useState<CardsOffer | null>(null);
+  const [pickDeadline, setPickDeadline] = useState(0);
+  const [pinned, setPinned] = useState<ChatStart['pinned']>([]);
+  const [chatDeadline, setChatDeadline] = useState(0);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [opponentTyping, setOpponentTyping] = useState(false);
+  const [chatEnded, setChatEnded] = useState<ChatEndReason | null>(null);
+  const [leftByMe, setLeftByMe] = useState(false);
+  const [chatNotice, setChatNotice] = useState<string | null>(null);
+  const [noticeIsError, setNoticeIsError] = useState(true);
+  const [refusedCount, setRefusedCount] = useState(0);
+  const [reported, setReported] = useState(false);
+  const [blockedUser, setBlockedUser] = useState(false);
 
   const phaseRef = useRef<Phase>('connecting');
   const socketRef = useRef<AppSocket | null>(null);
   const notifyRef = useRef(false);
   const chimeRef = useRef<(() => void) | null>(null);
   const stopFlashRef = useRef<(() => void) | null>(null);
+  const finishedRef = useRef(false);
+  const typingTimerRef = useRef<number | undefined>(undefined);
+  const noticeTimerRef = useRef<number | undefined>(undefined);
+  const lastTypingSentRef = useRef(0);
 
   const setPhase = useCallback((next: Phase) => {
     phaseRef.current = next;
@@ -69,6 +107,16 @@ export function PlayClient() {
     setRound(null);
     setRoundResult(null);
     setGameOver(null);
+    setOffer(null);
+    setPinned([]);
+    setMessages([]);
+    setOpponentTyping(false);
+    setChatEnded(null);
+    setLeftByMe(false);
+    setChatNotice(null);
+    setReported(false);
+    setBlockedUser(false);
+    finishedRef.current = false;
     setPhase('searching');
     const socket = socketRef.current;
     if (socket?.connected) socket.emit('queue:join', {});
@@ -78,6 +126,13 @@ export function PlayClient() {
   useEffect(() => {
     let cancelled = false;
     let detach = () => {};
+
+    const showNotice = (message: string, isError = true) => {
+      setChatNotice(message);
+      setNoticeIsError(isError);
+      window.clearTimeout(noticeTimerRef.current);
+      noticeTimerRef.current = window.setTimeout(() => setChatNotice(null), 4_000);
+    };
 
     const block = (message: string) => {
       setBlockedMessage(message);
@@ -95,7 +150,10 @@ export function PlayClient() {
 
         const onConnect = () => {
           if (phaseRef.current === 'searching') startSearch();
-          else if (phaseRef.current === 'connecting' || isInGame(phaseRef.current)) {
+          else if (
+            phaseRef.current === 'connecting' ||
+            (isInGame(phaseRef.current) && !finishedRef.current)
+          ) {
             socket.emit('game:resume', {});
           }
         };
@@ -122,7 +180,7 @@ export function PlayClient() {
         const onMatch = (payload: MatchFound) => {
           const parsed = serverEventSchemas['match:found'].safeParse(payload);
           if (!parsed.success) return;
-          if (notifyRef.current) {
+          if (notifyRef.current && !parsed.data.resumed) {
             chimeRef.current?.();
             stopFlashRef.current?.();
             stopFlashRef.current = flashTitle();
@@ -130,9 +188,11 @@ export function PlayClient() {
             setNotifying(false);
           }
           setMatch(parsed.data);
-          setGameOver(null);
-          // A resumed game receives round:start right after this and skips the spin.
-          if (phaseRef.current !== 'playing') setPhase('spinning');
+          // A resumed room restores its own stage right after this, without replaying the spin.
+          if (!parsed.data.resumed) {
+            setGameOver(null);
+            setPhase('spinning');
+          }
         };
         const onRoundStart = (payload: RoundStart) => {
           const parsed = serverEventSchemas['round:start'].safeParse(payload);
@@ -150,7 +210,62 @@ export function PlayClient() {
           const parsed = serverEventSchemas['game:over'].safeParse(payload);
           if (!parsed.success) return;
           setGameOver(parsed.data);
+          if (parsed.data.forfeit) finishedRef.current = true;
           setPhase('finished');
+        };
+        const onOffer = (payload: CardsOffer) => {
+          const parsed = serverEventSchemas['cards:offer'].safeParse(payload);
+          if (!parsed.success) return;
+          setOffer(parsed.data);
+          setPickDeadline(Date.now() + parsed.data.remainingMs);
+          setPhase('picking');
+        };
+        const onChatStart = (payload: ChatStart) => {
+          const parsed = serverEventSchemas['chat:start'].safeParse(payload);
+          if (!parsed.success) return;
+          setPinned(parsed.data.pinned);
+          setChatDeadline(Date.now() + parsed.data.remainingMs);
+          setMessages([]);
+          setChatEnded(null);
+          setPhase('chatting');
+        };
+        const onChatMessage = (payload: ChatMessage) => {
+          const parsed = serverEventSchemas['chat:message'].safeParse(payload);
+          if (!parsed.success) return;
+          setOpponentTyping(false);
+          setMessages((current) =>
+            current.some((message) => message.id === parsed.data.id)
+              ? current
+              : [...current, parsed.data],
+          );
+        };
+        const onChatTyping = (payload: ServerEventPayload<'chat:typing'>) => {
+          if (!serverEventSchemas['chat:typing'].safeParse(payload).success) return;
+          setOpponentTyping(true);
+          window.clearTimeout(typingTimerRef.current);
+          typingTimerRef.current = window.setTimeout(
+            () => setOpponentTyping(false),
+            TYPING_VISIBLE_MS,
+          );
+        };
+        const onChatEnded = (payload: ServerEventPayload<'chat:ended'>) => {
+          const parsed = serverEventSchemas['chat:ended'].safeParse(payload);
+          if (!parsed.success) return;
+          finishedRef.current = true;
+          setChatEnded(parsed.data.reason);
+          setPhase('chatting');
+        };
+        const onModeration = (payload: ServerEventPayload<'moderation:result'>) => {
+          const parsed = serverEventSchemas['moderation:result'].safeParse(payload);
+          if (!parsed.success) return;
+          if (parsed.data.action === 'report') setReported(true);
+          else setBlockedUser(true);
+          showNotice(
+            parsed.data.action === 'report'
+              ? 'Raporun alındı, teşekkürler.'
+              : 'Kullanıcı engellendi. Bir daha eşleşmeyeceksiniz.',
+            false,
+          );
         };
         const onError = (payload: ServerEventPayload<'error'>) => {
           const parsed = serverEventSchemas.error.safeParse(payload);
@@ -160,11 +275,16 @@ export function PlayClient() {
             router.replace('/');
           } else if (code === SOCKET_ERROR_CODES.noActiveGame) {
             if (phaseRef.current === 'connecting') startSearch();
-            else if (isInGame(phaseRef.current)) block('Bağlantın koptuğu için oyun sona erdi.');
+            else if (isInGame(phaseRef.current) && !finishedRef.current) {
+              block('Bağlantın koptuğu için oyun sona erdi.');
+            }
           } else if (code === SOCKET_ERROR_CODES.gameFailed) {
             block(message);
           } else if (phaseRef.current === 'searching') {
             block(message);
+          } else if (phaseRef.current === 'chatting' || phaseRef.current === 'picking') {
+            showNotice(message);
+            if (MESSAGE_REFUSAL_CODES.has(code)) setRefusedCount((count) => count + 1);
           }
         };
 
@@ -176,6 +296,12 @@ export function PlayClient() {
         socket.on('round:start', onRoundStart);
         socket.on('round:result', onRoundResult);
         socket.on('game:over', onGameOver);
+        socket.on('cards:offer', onOffer);
+        socket.on('chat:start', onChatStart);
+        socket.on('chat:message', onChatMessage);
+        socket.on('chat:typing', onChatTyping);
+        socket.on('chat:ended', onChatEnded);
+        socket.on('moderation:result', onModeration);
         socket.on('error', onError);
         detach = () => {
           socket.off('connect', onConnect);
@@ -186,6 +312,12 @@ export function PlayClient() {
           socket.off('round:start', onRoundStart);
           socket.off('round:result', onRoundResult);
           socket.off('game:over', onGameOver);
+          socket.off('cards:offer', onOffer);
+          socket.off('chat:start', onChatStart);
+          socket.off('chat:message', onChatMessage);
+          socket.off('chat:typing', onChatTyping);
+          socket.off('chat:ended', onChatEnded);
+          socket.off('moderation:result', onModeration);
           socket.off('error', onError);
           if (phaseRef.current === 'searching') socket.emit('queue:leave', {});
         };
@@ -200,6 +332,8 @@ export function PlayClient() {
       cancelled = true;
       detach();
       stopFlashRef.current?.();
+      window.clearTimeout(typingTimerRef.current);
+      window.clearTimeout(noticeTimerRef.current);
     };
   }, [router, setPhase, startSearch]);
 
@@ -226,6 +360,38 @@ export function PlayClient() {
     if (round) socketRef.current?.emit('game:answer', { roundNo: round.roundNo, ...payload });
   };
 
+  const sendTyping = () => {
+    const now = Date.now();
+    if (now - lastTypingSentRef.current < TYPING_SEND_INTERVAL_MS) return;
+    lastTypingSentRef.current = now;
+    socketRef.current?.emit('chat:typing', {});
+  };
+
+  const leaveChat = () => {
+    setLeftByMe(true);
+    socketRef.current?.emit('chat:leave', {});
+  };
+
+  const reportOpponent = (reason: ReportReason, note: string) => {
+    if (!match) return;
+    const trimmed = note.trim();
+    socketRef.current?.emit('user:report', {
+      userId: match.opponent.id,
+      reason,
+      ...(trimmed ? { note: trimmed } : {}),
+    });
+  };
+
+  const blockOpponent = () => {
+    if (!match) return;
+    setLeftByMe(true);
+    socketRef.current?.emit('user:block', { userId: match.opponent.id });
+  };
+
+  const rateChat = (value: 1 | -1) => {
+    if (match) socketRef.current?.emit('chat:rate', { roomId: match.roomId, value });
+  };
+
   const invite = async () => {
     const url = window.location.origin;
     const text = 'Önce oyun, sonra sohbet! Gel bir el oynayalım:';
@@ -247,7 +413,11 @@ export function PlayClient() {
   return (
     <main
       className={`mx-auto flex min-h-dvh w-full max-w-md flex-col items-center gap-6 px-4 text-center ${
-        phase === 'playing' ? '' : 'justify-center py-6'
+        phase === 'playing' || phase === 'chatting'
+          ? ''
+          : phase === 'picking'
+            ? 'py-2'
+            : 'justify-center py-6'
       }`}
     >
       {phase === 'connecting' && <p className="text-muted">Bağlanıyor…</p>}
@@ -315,8 +485,55 @@ export function PlayClient() {
         />
       )}
 
-      {phase === 'finished' && match && gameOver && me && (
-        <GameOver me={me} match={match} result={gameOver} onNewGame={startSearch} />
+      {phase === 'finished' &&
+        match &&
+        gameOver &&
+        me &&
+        (gameOver.forfeit ? (
+          <GameOver me={me} match={match} result={gameOver} onNewGame={startSearch} />
+        ) : (
+          <p role="status" className="text-muted">
+            Kartlar hazırlanıyor…
+          </p>
+        ))}
+
+      {phase === 'picking' && match && gameOver && offer && me && (
+        <CardPicker
+          key={match.roomId}
+          me={me}
+          match={match}
+          result={gameOver}
+          offer={offer}
+          deadline={pickDeadline}
+          onPick={(cardIds) => socketRef.current?.emit('cards:pick', { cardIds })}
+        />
+      )}
+
+      {phase === 'chatting' && match && me && (
+        <ChatScreen
+          key={match.roomId}
+          me={me}
+          match={match}
+          winnerId={gameOver?.winnerId ?? null}
+          pinned={pinned}
+          deadline={chatDeadline}
+          messages={messages}
+          opponentTyping={opponentTyping}
+          ended={chatEnded}
+          leftByMe={leftByMe}
+          notice={chatNotice}
+          noticeIsError={noticeIsError}
+          refusedCount={refusedCount}
+          reported={reported}
+          blocked={blockedUser}
+          onSend={(body) => socketRef.current?.emit('chat:send', { body })}
+          onTyping={sendTyping}
+          onLeave={leaveChat}
+          onReport={reportOpponent}
+          onBlock={blockOpponent}
+          onRate={rateChat}
+          onNewGame={startSearch}
+        />
       )}
 
       {phase === 'blocked' && (

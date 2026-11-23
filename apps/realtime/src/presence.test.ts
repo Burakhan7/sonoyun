@@ -6,7 +6,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vites
 import { createTokenService } from './auth.js';
 import { Presence, gamesTodayKey } from './presence.js';
 import { buildServer } from './server.js';
-import { MemoryMatchStore, MemoryUserStore } from './test/memory-store.js';
+import { MemoryMatchStore, MemoryModerationStore, MemoryUserStore } from './test/memory-store.js';
 
 // Requires Redis (docker compose up -d). Uses a dedicated logical database that is flushed.
 const TEST_DB = 15;
@@ -58,6 +58,7 @@ describe('presence over Socket.IO', () => {
       presence,
       redis,
       matches: new MemoryMatchStore(),
+      moderationStore: new MemoryModerationStore(),
       broadcastIntervalMs: 50,
     });
     await server.app.listen({ host: '127.0.0.1', port: 0 });

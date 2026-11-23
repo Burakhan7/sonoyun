@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
 
 const ALGORITHM = 'HS256';
-const TOKEN_LIFETIME = '365d';
+const TOKEN_LIFETIME_SECONDS = 365 * 24 * 60 * 60;
 
 export interface TokenService {
   sign(userId: string): Promise<string>;
@@ -12,13 +12,16 @@ export function createTokenService(secret: string): TokenService {
   const key = new TextEncoder().encode(secret);
 
   return {
-    sign: (userId) =>
-      new SignJWT()
+    sign(userId) {
+      // One clock reading, so the lifetime stays exact across a second boundary.
+      const issuedAt = Math.floor(Date.now() / 1000);
+      return new SignJWT()
         .setProtectedHeader({ alg: ALGORITHM })
         .setSubject(userId)
-        .setIssuedAt()
-        .setExpirationTime(TOKEN_LIFETIME)
-        .sign(key),
+        .setIssuedAt(issuedAt)
+        .setExpirationTime(issuedAt + TOKEN_LIFETIME_SECONDS)
+        .sign(key);
+    },
 
     async verify(token) {
       try {

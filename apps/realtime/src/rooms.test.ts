@@ -1,7 +1,10 @@
 import { Redis } from 'ioredis';
 import { CATEGORY_IDS, ENGINE_IDS, publicQuestionSchema, type MatchFound } from 'shared';
+import { createWordFilter } from 'shared/filter';
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ChatService } from './chat.js';
 import { activeKey, type Candidate } from './matchmaking.js';
+import { RateLimiter } from './ratelimit.js';
 import { gamesTodayKey } from './presence.js';
 import {
   ACTIVE_ROOMS_KEY,
@@ -79,6 +82,7 @@ describe('RoomService', () => {
       redis,
       users,
       matches,
+      chat: new ChatService(redis, new RateLimiter(redis), createWordFilter([])),
       timings,
       onError: (error) => {
         throw error;
@@ -108,7 +112,7 @@ describe('RoomService', () => {
     matches = new MemoryMatchStore();
     notified = [];
     events = [];
-    rooms = service({ spinMs: 10, gapMs: 5, reconnectMs: 60, roundMs: 40 });
+    rooms = service({ spinMs: 10, gapMs: 5, reconnectMs: 60, roundMs: 40, pickMs: 5, chatMs: 10 });
     const userA = await users.create({ nickname: 'Sakin Tilki', avatarId: 'tilki' });
     const userB = await users.create({ nickname: 'Cesur Kartal', avatarId: 'kartal' });
     a = candidate(userA.id, 'socket-a');
@@ -159,7 +163,7 @@ describe('RoomService', () => {
     expect(await redis.llen(recentCategoriesKey(a.userId))).toBe(3);
   });
 
-  it('plays every round in order and ends after game:over', async () => {
+  it('plays every round, then cards and chat, and releases the room', async () => {
     await rooms.create('room-1', a, b);
 
     await vi.waitFor(() => expect(matches.ended.has('room-1')).toBe(true), { timeout: 3000 });
@@ -169,7 +173,8 @@ describe('RoomService', () => {
     const results = forA.filter(({ event }) => event === 'round:result');
     expect(starts.length).toBeGreaterThan(0);
     expect(results).toHaveLength(starts.length);
-    expect(forA.at(-1)!.event).toBe('game:over');
+    expect(forA.map(({ event }) => event)).toContain('game:over');
+    expect(forA.at(-1)!.event).toBe('chat:ended');
     forA
       .filter(({ event }) => event.startsWith('round:'))
       .forEach(({ event }, index) => {
@@ -248,7 +253,7 @@ describe('RoomService', () => {
     await vi.waitFor(() => expect(events.some(({ event }) => event === 'round:start')).toBe(true));
     rooms.handleDisconnect(a.userId, 'socket-a');
 
-    expect(rooms.resume(a.userId, 'socket-a2')).toBe(true);
+    expect(await rooms.resume(a.userId, 'socket-a2')).toBe(true);
     await new Promise((resolve) => setTimeout(resolve, 80));
 
     expect(matches.ended.has('room-1')).toBe(false);
@@ -259,8 +264,8 @@ describe('RoomService', () => {
     await rooms.shutdown();
   });
 
-  it('reports no game to resume for a player without a room', () => {
-    expect(rooms.resume('nobody', 'socket')).toBe(false);
+  it('reports no game to resume for a player without a room', async () => {
+    expect(await rooms.resume('nobody', 'socket')).toBe(false);
   });
 
   it('does not release a player who already moved to another room', async () => {
