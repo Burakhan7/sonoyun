@@ -38,7 +38,14 @@ const { app, io } = buildServer({
   logger: true,
 });
 
+// A Redis outage must not take the service down: ioredis reconnects once Redis is back.
+for (const client of [redis, redisSubscriber]) {
+  client.on('error', (error: Error) => app.log.warn({ message: error.message }, 'Redis error'));
+}
 io.adapter(createAdapter(redis, redisSubscriber));
+process.on('unhandledRejection', (reason) => {
+  app.log.error({ err: reason }, 'Unhandled rejection');
+});
 
 let shuttingDown = false;
 
