@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { transferRedeemSchema, unreadResponseSchema } from 'shared';
+import { deleteAccountSchema, transferRedeemSchema, unreadResponseSchema } from 'shared';
 import type { TokenService } from './auth.js';
 import type { DmService } from './dm.js';
 import type { FriendService } from './friends.js';
@@ -18,6 +18,7 @@ export interface SocialRouteDeps {
   requireUser: (request: FastifyRequest, reply: FastifyReply) => Promise<UserRecord | null>;
   /** Tells the other side's open pages that the friendship ended. */
   onFriendRemoved?: (userId: string, friendId: string) => void;
+  deleteAccount?: (userId: string) => Promise<void>;
 }
 
 const param = (request: FastifyRequest, name: string) =>
@@ -78,6 +79,16 @@ export function registerSocialRoutes(app: FastifyInstance, deps: SocialRouteDeps
     if (!user) return reply;
     const { code, expiresAt } = await transfers.create(user.id);
     return { code, expiresAt: expiresAt.toISOString() };
+  });
+
+  app.post('/api/me/delete', async (request, reply) => {
+    const user = await requireUser(request, reply);
+    if (!user) return reply;
+    if (!deps.deleteAccount || !deleteAccountSchema.safeParse(request.body).success) {
+      return reply.code(400).send({ code: 'invalid_payload' });
+    }
+    await deps.deleteAccount(user.id);
+    return { ok: true };
   });
 
   app.post('/api/transfer/redeem', async (request, reply) => {

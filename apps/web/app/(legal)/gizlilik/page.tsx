@@ -1,5 +1,61 @@
-import { ComingSoon } from '@/components/ComingSoon';
+import type { Metadata } from 'next';
+import { LegalPage } from '@/components/LegalPage';
+
+export const metadata: Metadata = { title: 'Gizlilik' };
 
 export default function PrivacyPage() {
-  return <ComingSoon title="Gizlilik" text="Bu metin hazırlanıyor." />;
+  return (
+    <LegalPage title="Gizlilik Politikası">
+      <p>Son güncelleme: [tarih]. Veri sorumlusu: [şirket unvanı, adres, iletişim e-postası].</p>
+
+      <h2>Hangi verileri işliyoruz?</h2>
+      <ul>
+        <li>Hesap: rastgele takma ad, avatar, oluşturma ve son görülme zamanı, kural onayı.</li>
+        <li>Bağlantı kayıtları: IP adresi, varsa port, olay türü ve zaman damgası.</li>
+        <li>Oyun: eşleşmeler, kategori, skor, görülen soru kimlikleri.</li>
+        <li>Sosyal: arkadaşlıklar, istekler, engellemeler.</li>
+        <li>Mesajlar: rastgele sohbet ve özel mesajlar.</li>
+        <li>Raporlar: rapor nedeni, not ve raporlanan görüşmenin son 50 mesajı.</li>
+        <li>Hata kayıtları: kullanıcı kimliği ve mesaj içeriği olmadan teknik hata bilgisi.</li>
+      </ul>
+
+      <h2>Ne kadar saklıyoruz?</h2>
+      <ul>
+        <li>Rastgele sohbet mesajları: 24 saat.</li>
+        <li>Özel mesajlar: gönderildikten 24 saat sonra silinir.</li>
+        <li>Hesap verileri: hesabını silene kadar.</li>
+        <li>Bağlantı kayıtları: [5651 sayılı Kanun kapsamındaki süre, hukukçu teyidiyle].</li>
+        <li>Raporlar: [inceleme ve hukuki yükümlülükler için belirlenecek süre].</li>
+      </ul>
+
+      <h2>Çerezler ve tarayıcı depolama</h2>
+      <ul>
+        <li>
+          <strong>Zorunlu:</strong> oturum çerezi ve tarayıcıda saklanan oturum anahtarı; misafir
+          hesabının çalışması için gereklidir.
+        </li>
+        <li>
+          <strong>Analitik (isteğe bağlı):</strong> yalnızca onay verirsen yüklenir. Onayını çerez
+          bandından verebilir veya reddedebilirsin.
+        </li>
+      </ul>
+
+      <h2>Kimlerle paylaşıyoruz?</h2>
+      <p>
+        Hizmetin çalışması için barındırma ve altyapı sağlayıcıları kullanılır: [Vercel, Railway ve
+        kullanılıyorsa Sentry, Plausible; ülke ve aktarım dayanağı]. Yetkili kurumların hukuka uygun
+        talepleri hâlinde veriler paylaşılabilir. Verilerin satılması söz konusu değildir.
+      </p>
+
+      <h2>Hesabını silme</h2>
+      <p>
+        Ayarlar → Hesabımı sil ile hesabın, arkadaşlıkların, özel mesajların ve eşleşme listelerin
+        silinir; oyun istatistikleri anonimleştirilir. Bağlantı kayıtları yasal süre boyunca, rapor
+        kayıtları ise yukarıda belirtilen süre boyunca saklanır.
+      </p>
+
+      <h2>İletişim</h2>
+      <p>Sorularını [iletişim e-postası] adresine iletebilirsin.</p>
+    </LegalPage>
+  );
 }

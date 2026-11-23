@@ -16,6 +16,7 @@ const envSchema = z
     MATCH_ALLOW_SAME_IP: booleanFlag,
     TRUST_PROXY: booleanFlag,
     INTERNAL_API_SECRET: z.string().min(32).optional(),
+    SENTRY_DSN: z.string().url().optional(),
     GUEST_LIMIT_PER_HOUR: z.coerce.number().int().positive().default(30),
   })
   .refine((env) => env.NODE_ENV !== 'production' || !env.MATCH_ALLOW_SAME_IP, {

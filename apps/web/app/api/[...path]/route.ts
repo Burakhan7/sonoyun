@@ -15,6 +15,7 @@ const ALLOWED_ROUTES: Record<string, RegExp[]> = {
     new RegExp(`^/api/friends/${ID}/remove$`),
     new RegExp(`^/api/friends/requests/${ID}/cancel$`),
     /^\/api\/me\/transfer-code$/,
+    /^\/api\/me\/delete$/,
     /^\/api\/transfer\/redeem$/,
   ],
 };

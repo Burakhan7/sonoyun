@@ -3,7 +3,17 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_REALTIME_URL", "REALTIME_INTERNAL_URL", "INTERNAL_API_SECRET"],
+      "env": [
+        "NEXT_PUBLIC_REALTIME_URL",
+        "REALTIME_INTERNAL_URL",
+        "INTERNAL_API_SECRET",
+        "ADMIN_USER",
+        "ADMIN_PASSWORD",
+        "ADMIN_IP_ALLOWLIST",
+        "SENTRY_DSN",
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "NEXT_PUBLIC_PLAUSIBLE_DOMAIN"
+      ],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {

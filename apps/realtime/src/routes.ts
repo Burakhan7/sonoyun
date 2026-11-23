@@ -22,7 +22,10 @@ export interface ApiDeps {
   trustProxy?: boolean;
   /** Proves a request came from the web app, whose forwarded client IP can then be trusted. */
   internalSecret?: string;
-  social?: Pick<SocialRouteDeps, 'friends' | 'dm' | 'transfers' | 'onFriendRemoved'>;
+  social?: Pick<
+    SocialRouteDeps,
+    'friends' | 'dm' | 'transfers' | 'onFriendRemoved' | 'deleteAccount'
+  >;
 }
 
 const DEFAULT_GUEST_LIMIT_PER_HOUR = 30;

@@ -37,8 +37,14 @@ export type {
   SocketErrorCode,
 } from './events.js';
 export {
+  ADMIN_REPORT_STATUSES,
+  adminBanSchema,
+  adminReportSchema,
+  adminReportStatusSchema,
+  adminReportsResponseSchema,
   conversationSummarySchema,
   conversationsResponseSchema,
+  deleteAccountSchema,
   directMessageSchema,
   friendRequestSchema,
   friendSchema,
@@ -53,6 +59,7 @@ export {
   userResponseSchema,
 } from './api.js';
 export type {
+  AdminReport,
   ConversationSummary,
   Friend,
   FriendRequestEntry,

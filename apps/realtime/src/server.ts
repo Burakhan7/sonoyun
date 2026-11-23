@@ -13,12 +13,15 @@ import {
 } from 'shared';
 import { createWordFilter, type WordFilter } from 'shared/filter';
 import { Server } from 'socket.io';
+import { AccountService } from './account.js';
+import { AdminService, registerAdminRoutes } from './admin.js';
 import type { TokenService } from './auth.js';
 import { ChatService } from './chat.js';
 import { clientIp } from './client-ip.js';
 import { DmService } from './dm.js';
 import { FriendService, type FriendResult } from './friends.js';
 import { INVITE_TTL_MS, InviteService } from './invites.js';
+import { AccessLogger, type AccessEvent } from './logging5651.js';
 import { Matchmaker } from './matchmaking.js';
 import { ModerationService, type ModerationStore } from './moderation.js';
 import type { Presence } from './presence.js';
@@ -35,6 +38,7 @@ const MATCH_TICK_MS = 500;
 const QUEUE_STATUS_INTERVAL_MS = 1_000;
 const TYPING_INTERVAL_MS = 1_000;
 const DM_PURGE_INTERVAL_MS = 5 * 60 * 1000;
+const ACCESS_LOG_FLUSH_MS = 2_000;
 const userRoom = (userId: string) => `user:${userId}`;
 
 const ERROR_MESSAGES: Record<SocketErrorCode, string> = {
@@ -75,6 +79,8 @@ export interface ServerOptions {
   allowSameIp?: boolean;
   trustProxy?: boolean;
   logger?: boolean;
+  /** Receives unexpected errors, e.g. to forward them to Sentry. */
+  reportError?: (error: unknown) => void;
   broadcastIntervalMs?: number;
   matchTickMs?: number;
   timings?: RoomTimings;
@@ -83,6 +89,8 @@ export interface ServerOptions {
 interface SocketData {
   userId: string;
   ip: string;
+  /** Source port. Unknown behind a reverse proxy, which hides the visitor's port. */
+  port: number | null;
 }
 
 export function buildServer({
@@ -100,6 +108,7 @@ export function buildServer({
   allowSameIp = false,
   trustProxy = false,
   logger = false,
+  reportError,
   broadcastIntervalMs = BROADCAST_INTERVAL_MS,
   matchTickMs = MATCH_TICK_MS,
   timings,
@@ -115,7 +124,15 @@ export function buildServer({
   });
   const timers: NodeJS.Timeout[] = [];
 
-  const logFailure = (error: unknown) => app.log.error(error);
+  const logFailure = (error: unknown) => {
+    app.log.error(error);
+    reportError?.(error);
+  };
+  const accessLog = prisma ? new AccessLogger(prisma, logFailure) : null;
+  const logSocketEvent = (socketId: string, event: AccessEvent) => {
+    const data = io.sockets.sockets.get(socketId)?.data;
+    if (data) accessLog?.record({ userId: data.userId, ip: data.ip, port: data.port, event });
+  };
 
   const limiter = new RateLimiter(redis);
   const chat = new ChatService(redis, limiter, wordFilter);
@@ -133,9 +150,15 @@ export function buildServer({
       );
     },
   });
-  const matchmaker = new Matchmaker(redis, (roomId, a, b) => rooms.create(roomId, a, b), {
-    allowSameIp,
-  });
+  const matchmaker = new Matchmaker(
+    redis,
+    async (roomId, a, b) => {
+      await rooms.create(roomId, a, b);
+      logSocketEvent(a.socketId, 'match');
+      logSocketEvent(b.socketId, 'match');
+    },
+    { allowSameIp },
+  );
   const removeFromQueue = (userId: string) => matchmaker.remove(userId);
   const friends = prisma ? new FriendService(prisma, redis, limiter, presence) : null;
   const dm = prisma && friends ? new DmService(prisma, chat, friends, presence) : null;
@@ -147,7 +170,11 @@ export function buildServer({
         limiter,
         removeFromQueue,
         isConnected: async (socketId) => (await io.in(socketId).fetchSockets()).length > 0,
-        createRoom: (roomId, a, b) => rooms.create(roomId, a, b, { friendly: true }),
+        createRoom: async (roomId, a, b) => {
+          await rooms.create(roomId, a, b, { friendly: true });
+          logSocketEvent(a.socketId, 'match');
+          logSocketEvent(b.socketId, 'match');
+        },
       })
     : null;
   const moderation = new ModerationService({
@@ -166,7 +193,28 @@ export function buildServer({
         : undefined,
   });
 
+  const kickUser = async (userId: string) => {
+    await matchmaker.remove(userId);
+    io.in(userRoom(userId)).disconnectSockets(true);
+  };
+  const accounts = prisma ? new AccountService(prisma, redis) : null;
+
   app.get('/health', async () => ({ status: 'ok' }));
+
+  // Unlike /health, this reports whether the service can do useful work right now.
+  app.get('/ready', async (_request, reply) => {
+    const checks = await Promise.allSettled([
+      redis.ping(),
+      prisma ? prisma.$queryRaw`SELECT 1` : Promise.resolve(),
+    ]);
+    const [redisCheck, databaseCheck] = checks;
+    const ready = checks.every((check) => check.status === 'fulfilled');
+    return reply.code(ready ? 200 : 503).send({
+      status: ready ? 'ok' : 'unavailable',
+      redis: redisCheck.status === 'fulfilled',
+      database: databaseCheck.status === 'fulfilled',
+    });
+  });
   registerApiRoutes(app, {
     tokens,
     users,
@@ -174,8 +222,22 @@ export function buildServer({
     guestLimitPerHour,
     trustProxy,
     internalSecret,
-    social: friends && dm && transfers ? { friends, dm, transfers } : undefined,
+    social:
+      friends && dm && transfers
+        ? {
+            friends,
+            dm,
+            transfers,
+            deleteAccount: async (userId) => {
+              await kickUser(userId);
+              await accounts?.delete(userId);
+            },
+          }
+        : undefined,
   });
+  if (prisma && internalSecret) {
+    registerAdminRoutes(app, new AdminService(prisma, redis, kickUser), internalSecret);
+  }
 
   io.use(async (socket, next) => {
     try {
@@ -189,6 +251,7 @@ export function buildServer({
 
       socket.data.userId = user.id;
       socket.data.ip = clientIp(socket.handshake, trustProxy);
+      socket.data.port = trustProxy ? null : (socket.request.socket.remotePort ?? null);
       users.touch(user.id, now).catch(logFailure);
       return next();
     } catch (error) {
@@ -212,6 +275,7 @@ export function buildServer({
     };
 
     void socket.join(userRoom(userId));
+    logSocketEvent(socket.id, 'connect');
 
     const announceFriendship = async (result: FriendResult, actorId: string) => {
       if (result.status !== 'accepted') return;
@@ -270,6 +334,7 @@ export function buildServer({
         const { conversationId, body } = parsed.data;
         const result = await dm.send(userId, conversationId, body);
         if (!result.ok) return void sendError(result.code);
+        logSocketEvent(socket.id, 'message');
         io.to(userRoom(userId))
           .to(userRoom(result.recipientId))
           .emit('dm:message', { conversationId, message: result.message });
@@ -415,6 +480,7 @@ export function buildServer({
       enqueue(async () => {
         const refused = await rooms.sendMessage(userId, socket.id, parsed.data.body);
         if (refused) sendError(refused);
+        else logSocketEvent(socket.id, 'message');
       });
     });
 
@@ -465,6 +531,7 @@ export function buildServer({
     });
 
     socket.on('disconnect', () => {
+      accessLog?.record({ userId, ip, port: socket.data.port, event: 'disconnect' });
       rooms.handleDisconnect(userId, socket.id);
       presence.disconnect(userId).catch(logFailure);
       enqueue(() => matchmaker.leave(userId, socket.id));
@@ -493,6 +560,7 @@ export function buildServer({
     );
     every(SWEEP_INTERVAL_MS, () => Promise.all([presence.sweep(), rooms.sweep()]));
     if (dm) every(DM_PURGE_INTERVAL_MS, () => dm.purgeExpired());
+    if (accessLog) every(ACCESS_LOG_FLUSH_MS, () => accessLog.flush());
     every(matchTickMs, () => matchmaker.tick());
     every(QUEUE_STATUS_INTERVAL_MS, async () => {
       for (const { socketId, waitingSec } of await matchmaker.waitingTimes()) {
@@ -506,6 +574,7 @@ export function buildServer({
     await rooms.shutdown();
     io.local.disconnectSockets(true);
     await presence.flush();
+    await accessLog?.flush();
     io.engine.close();
   });
 
