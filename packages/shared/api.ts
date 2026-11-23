@@ -92,6 +92,52 @@ export const transferCodeResponseSchema = z
 
 export const transferRedeemSchema = z.object({ code: z.string().min(8).max(16) }).strict();
 
+export const deleteAccountSchema = z.object({ confirm: z.literal('SİL') }).strict();
+
+export const ADMIN_REPORT_STATUSES = ['open', 'resolved', 'dismissed'] as const;
+
+export const adminReportStatusSchema = z.object({ status: z.enum(ADMIN_REPORT_STATUSES) }).strict();
+
+export const adminBanSchema = z
+  .object({
+    hours: z
+      .number()
+      .int()
+      .min(1)
+      .max(24 * 365),
+  })
+  .strict();
+
+export const adminReportSchema = z
+  .object({
+    id: z.string().min(1),
+    reason: z.string(),
+    note: z.string().nullable(),
+    status: z.string(),
+    createdAt: z.string().datetime(),
+    matchId: z.string().nullable(),
+    priority: z.boolean(),
+    snapshot: z.array(
+      z.object({ id: z.string(), senderId: z.string(), body: z.string(), at: z.string() }),
+    ),
+    reporter: z.object({ id: z.string(), nickname: z.string().nullable() }).strict(),
+    reported: z
+      .object({
+        id: z.string(),
+        nickname: z.string().nullable(),
+        bannedUntil: z.string().datetime().nullable(),
+        suspended: z.boolean(),
+        openReports: z.number().int().nonnegative(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export const adminReportsResponseSchema = z
+  .object({ reports: z.array(adminReportSchema) })
+  .strict();
+
+export type AdminReport = z.infer<typeof adminReportSchema>;
 export type Friend = z.infer<typeof friendSchema>;
 export type FriendRequestEntry = z.infer<typeof friendRequestSchema>;
 export type FriendsResponse = z.infer<typeof friendsResponseSchema>;

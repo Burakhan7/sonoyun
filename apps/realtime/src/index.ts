@@ -1,3 +1,4 @@
+import { captureError, flushErrors } from './instrument.js';
 import prismaClient from '@prisma/client';
 import { readFile } from 'node:fs/promises';
 import { createAdapter } from '@socket.io/redis-adapter';
@@ -37,6 +38,7 @@ const { app, io } = buildServer({
   allowSameIp: env.MATCH_ALLOW_SAME_IP,
   trustProxy: env.TRUST_PROXY,
   logger: true,
+  reportError: captureError,
 });
 
 // A Redis outage must not take the service down: ioredis reconnects once Redis is back.
@@ -46,6 +48,7 @@ for (const client of [redis, redisSubscriber]) {
 io.adapter(createAdapter(redis, redisSubscriber));
 process.on('unhandledRejection', (reason) => {
   app.log.error({ err: reason }, 'Unhandled rejection');
+  captureError(reason);
 });
 
 let shuttingDown = false;
@@ -55,6 +58,7 @@ async function shutdown() {
   shuttingDown = true;
   await app.close();
   await prisma.$disconnect();
+  await flushErrors();
   redisSubscriber.disconnect();
   redis.disconnect();
 }

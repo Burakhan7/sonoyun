@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import {
   guestResponseSchema,
@@ -7,10 +8,14 @@ import {
   type PublicUser,
   type TransferCodeResponse,
 } from 'shared';
+import { z } from 'zod';
 import { Avatar } from '@/components/Avatar';
 import { PageHeader } from '@/components/PageHeader';
 import { ApiError, apiPost } from '@/lib/api';
-import { adoptSession, loadSession } from '@/lib/session';
+import { adoptSession, loadSession, resetSession } from '@/lib/session';
+
+const DELETE_WORD = 'SİL';
+const okSchema = z.object({ ok: z.literal(true) });
 
 function formatClock(ms: number) {
   const seconds = Math.ceil(ms / 1000);
@@ -25,6 +30,8 @@ export function SettingsClient() {
   const [input, setInput] = useState('');
   const [redeeming, setRedeeming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deleteText, setDeleteText] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadSession()
@@ -76,6 +83,21 @@ export function SettingsClient() {
           : 'Kod geçersiz, süresi dolmuş ya da daha önce kullanılmış.',
       );
       setRedeeming(false);
+    }
+  };
+
+  const deleteAccount = async (event: FormEvent) => {
+    event.preventDefault();
+    if (deleteText !== DELETE_WORD) return;
+    setDeleting(true);
+    setError(null);
+    try {
+      await apiPost('/api/me/delete', okSchema, { confirm: DELETE_WORD });
+      resetSession();
+      window.location.assign('/');
+    } catch {
+      setError('Hesap silinemedi, lütfen tekrar dene.');
+      setDeleting(false);
     }
   };
 
@@ -143,6 +165,34 @@ export function SettingsClient() {
           className="mt-2 min-h-touch w-full rounded-xl bg-accent px-4 font-semibold text-white disabled:opacity-50"
         >
           Hesaba geç
+        </button>
+      </form>
+
+      <form onSubmit={deleteAccount} className="rounded-xl border-2 border-danger/40 bg-white p-4">
+        <h2 className="font-bold text-danger">Hesabımı sil</h2>
+        <p className="mt-1 text-sm text-muted">
+          Hesabın, arkadaşlıkların ve özel mesajların kalıcı olarak silinir. Bu işlem geri alınamaz.
+          Yasal bağlantı kayıtları ve rapor kayıtları{' '}
+          <Link href="/gizlilik" className="underline">
+            Gizlilik Politikası
+          </Link>
+          ’ndaki süre boyunca saklanır.
+        </p>
+        <label className="mt-3 block text-sm font-semibold">
+          Onaylamak için {DELETE_WORD} yaz
+          <input
+            value={deleteText}
+            onChange={(event) => setDeleteText(event.target.value.toLocaleUpperCase('tr-TR'))}
+            autoComplete="off"
+            className="mt-1 h-11 w-full rounded-xl border-2 border-ink/20 px-3 text-center font-semibold outline-none focus:border-danger"
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={deleting || deleteText !== DELETE_WORD}
+          className="mt-2 min-h-touch w-full rounded-xl bg-danger px-4 font-semibold text-white disabled:opacity-50"
+        >
+          Hesabımı kalıcı olarak sil
         </button>
       </form>
     </div>

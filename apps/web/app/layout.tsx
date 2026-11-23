@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { AnalyticsConsent } from '@/components/AnalyticsConsent';
 import { SocialToasts } from '@/components/social/SocialToasts';
 import './globals.css';
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <SocialToasts />
         {children}
+        <AnalyticsConsent />
       </body>
     </html>
   );
