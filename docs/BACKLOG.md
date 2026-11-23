@@ -2,12 +2,9 @@
 
 Zamanı gelince yapılacak işler. Yapılan madde bu listeden silinir.
 
-## Sprint 5 (avatar ve hesap)
-- [ ] Engelleme akışına arkadaşlık, bekleyen istek ve DM gizleme temizliğini ekle (SPEC §10).
-- [ ] Sohbet sonrası paneldeki "Arkadaş ekle" butonunu etkinleştir.
-- [ ] `scripts/optimize-avatars.ts` yazılınca ham görselleri üret. Görseller gelene kadar yedek emoji gösteriliyor ve tarayıcıda 404 kaydı oluşuyor.
+## İçerik (senden bekleniyor)
 
-- [ ] Gemini ile 24 avatar görselini üret ve `apps/web/public/avatars/raw/{id}.png` olarak ekle (`docs/GEMINI_AVATARS.md`).
+- [ ] Gemini ile 24 avatar görselini üret ve `apps/web/public/avatars/raw/{id}.png` olarak ekle (`docs/GEMINI_AVATARS.md`), sonra `pnpm tsx scripts/optimize-avatars.ts` çalıştır. Görseller gelene kadar yedek emoji gösterilir.
 
 ## Sprint 6 (lansman öncesi zorunlu)
 - [ ] `/admin` paneli: açık raporlar, snapshot görüntüleme, ban/unban. "Reşit olmadığını düşünüyorum" raporları öncelikli listelensin; otomatik 24 saat eşleşme kısıtı buradan kaldırılabilsin.
@@ -35,6 +32,8 @@ Zamanı gelince yapılacak işler. Yapılan madde bu listeden silinir.
 - [ ] Çalışma adı yerine nihai ürün adı ve logoyu belirle.
 
 ## Küçük iyileştirmeler
+- [ ] Arkadaşlar arası oyun sohbetinde link şimdilik rastgele sohbetteki gibi engelli; DM gibi serbest olsun mu kararlaştır.
+- [ ] Oyun veya sohbet sırasında gelen oyun davetleri gösterilmiyor ve 1 dakikada düşüyor; davet edene "arkadaşın şu an oyunda" bilgisi ver.
 - [ ] Kart seçimi ekranında sunucudan gelen hata mesajları gösterilmiyor; `CardPicker` içine bildirim alanı ekle.
 - [ ] Sohbette 1 mesaj/sn sınırına takılan kullanıcı için butonda kısa bir bekleme göstergesi ekle.
 - [ ] Tarayıcı denemelerinde beraberlik dışı senaryolar için sabit test verisi kullan.

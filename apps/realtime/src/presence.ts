@@ -84,6 +84,12 @@ export class Presence {
     return { online, activeGames, gamesToday: Number(gamesToday ?? 0) };
   }
 
+  async onlineAmong(userIds: readonly string[]): Promise<Set<string>> {
+    if (userIds.length === 0) return new Set();
+    const flags = await this.redis.smismember(ONLINE_KEY, ...userIds);
+    return new Set(userIds.filter((_, index) => flags[index] === 1));
+  }
+
   /** Resolves once every previously issued Redis command has completed. */
   async flush(): Promise<void> {
     await this.redis.ping();

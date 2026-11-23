@@ -10,7 +10,7 @@ import { MemoryMatchStore, MemoryModerationStore, MemoryUserStore } from './test
 
 // Requires Redis (docker compose up -d). Uses a dedicated logical database that is flushed.
 const TEST_DB = 15;
-const redis = new Redis(process.env.TEST_REDIS_URL ?? 'redis://localhost:6379', {
+const redis = new Redis(process.env.TEST_REDIS_URL ?? 'redis://127.0.0.1:6379', {
   db: TEST_DB,
   maxRetriesPerRequest: 1,
 });

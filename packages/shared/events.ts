@@ -27,6 +27,9 @@ export const SOCKET_ERROR_CODES = {
   chatClosed: 'chat_closed',
   cardsRejected: 'cards_rejected',
   notAllowed: 'not_allowed',
+  alreadyFriends: 'already_friends',
+  friendLimit: 'friend_limit',
+  inviteUnavailable: 'invite_unavailable',
   internal: 'internal',
 } as const;
 
@@ -96,6 +99,9 @@ export const clientEventSchemas = {
     .object({ userId: id, reason: z.enum(REPORT_REASONS), note: z.string().max(300).optional() })
     .strict(),
   'invite:create': z.object({ friendId: id }).strict(),
+  // Not in SPEC §14: the invited friend answers, or the inviter withdraws (SPEC §5.8).
+  'invite:respond': z.object({ inviteId: id, accept: z.boolean() }).strict(),
+  'invite:cancel': z.object({ inviteId: id }).strict(),
   // Not in SPEC §14: restores a running game after a reload or reconnect (SPEC §5.4).
   'game:resume': empty,
   // Not in SPEC §14: stores the internal 👍/👎 quality signal from SPEC §5.7.
@@ -166,8 +172,9 @@ export const serverEventSchemas = {
     .object({
       // byUserId is null for the extra card the system adds after a tie (SPEC §5.5).
       pinned: z.array(z.object({ byUserId: id.nullable(), card: publicCardSchema }).strict()),
-      endsAt: timestamp,
-      remainingMs: z.number().int().nonnegative(),
+      // Null in a friends' room, whose chat has no time limit (SPEC §5.8).
+      endsAt: timestamp.nullable(),
+      remainingMs: z.number().int().nonnegative().nullable(),
     })
     .strict(),
   'chat:message': z.object({ id, senderId: id, body: z.string(), at: timestamp }).strict(),
@@ -178,8 +185,19 @@ export const serverEventSchemas = {
   'dm:message': z
     .object({
       conversationId: id,
-      message: z.object({ id, senderId: id, body: z.string(), at: timestamp }).strict(),
+      message: z
+        .object({ id, senderId: id, body: z.string(), at: timestamp, expiresAt: timestamp })
+        .strict(),
     })
+    .strict(),
+  // Not in SPEC §14: confirms a sent friend request and tracks a game invite.
+  'friend:requested': z.object({ userId: id, requestId: id }).strict(),
+  'invite:created': z.object({ inviteId: id, expiresInMs: z.number().int().positive() }).strict(),
+  'invite:incoming': z
+    .object({ inviteId: id, from: opponentSchema, expiresInMs: z.number().int().positive() })
+    .strict(),
+  'invite:closed': z
+    .object({ inviteId: id, reason: z.enum(['declined', 'expired', 'cancelled', 'unavailable']) })
     .strict(),
   // Not in SPEC §14: confirms a report or block to the user who sent it.
   'moderation:result': z.object({ action: z.enum(['report', 'block']), userId: id }).strict(),
@@ -205,6 +223,7 @@ export type ChatStart = ServerEventPayload<'chat:start'>;
 export type ChatMessage = ServerEventPayload<'chat:message'>;
 export type CardsOffer = ServerEventPayload<'cards:offer'>;
 export type ReportReason = (typeof REPORT_REASONS)[number];
+export type DirectMessage = ServerEventPayload<'dm:message'>['message'];
 export type OnlineCount = z.infer<typeof onlineCountSchema>;
 export type MatchFound = ServerEventPayload<'match:found'>;
 export type Opponent = z.infer<typeof opponentSchema>;

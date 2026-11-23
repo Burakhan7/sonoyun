@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { AVATAR_IDS } from './avatars.js';
+import { CATEGORY_IDS } from './categories.js';
 
 export const publicUserSchema = z
   .object({
@@ -25,5 +26,77 @@ export const identityLimitResponseSchema = z
   })
   .strict();
 
+const person = {
+  id: z.string().min(1),
+  nickname: z.string().min(1),
+  avatarId: z.enum(AVATAR_IDS),
+};
+
+export const friendSchema = z
+  .object({ ...person, online: z.boolean(), conversationId: z.string().nullable() })
+  .strict();
+
+export const friendRequestSchema = z
+  .object({ requestId: z.string().min(1), user: z.object(person).strict() })
+  .strict();
+
+export const friendsResponseSchema = z
+  .object({
+    friends: z.array(friendSchema),
+    incoming: z.array(friendRequestSchema),
+    outgoing: z.array(friendRequestSchema),
+  })
+  .strict();
+
+export const directMessageSchema = z
+  .object({
+    id: z.string().min(1),
+    senderId: z.string().min(1),
+    body: z.string(),
+    at: z.string().datetime(),
+    expiresAt: z.string().datetime(),
+  })
+  .strict();
+
+export const conversationSummarySchema = z
+  .object({
+    id: z.string().min(1),
+    friend: z.object({ ...person, online: z.boolean() }).strict(),
+    lastMessage: directMessageSchema.nullable(),
+    unread: z.number().int().nonnegative(),
+  })
+  .strict();
+
+export const conversationsResponseSchema = z
+  .object({ conversations: z.array(conversationSummarySchema) })
+  .strict();
+
+export const messagesPageSchema = z
+  .object({
+    friend: z.object({ ...person, online: z.boolean() }).strict(),
+    /** Category of the game where the two met, for the first system line (SPEC §9). */
+    metInCategory: z.enum(CATEGORY_IDS).nullable(),
+    messages: z.array(directMessageSchema),
+    nextCursor: z.string().nullable(),
+  })
+  .strict();
+
+export const unreadResponseSchema = z.object({ unread: z.number().int().nonnegative() }).strict();
+
+export const transferCodeResponseSchema = z
+  .object({
+    code: z.string().regex(/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/),
+    expiresAt: z.string().datetime(),
+  })
+  .strict();
+
+export const transferRedeemSchema = z.object({ code: z.string().min(8).max(16) }).strict();
+
+export type Friend = z.infer<typeof friendSchema>;
+export type FriendRequestEntry = z.infer<typeof friendRequestSchema>;
+export type FriendsResponse = z.infer<typeof friendsResponseSchema>;
+export type ConversationSummary = z.infer<typeof conversationSummarySchema>;
+export type MessagesPage = z.infer<typeof messagesPageSchema>;
+export type TransferCodeResponse = z.infer<typeof transferCodeResponseSchema>;
 export type PublicUser = z.infer<typeof publicUserSchema>;
 export type GuestResponse = z.infer<typeof guestResponseSchema>;

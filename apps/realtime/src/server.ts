@@ -1,3 +1,4 @@
+import type { PrismaClient } from '@prisma/client';
 import Fastify from 'fastify';
 import type { Redis } from 'ioredis';
 import {
@@ -5,6 +6,7 @@ import {
   SOCKET_ERROR_CODES,
   clientEventSchemas,
   handshakeAuthSchema,
+  opponentSchema,
   type ClientToServerEvents,
   type ServerToClientEvents,
   type SocketErrorCode,
@@ -14,12 +16,16 @@ import { Server } from 'socket.io';
 import type { TokenService } from './auth.js';
 import { ChatService } from './chat.js';
 import { clientIp } from './client-ip.js';
+import { DmService } from './dm.js';
+import { FriendService, type FriendResult } from './friends.js';
+import { INVITE_TTL_MS, InviteService } from './invites.js';
 import { Matchmaker } from './matchmaking.js';
 import { ModerationService, type ModerationStore } from './moderation.js';
 import type { Presence } from './presence.js';
 import { RATE_RULES, RateLimiter } from './ratelimit.js';
 import { RoomService, type MatchStore, type RoomTimings } from './rooms.js';
 import { registerApiRoutes } from './routes.js';
+import { TransferService } from './transfer.js';
 import { isBanned, type UserStore } from './users.js';
 
 const BROADCAST_INTERVAL_MS = 5_000;
@@ -28,6 +34,8 @@ const SWEEP_INTERVAL_MS = 15_000;
 const MATCH_TICK_MS = 500;
 const QUEUE_STATUS_INTERVAL_MS = 1_000;
 const TYPING_INTERVAL_MS = 1_000;
+const DM_PURGE_INTERVAL_MS = 5 * 60 * 1000;
+const userRoom = (userId: string) => `user:${userId}`;
 
 const ERROR_MESSAGES: Record<SocketErrorCode, string> = {
   [SOCKET_ERROR_CODES.invalidPayload]: 'Geçersiz istek.',
@@ -45,6 +53,9 @@ const ERROR_MESSAGES: Record<SocketErrorCode, string> = {
   [SOCKET_ERROR_CODES.chatClosed]: 'Sohbet sona erdi.',
   [SOCKET_ERROR_CODES.cardsRejected]: 'Kart seçimi geçersiz.',
   [SOCKET_ERROR_CODES.notAllowed]: 'Bu işlem yapılamıyor.',
+  [SOCKET_ERROR_CODES.alreadyFriends]: 'Zaten arkadaşsınız.',
+  [SOCKET_ERROR_CODES.friendLimit]: 'Arkadaş veya istek sınırına ulaşıldı.',
+  [SOCKET_ERROR_CODES.inviteUnavailable]: 'Bu davet artık geçerli değil.',
   [SOCKET_ERROR_CODES.internal]: 'Bir sorun oluştu, lütfen tekrar dene.',
 };
 
@@ -56,6 +67,8 @@ export interface ServerOptions {
   redis: Redis;
   matches: MatchStore;
   moderationStore: ModerationStore;
+  /** Enables friends, DMs, invites and account transfer. */
+  prisma?: PrismaClient;
   wordFilter?: WordFilter;
   internalSecret?: string;
   guestLimitPerHour?: number;
@@ -80,6 +93,7 @@ export function buildServer({
   redis,
   matches,
   moderationStore,
+  prisma,
   wordFilter = createWordFilter([]),
   internalSecret,
   guestLimitPerHour,
@@ -122,16 +136,46 @@ export function buildServer({
   const matchmaker = new Matchmaker(redis, (roomId, a, b) => rooms.create(roomId, a, b), {
     allowSameIp,
   });
+  const removeFromQueue = (userId: string) => matchmaker.remove(userId);
+  const friends = prisma ? new FriendService(prisma, redis, limiter, presence) : null;
+  const dm = prisma && friends ? new DmService(prisma, chat, friends, presence) : null;
+  const transfers = prisma ? new TransferService(prisma) : null;
+  const invites = friends
+    ? new InviteService({
+        redis,
+        friends,
+        limiter,
+        removeFromQueue,
+        isConnected: async (socketId) => (await io.in(socketId).fetchSockets()).length > 0,
+        createRoom: (roomId, a, b) => rooms.create(roomId, a, b, { friendly: true }),
+      })
+    : null;
   const moderation = new ModerationService({
     redis,
     store: moderationStore,
     chat,
     limiter,
-    removeFromQueue: (userId) => matchmaker.remove(userId),
+    removeFromQueue,
+    social:
+      friends && dm
+        ? {
+            haveRelationship: (a, b) => friends.areFriends(a, b),
+            directSnapshot: (a, b, limit) => dm.snapshotBetween(a, b, limit),
+            afterBlock: (a, b) => friends.disconnect(a, b),
+          }
+        : undefined,
   });
 
   app.get('/health', async () => ({ status: 'ok' }));
-  registerApiRoutes(app, { tokens, users, limiter, guestLimitPerHour, trustProxy, internalSecret });
+  registerApiRoutes(app, {
+    tokens,
+    users,
+    limiter,
+    guestLimitPerHour,
+    trustProxy,
+    internalSecret,
+    social: friends && dm && transfers ? { friends, dm, transfers } : undefined,
+  });
 
   io.use(async (socket, next) => {
     try {
@@ -166,6 +210,133 @@ export function buildServer({
         sendError(SOCKET_ERROR_CODES.internal);
       });
     };
+
+    void socket.join(userRoom(userId));
+
+    const announceFriendship = async (result: FriendResult, actorId: string) => {
+      if (result.status !== 'accepted') return;
+      io.to(userRoom(actorId)).emit('friend:accepted', {
+        userId: result.friendId,
+        conversationId: result.conversationId,
+      });
+      io.to(userRoom(result.friendId)).emit('friend:accepted', {
+        userId: actorId,
+        conversationId: result.conversationId,
+      });
+    };
+
+    socket.on('friend:request', (payload) => {
+      const parsed = clientEventSchemas['friend:request'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        if (!friends) return void sendError(SOCKET_ERROR_CODES.notAllowed);
+        const targetId = parsed.data.userId;
+        const result = await friends.request(userId, targetId);
+        if (result.status === 'error') return void sendError(result.code);
+        if (result.status === 'pending') {
+          socket.emit('friend:requested', { userId: targetId, requestId: result.requestId });
+          const sender = result.created ? await users.findById(userId) : null;
+          if (sender) {
+            io.to(userRoom(targetId)).emit('friend:incoming', {
+              requestId: result.requestId,
+              from: opponentSchema.parse({
+                id: sender.id,
+                nickname: sender.nickname,
+                avatarId: sender.avatarId,
+              }),
+            });
+          }
+        }
+        await announceFriendship(result, userId);
+      });
+    });
+
+    socket.on('friend:respond', (payload) => {
+      const parsed = clientEventSchemas['friend:respond'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        if (!friends) return void sendError(SOCKET_ERROR_CODES.notAllowed);
+        const result = await friends.respond(userId, parsed.data.requestId, parsed.data.accept);
+        if (result.status === 'error') return void sendError(result.code);
+        await announceFriendship(result, userId);
+      });
+    });
+
+    socket.on('dm:send', (payload) => {
+      const parsed = clientEventSchemas['dm:send'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        if (!dm) return void sendError(SOCKET_ERROR_CODES.notAllowed);
+        const { conversationId, body } = parsed.data;
+        const result = await dm.send(userId, conversationId, body);
+        if (!result.ok) return void sendError(result.code);
+        io.to(userRoom(userId))
+          .to(userRoom(result.recipientId))
+          .emit('dm:message', { conversationId, message: result.message });
+      });
+    });
+
+    socket.on('dm:read', (payload) => {
+      const parsed = clientEventSchemas['dm:read'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        await dm?.markRead(userId, parsed.data.conversationId);
+      });
+    });
+
+    socket.on('invite:create', (payload) => {
+      const parsed = clientEventSchemas['invite:create'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        if (!invites) return void sendError(SOCKET_ERROR_CODES.notAllowed);
+        const friendId = parsed.data.friendId;
+        const result = await invites.create(userId, friendId, socket.id);
+        if (!result.ok) return void sendError(result.code);
+        const sender = await users.findById(userId);
+        if (!sender) return void sendError(SOCKET_ERROR_CODES.unauthorized);
+        const { inviteId } = result.value;
+        socket.emit('invite:created', { inviteId, expiresInMs: INVITE_TTL_MS });
+        io.to(userRoom(friendId)).emit('invite:incoming', {
+          inviteId,
+          from: opponentSchema.parse({
+            id: sender.id,
+            nickname: sender.nickname,
+            avatarId: sender.avatarId,
+          }),
+          expiresInMs: INVITE_TTL_MS,
+        });
+      });
+    });
+
+    socket.on('invite:respond', (payload) => {
+      const parsed = clientEventSchemas['invite:respond'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        if (!invites) return void sendError(SOCKET_ERROR_CODES.notAllowed);
+        const { inviteId, accept } = parsed.data;
+        if (!accept) {
+          const declined = await invites.decline(inviteId, userId);
+          if (declined) {
+            io.to(declined.fromSocket).emit('invite:closed', { inviteId, reason: 'declined' });
+          }
+          return;
+        }
+        const result = await invites.accept(inviteId, userId, socket.id);
+        if (!result.ok) sendError(result.code);
+      });
+    });
+
+    socket.on('invite:cancel', (payload) => {
+      const parsed = clientEventSchemas['invite:cancel'].safeParse(payload);
+      if (!parsed.success) return void sendError(SOCKET_ERROR_CODES.invalidPayload);
+      enqueue(async () => {
+        const { inviteId } = parsed.data;
+        const cancelled = await invites?.cancel(inviteId, userId);
+        if (cancelled) {
+          io.to(userRoom(cancelled.to)).emit('invite:closed', { inviteId, reason: 'cancelled' });
+        }
+      });
+    });
 
     socket.on('queue:join', (payload) => {
       enqueue(async () => {
@@ -321,6 +492,7 @@ export function buildServer({
       Promise.all([presence.heartbeat(), matchmaker.heartbeat(), rooms.heartbeat()]),
     );
     every(SWEEP_INTERVAL_MS, () => Promise.all([presence.sweep(), rooms.sweep()]));
+    if (dm) every(DM_PURGE_INTERVAL_MS, () => dm.purgeExpired());
     every(matchTickMs, () => matchmaker.tick());
     every(QUEUE_STATUS_INTERVAL_MS, async () => {
       for (const { socketId, waitingSec } of await matchmaker.waitingTimes()) {

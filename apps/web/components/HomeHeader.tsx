@@ -2,7 +2,14 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { SOCKET_AUTH_ERRORS, onlineCountSchema, type OnlineCount, type PublicUser } from 'shared';
+import {
+  SOCKET_AUTH_ERRORS,
+  onlineCountSchema,
+  unreadResponseSchema,
+  type OnlineCount,
+  type PublicUser,
+} from 'shared';
+import { apiGet } from '@/lib/api';
 import {
   SessionExpiredError,
   acceptTerms,
@@ -36,6 +43,7 @@ export function HomeHeader() {
   const [refreshing, setRefreshing] = useState(false);
   const [accepting, setAccepting] = useState(false);
   const [acceptFailed, setAcceptFailed] = useState(false);
+  const [unread, setUnread] = useState(0);
   const recoveredSession = useRef(false);
 
   const startSession = useCallback(async () => {
@@ -77,10 +85,18 @@ export function HomeHeader() {
       }
     };
 
+    const refreshUnread = () => {
+      apiGet('/api/me/unread', unreadResponseSchema)
+        .then(({ unread: count }) => setUnread(count))
+        .catch(() => {});
+    };
+    refreshUnread();
+    socket.on('dm:message', refreshUnread);
     socket.on('online:count', onCount);
     socket.on('disconnect', onDisconnect);
     socket.on('connect_error', onConnectError);
     return () => {
+      socket.off('dm:message', refreshUnread);
       socket.off('online:count', onCount);
       socket.off('disconnect', onDisconnect);
       socket.off('connect_error', onConnectError);
@@ -149,8 +165,20 @@ export function HomeHeader() {
           <Link href="/friends" aria-label="Arkadaşlar" className={iconLinkClass}>
             👥
           </Link>
-          <Link href="/messages" aria-label="Mesajlar" className={iconLinkClass}>
+          <Link
+            href="/messages"
+            aria-label={unread > 0 ? `Mesajlar, ${unread} okunmamış` : 'Mesajlar'}
+            className={`relative ${iconLinkClass}`}
+          >
             💬
+            {unread > 0 && (
+              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[11px] font-bold text-white">
+                {unread > 99 ? '99+' : unread}
+              </span>
+            )}
+          </Link>
+          <Link href="/settings" aria-label="Ayarlar" className={iconLinkClass}>
+            ⚙️
           </Link>
         </nav>
       </div>

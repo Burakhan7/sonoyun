@@ -16,7 +16,7 @@ import {
 } from './matchmaking.js';
 
 // Requires Redis (docker compose up -d). Uses a dedicated logical database that is flushed.
-const redis = new Redis(process.env.TEST_REDIS_URL ?? 'redis://localhost:6379', {
+const redis = new Redis(process.env.TEST_REDIS_URL ?? 'redis://127.0.0.1:6379', {
   db: 14,
   maxRetriesPerRequest: 1,
 });

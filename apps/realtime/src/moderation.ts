@@ -6,7 +6,7 @@ import {
   type ReportReason,
   type SocketErrorCode,
 } from 'shared';
-import type { ChatService } from './chat.js';
+import { SNAPSHOT_LIMIT, type ChatService } from './chat.js';
 import { blockKey } from './matchmaking.js';
 import { RATE_RULES, type RateLimiter } from './ratelimit.js';
 
@@ -22,7 +22,7 @@ export const ENCOUNTER_TTL_SECONDS = DAY_SECONDS;
 export interface NewReport {
   reporterId: string;
   reportedId: string;
-  matchId: string;
+  matchId: string | null;
   reason: ReportReason;
   note: string | null;
   snapshot: ChatMessage[];
@@ -68,6 +68,15 @@ export interface ModerationOptions {
   limiter: RateLimiter;
   /** Takes a suspended user out of the matchmaking queue. */
   removeFromQueue: (userId: string) => Promise<void>;
+  social?: ModerationSocial;
+}
+
+/** Friendship and DM hooks. Optional so moderation works without the social features. */
+export interface ModerationSocial {
+  haveRelationship(userId: string, otherId: string): Promise<boolean>;
+  directSnapshot(userId: string, otherId: string, limit: number): Promise<ChatMessage[]>;
+  /** Removes friendship and pending requests and hides the DM (SPEC §10). */
+  afterBlock(blockerId: string, blockedId: string): Promise<void>;
 }
 
 export class ModerationService {
@@ -76,6 +85,7 @@ export class ModerationService {
   private readonly chat: ChatService;
   private readonly limiter: RateLimiter;
   private readonly removeFromQueue: ModerationOptions['removeFromQueue'];
+  private readonly social?: ModerationSocial;
 
   constructor(options: ModerationOptions) {
     this.redis = options.redis;
@@ -83,6 +93,7 @@ export class ModerationService {
     this.chat = options.chat;
     this.limiter = options.limiter;
     this.removeFromQueue = options.removeFromQueue;
+    this.social = options.social;
   }
 
   async isSuspended(userId: string) {
@@ -95,7 +106,8 @@ export class ModerationService {
     now = new Date(),
   ): Promise<ModerationResult> {
     const matchId = await this.redis.get(encounterKey(reporterId, userId));
-    if (!matchId || reporterId === userId) {
+    const related = Boolean(matchId) || (await this.social?.haveRelationship(reporterId, userId));
+    if (!related || reporterId === userId) {
       return { ok: false, code: SOCKET_ERROR_CODES.notAllowed };
     }
     if (!(await this.limiter.hit(RATE_RULES.report, reporterId, now.getTime()))) {
@@ -108,7 +120,7 @@ export class ModerationService {
       matchId,
       reason,
       note: note?.trim() || null,
-      snapshot: await this.chat.snapshot(matchId),
+      snapshot: await this.buildSnapshot(reporterId, userId, matchId),
     });
 
     const since = new Date(now.getTime() - DAY_MS);
@@ -119,8 +131,19 @@ export class ModerationService {
     return { ok: true };
   }
 
+  /** The last 50 messages across the random chat and the DM, which expire on their own. */
+  private async buildSnapshot(reporterId: string, userId: string, matchId: string | null) {
+    const [random, direct] = await Promise.all([
+      matchId ? this.chat.snapshot(matchId) : [],
+      this.social?.directSnapshot(reporterId, userId, SNAPSHOT_LIMIT) ?? [],
+    ]);
+    return [...random, ...direct].sort((a, b) => a.at.localeCompare(b.at)).slice(-SNAPSHOT_LIMIT);
+  }
+
   async block(blockerId: string, blockedId: string): Promise<ModerationResult> {
-    const met = await this.redis.exists(encounterKey(blockerId, blockedId));
+    const met =
+      (await this.redis.exists(encounterKey(blockerId, blockedId))) === 1 ||
+      (await this.social?.haveRelationship(blockerId, blockedId));
     if (!met || blockerId === blockedId) {
       return { ok: false, code: SOCKET_ERROR_CODES.notAllowed };
     }
@@ -130,6 +153,7 @@ export class ModerationService {
       .sadd(blockKey(blockerId), blockedId)
       .sadd(blockKey(blockedId), blockerId)
       .exec();
+    await this.social?.afterBlock(blockerId, blockedId);
     return { ok: true };
   }
 }

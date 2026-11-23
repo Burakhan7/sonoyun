@@ -29,7 +29,7 @@ function writeToken(token: string | null) {
   }
 }
 
-function authHeaders(): HeadersInit {
+export function authHeaders(): Record<string, string> {
   const token = readToken();
   return token ? { authorization: `Bearer ${token}` } : {};
 }
@@ -56,6 +56,16 @@ export function loadSession(): Promise<GuestResponse> {
     throw error;
   });
   return pendingSession;
+}
+
+export function hasStoredSession() {
+  return readToken() !== null;
+}
+
+/** Switches this browser to another account, e.g. after redeeming a transfer code. */
+export function adoptSession(session: GuestResponse) {
+  writeToken(session.token);
+  pendingSession = Promise.resolve(session);
 }
 
 export function resetSession() {
