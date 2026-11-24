@@ -21,8 +21,8 @@ write_once() {
     echo "Keeping existing $file"
     cat >/dev/null
   else
-    umask 077
-    cat >"$file"
+    # Subshell, so the strict umask only applies to secret files.
+    (umask 077 && cat >"$file")
     echo "Created $file"
   fi
 }
@@ -53,6 +53,8 @@ EOF
 
 if [[ ! -e badwords.tr.txt ]]; then
   cp ../apps/realtime/badwords.tr.txt badwords.tr.txt
+  # The realtime container runs as a non-root user and must be able to read it.
+  chmod 644 badwords.tr.txt
   echo "Created badwords.tr.txt from the template. Fill it before launch."
 fi
 
