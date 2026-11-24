@@ -137,7 +137,54 @@ export const adminReportsResponseSchema = z
   .object({ reports: z.array(adminReportSchema) })
   .strict();
 
+export const ADMIN_CHAT_KINDS = ['room', 'dm'] as const;
+
+const adminChatPartySchema = z
+  .object({
+    id: z.string(),
+    /** Null when the account was deleted. */
+    nickname: z.string().nullable(),
+    avatarId: z.enum(AVATAR_IDS).nullable(),
+    bannedUntil: z.string().datetime().nullable(),
+  })
+  .strict();
+
+const adminChatMessageSchema = z
+  .object({ id: z.string(), senderId: z.string(), body: z.string(), at: z.string().datetime() })
+  .strict();
+
+export const adminChatSummarySchema = z
+  .object({
+    kind: z.enum(ADMIN_CHAT_KINDS),
+    id: z.string().min(1),
+    /** A game chat happening right now, or a DM with a message in the last few minutes. */
+    live: z.boolean(),
+    /** A friends' game room from an invite. Only known while the room is live. */
+    friendly: z.boolean(),
+    participants: z.array(adminChatPartySchema),
+    startedAt: z.string().datetime().nullable(),
+    lastMessageAt: z.string().datetime().nullable(),
+    /** When a live random chat closes; null for DMs and untimed friends' rooms. */
+    endsAt: z.string().datetime().nullable(),
+    messageCount: z.number().int().nonnegative(),
+    preview: adminChatMessageSchema.nullable(),
+    reported: z.boolean(),
+  })
+  .strict();
+
+export const adminChatsResponseSchema = z
+  .object({ active: z.array(adminChatSummarySchema), stored: z.array(adminChatSummarySchema) })
+  .strict();
+
+export const adminChatDetailSchema = z
+  .object({ chat: adminChatSummarySchema, messages: z.array(adminChatMessageSchema) })
+  .strict();
+
 export type AdminReport = z.infer<typeof adminReportSchema>;
+export type AdminChatKind = (typeof ADMIN_CHAT_KINDS)[number];
+export type AdminChatSummary = z.infer<typeof adminChatSummarySchema>;
+export type AdminChatsResponse = z.infer<typeof adminChatsResponseSchema>;
+export type AdminChatDetail = z.infer<typeof adminChatDetailSchema>;
 export type Friend = z.infer<typeof friendSchema>;
 export type FriendRequestEntry = z.infer<typeof friendRequestSchema>;
 export type FriendsResponse = z.infer<typeof friendsResponseSchema>;

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { AdminClient } from '@/components/admin/AdminClient';
+import { ChatsClient } from '@/components/admin/ChatsClient';
 
 export const metadata: Metadata = {
-  title: 'Yönetim',
+  title: 'Yönetim · Sohbetler',
   robots: { index: false, follow: false },
 };
 
 export default function AdminPage() {
-  return <AdminClient />;
+  return <ChatsClient />;
 }

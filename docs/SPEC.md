@@ -509,7 +509,10 @@ Oda durum makinesi: `MATCHED → SPIN → PLAYING → PICKING → CHATTING → E
 - Socket handshake'te JWT doğrulama; `bannedUntil` kontrolü.
 - Rate limit (Redis sliding window): `queue:join` 10/dk, `chat:send` 6/10 sn, `friend:request` 20/saat, `user:report` 10/gün.
 - **Otomatik koruma:** 24 saatte **3 farklı kişiden** rapor alan kullanıcı otomatik 24 saat eşleşmeden çıkarılır, admin incelemesine düşer.
-- Admin paneli (MVP için basit): `/admin` (Basic Auth + IP allowlist) → açık raporlar, snapshot görüntüleme, ban.
+- Admin paneli: `/admin` (Basic Auth + IP allowlist).
+  - **Sohbetler** (`/admin`): "Şu an konuşanlar" (CHATTING durumundaki canlı odalar + son 5 dakikada mesaj alan DM'ler) ve "Kayıtlı sohbetler" (son 24 saatte mesajı olan biten oyun sohbetleri ve DM'ler) kart ızgarası olarak; 5 sn'de bir yenilenir. Karta basınca `/admin/sohbet/{room|dm}/{id}` sohbetin tamamını gösterir (canlıysa 3 sn'de bir yenilenir), katılımcıları banlama/kısıt kaldırma buradan yapılır. Açık raporu olan sohbet kırmızı işaretlenir.
+  - **Raporlar** (`/admin/raporlar`): açık raporlar, snapshot, ban.
+  - Açılan her sohbet loglanır (`Admin opened chat`). Mesajların moderatörce incelenebileceği Kullanım Koşulları, Gizlilik ve ilk giriş kurallarında yazar.
 - **5651:** `AccessLog`'a bağlantı IP + port + zaman damgası yazılır; saklama süresi ve kapsamı için hukukçu teyidi alınmalı (yer sağlayıcı yükümlülükleri). **[KARAR]**
 - **KVKK:** Aydınlatma metni, çerez bandı (analitik için), "Hesabımı sil" (Ayarlar → tüm veriler silinir, AccessLog yasal süre boyunca saklanır).
 - **18+:** Onay modali + kurallarda "18 yaşından küçükler kullanamaz". Rapor nedenlerinde "Reşit olmadığını düşünüyorum" seçeneği; bu raporlar öncelikli incelenir.

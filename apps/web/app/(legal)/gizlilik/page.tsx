@@ -24,7 +24,11 @@ export default function PrivacyPage() {
         </li>
         <li>Oyun: eşleşmeler, kategori, skor, görülen soru kimlikleri.</li>
         <li>Sosyal: arkadaşlıklar, istekler, engellemeler.</li>
-        <li>Mesajlar: rastgele sohbet ve özel mesajlar.</li>
+        <li>
+          Mesajlar: rastgele sohbet, oyun sohbeti ve özel mesajlar. Güvenlik ve kötüye kullanımın
+          önlenmesi için, silindikleri 24 saate kadar yetkili moderatörler tarafından incelenebilir;
+          her inceleme kayıt altına alınır.
+        </li>
         <li>Raporlar: rapor nedeni, not ve raporlanan görüşmenin son 50 mesajı.</li>
         <li>Hata kayıtları: kullanıcı kimliği ve mesaj içeriği olmadan teknik hata bilgisi.</li>
       </ul>

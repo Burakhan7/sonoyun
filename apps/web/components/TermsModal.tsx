@@ -10,6 +10,7 @@ const RULES = [
   '18 yaşından küçükler bu siteyi kullanamaz.',
   'Saygılı ol: taciz, küfür ve nefret söylemi yasaktır.',
   'Rastgele sohbette link veya iletişim bilgisi paylaşma.',
+  'Güvenlik için tüm mesajlar, silinene kadar (24 saat) moderatörlerce incelenebilir.',
 ];
 
 export function TermsModal({ busy, failed, onAccept }: TermsModalProps) {

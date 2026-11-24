@@ -38,8 +38,12 @@ export type {
   SocketErrorCode,
 } from './events.js';
 export {
+  ADMIN_CHAT_KINDS,
   ADMIN_REPORT_STATUSES,
   adminBanSchema,
+  adminChatDetailSchema,
+  adminChatsResponseSchema,
+  adminChatSummarySchema,
   adminReportSchema,
   adminReportStatusSchema,
   adminReportsResponseSchema,
@@ -60,6 +64,10 @@ export {
   userResponseSchema,
 } from './api.js';
 export type {
+  AdminChatDetail,
+  AdminChatKind,
+  AdminChatsResponse,
+  AdminChatSummary,
   AdminReport,
   ConversationSummary,
   Friend,

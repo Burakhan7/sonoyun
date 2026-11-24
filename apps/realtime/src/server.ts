@@ -14,6 +14,7 @@ import {
 import { createWordFilter, type WordFilter } from 'shared/filter';
 import { Server } from 'socket.io';
 import { AccountService } from './account.js';
+import { AdminChatService } from './admin-chats.js';
 import { AdminService, registerAdminRoutes } from './admin.js';
 import type { TokenService } from './auth.js';
 import { ChatService } from './chat.js';
@@ -240,7 +241,12 @@ export function buildServer({
         : undefined,
   });
   if (prisma && internalSecret) {
-    registerAdminRoutes(app, new AdminService(prisma, redis, kickUser), internalSecret);
+    registerAdminRoutes(
+      app,
+      new AdminService(prisma, redis, kickUser),
+      internalSecret,
+      new AdminChatService(prisma, redis, () => rooms.rooms.values()),
+    );
   }
 
   io.use(async (socket, next) => {
