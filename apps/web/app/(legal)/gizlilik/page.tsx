@@ -52,9 +52,10 @@ export default function PrivacyPage() {
 
       <h2>Kimlerle paylaşıyoruz?</h2>
       <p>
-        Hizmetin çalışması için barındırma ve altyapı sağlayıcıları kullanılır: [Vercel, Railway ve
-        kullanılıyorsa Sentry, Plausible; ülke ve aktarım dayanağı]. Yetkili kurumların hukuka uygun
-        talepleri hâlinde veriler paylaşılabilir. Verilerin satılması söz konusu değildir.
+        Site ve tüm veriler, barındırma sağlayıcısı Hetzner Online GmbH’nin Almanya’daki
+        sunucularında tutulur. Aktarım dayanağı: [KVKK m.9 kapsamındaki dayanak]. Yetkili kurumların
+        hukuka uygun talepleri hâlinde veriler paylaşılabilir. Verilerin satılması söz konusu
+        değildir.
       </p>
 
       <h2>Hesabını silme</h2>

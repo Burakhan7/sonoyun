@@ -9,7 +9,7 @@ function normalizeIp(ip: string) {
   return trimmed.startsWith('::ffff:') ? trimmed.slice(7) : trimmed;
 }
 
-/** On Vercel, x-real-ip is set by the platform and cannot be supplied by the visitor. */
+/** In production Caddy overwrites x-real-ip, so the visitor cannot supply it. */
 function visitorIp(request: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
     const realIp = request.headers.get('x-real-ip');

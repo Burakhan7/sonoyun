@@ -17,7 +17,7 @@ import { AccountService } from './account.js';
 import { AdminService, registerAdminRoutes } from './admin.js';
 import type { TokenService } from './auth.js';
 import { ChatService } from './chat.js';
-import { clientIp } from './client-ip.js';
+import { clientIp, proxiedPort } from './client-ip.js';
 import { DmService } from './dm.js';
 import { FriendService, type FriendResult } from './friends.js';
 import { INVITE_TTL_MS, InviteService } from './invites.js';
@@ -252,7 +252,9 @@ export function buildServer({
 
       socket.data.userId = user.id;
       socket.data.ip = clientIp(socket.handshake, trustProxy);
-      socket.data.port = trustProxy ? null : (socket.request.socket.remotePort ?? null);
+      socket.data.port = trustProxy
+        ? proxiedPort(socket.handshake.headers['x-client-port'])
+        : (socket.request.socket.remotePort ?? null);
       socket.data.deviceHash = auth.data?.device ?? null;
       users.touch(user.id, now).catch(logFailure);
       if (socket.data.deviceHash && socket.data.deviceHash !== user.deviceHash) {

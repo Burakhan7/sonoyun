@@ -30,43 +30,44 @@ pnpm dev                                           # web :3100, realtime :4000
 
 Testler yalnızca adı `_test` ile biten yerel bir veritabanında çalışır.
 
-## Yayına alma
+## Yayına alma (Hetzner, tek sunucu)
 
-### 1. Railway (realtime, Postgres, Redis)
+Her şey tek sunucuda Docker Compose ile çalışır: Caddy (HTTPS), web, realtime, Postgres ve Redis. İnternete yalnızca Caddy açıktır. `/socket.io` istekleri realtime'a, geri kalanı web'e gider; bu yüzden tek alan adı yeter. Dosyalar [deploy/](deploy/) klasöründedir.
 
-1. Bu repodan yeni proje aç, Postgres 16 ve Redis 7 ekle. Build ayarı [railway.json](railway.json) içinden gelir.
-2. Realtime servisine şu değişkenleri gir:
+### 1. Alan adı
 
-| Değişken                    | Değer                                             |
-| --------------------------- | ------------------------------------------------- |
-| `NODE_ENV`                  | `production`                                      |
-| `DATABASE_URL`, `REDIS_URL` | Railway servis referansları                       |
-| `JWT_SECRET`                | En az 32 karakter rastgele değer                  |
-| `INTERNAL_API_SECRET`       | En az 32 karakter rastgele değer, Vercel ile aynı |
-| `WEB_ORIGIN`                | Sitenin tam adresi, örn. `https://alanadi.com`    |
-| `TRUST_PROXY`               | `true` (**zorunlu**, yoksa kimse eşleşemez)       |
-| `SENTRY_DSN`                | İsteğe bağlı                                      |
+DNS'te iki `A` kaydı aç: `@` ve `www`, ikisi de sunucunun IPv4 adresine. Cloudflare kullanılıyorsa proxy (turuncu bulut) **kapalı** olsun; aksi halde ziyaretçi IP'si yerine Cloudflare'in IP'si kaydedilir.
 
-Migration'lar konteyner açılırken otomatik uygulanır. **Tek replika çalıştır:** canlı oyun durumu süreç belleğindedir.
+### 2. Sunucuyu hazırla (bir kez)
 
-### 2. Vercel (web)
+Ubuntu 24.04, Docker ve Docker Compose eklentisi kurulu olmalı. Hetzner Cloud Firewall'da yalnızca 22, 80 ve 443 portlarını aç.
 
-1. Bu repoyu içe aktar. Root Directory: `apps/web`. "Include files outside the root directory" açık kalsın.
-2. Şu değişkenleri gir:
+```bash
+git clone https://github.com/Burakhan7/sonoyun.git /opt/sonoyun
+cd /opt/sonoyun
+sudo bash deploy/setup.sh alanadi.com eposta@ornek.com <admin-ip>
+```
 
-| Değişken                               | Değer                                        |
-| -------------------------------------- | -------------------------------------------- |
-| `NEXT_PUBLIC_REALTIME_URL`             | Realtime servisinin herkese açık adresi      |
-| `REALTIME_INTERNAL_URL`                | Aynı adres                                   |
-| `INTERNAL_API_SECRET`                  | Railway ile aynı değer                       |
-| `ADMIN_USER`, `ADMIN_PASSWORD`         | Admin girişi, güçlü parola                   |
-| `ADMIN_IP_ALLOWLIST`                   | Admin'e girecek IP adresleri, virgülle       |
-| `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` | İsteğe bağlı                                 |
-| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`         | İsteğe bağlı; ayarlanınca çerez bandı açılır |
+`setup.sh` rastgele parolalarla `deploy/.env`, `deploy/realtime.env` ve `deploy/web.env` dosyalarını oluşturur, günlük veritabanı yedeğini cron'a ekler. Var olan dosyaların üzerine yazmaz. Admin parolası `deploy/web.env` içindedir.
 
-`/admin` bu üç admin değeri ayarlanmadan 404 döner.
+Kelime listesini sunucuda `deploy/badwords.tr.txt` dosyasına koy. Bu dosya repoya girmez, konteynere salt okunur bağlanır.
 
-### 3. Yük testi
+### 3. Yayınla ve güncelle
+
+```bash
+bash /opt/sonoyun/deploy/deploy.sh
+```
+
+`main`'i çeker, imajları yeniden derler, servisleri yeniler ve site HTTPS'ten cevap verene kadar bekler. Migration'lar realtime açılırken otomatik uygulanır. **Realtime tek kopya çalışır:** canlı oyun durumu süreç belleğindedir, deploy sırasında süren oyunlar biter.
+
+### 4. Yedekler ve bakım
+
+- Veritabanı her gece 03:30'da `/var/backups/sonoyun` içine alınır, son 14 yedek tutulur. Hetzner panelinden sunucu yedeğini de aç; aksi halde sunucu kaybolursa yedekler de gider.
+- Geri yükleme: `gunzip -c yedek.sql.gz | docker compose -f deploy/docker-compose.yml --env-file deploy/.env exec -T postgres psql -U app -d oyun_sohbet`
+- Loglar: `docker compose -f deploy/docker-compose.yml --env-file deploy/.env logs -f realtime`
+- Konteyner logları 3 × 10 MB ile sınırlıdır; eski imajlar her deploy'da silinir.
+
+### 5. Yük testi
 
 Canlı ortama **çalıştırma**, gerçek hesap açar. Staging ortamında:
 
@@ -83,20 +84,20 @@ Aynı IP'den çalıştığı için hedefte `MATCH_ALLOW_SAME_IP=true` ve yüksek
 - [ ] Kullanım Koşulları, Gizlilik ve KVKK şablonları hukukçu tarafından gözden geçirildi, köşeli parantezler dolduruldu
 - [ ] Şablon uyarısı `apps/web/components/LegalPage.tsx` içinden kaldırıldı
 - [ ] 5651 kayıtlarının kapsamı ve saklama süresi netleşti; silme işi eklendi (şu an hiçbir kayıt silinmez)
-- [ ] Reverse proxy arkasında kaynak port alınamıyor; 5651 açısından yeterliliği hukukçuyla değerlendirildi
+- [ ] 5651 kayıtlarının (IP, kaynak port, zaman) yeterliliği hukukçuyla değerlendirildi
 - [ ] Silinen hesapların rapor kayıtlarının saklama süresi belirlendi
-- [ ] Yurt dışı veri aktarımı (Vercel, Railway, Sentry, Plausible) için KVKK m.9 dayanağı belirlendi
+- [ ] Yurt dışı veri aktarımı (Hetzner, Almanya; kullanılırsa Sentry ve Plausible) için KVKK m.9 dayanağı belirlendi
 
 **İçerik ve ürün**
 
-- [ ] `apps/realtime/badwords.tr.txt` dolduruldu (boşken küfür maskelenmez)
+- [ ] Sunucudaki `deploy/badwords.tr.txt` dolduruldu (boşken küfür maskelenmez)
 - [ ] Nihai ürün adı, logo ve slogan belirlendi
 
 **Altyapı**
 
-- [ ] Railway ve Vercel değişkenleri girildi, `TRUST_PROXY=true`
+- [ ] `deploy/setup.sh` çalıştırıldı, DNS kayıtları sunucuyu gösteriyor
 - [ ] `/ready` Redis ve veritabanı için `ok` dönüyor
-- [ ] Veritabanı yedekleri açık
+- [ ] Günlük veritabanı yedeği oluşuyor, Hetzner sunucu yedeği açık
 - [ ] Yük testi staging ortamında geçti
 - [ ] `/admin` izinli IP dışından 404, izinli IP'den parolayla açılıyor
 - [ ] İki farklı ağdan gerçek cihazlarla eşleşme, sohbet ve DM denendi

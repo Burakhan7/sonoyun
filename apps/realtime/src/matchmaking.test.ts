@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
-import { clientIp } from './client-ip.js';
+import { clientIp, proxiedPort } from './client-ip.js';
 import { loadEnv } from './env.js';
 import {
   ACTIVE_TTL_SECONDS,
@@ -291,6 +291,17 @@ describe('clientIp', () => {
 
   it('uses the entry added by the trusted proxy, not a client-supplied one', () => {
     expect(clientIp({ address: '10.0.0.1', headers }, true)).toBe('9.9.9.9');
+  });
+});
+
+describe('proxiedPort', () => {
+  it('reads the port set by the proxy', () => {
+    expect(proxiedPort('51234')).toBe(51234);
+    expect(proxiedPort(['1', '443'])).toBe(443);
+  });
+
+  it.each([undefined, '', 'abc', '0', '70000', '12.5'])('ignores %s', (value) => {
+    expect(proxiedPort(value)).toBeNull();
   });
 });
 

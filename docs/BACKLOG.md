@@ -5,11 +5,11 @@ Zamanı gelince yapılacak işler. Yapılan madde bu listeden silinir. Yayın ad
 ## Yayından önce zorunlu
 - [ ] Kullanım Koşulları, Gizlilik ve KVKK şablonlarını **hukukçuya onaylat**, köşeli parantezleri doldur, `LegalPage.tsx` içindeki şablon uyarısını kaldır.
 - [ ] 5651 kayıtlarının kapsamını ve saklama süresini netleştir (SPEC §15 [KARAR]), sonra silme işini ekle. **Şu an `AccessLog` hiç silinmiyor.**
-- [ ] Railway proxy'si ziyaretçinin kaynak portunu vermiyor, bu yüzden `AccessLog.port` production'da boş kalacak. CGNAT kullanan operatörlerde IP tek başına kişiyi ayırt etmeyebilir; yeterliliğini hukukçuya sor, gerekirse portu ileten bir proxy kullan.
+- [ ] 5651 kayıtları artık IP, kaynak port ve zamanı içeriyor (Caddy portu iletiyor). Bunun yeterliliğini hukukçuya sor.
 - [ ] Silinen hesaplara ait rapor kayıtlarının saklama süresini belirle. Şu an kanıt olarak süresiz tutuluyor.
-- [ ] Yurt dışı veri aktarımı (Vercel, Railway, Sentry, Plausible) için KVKK m.9 dayanağını belirle.
+- [ ] Yurt dışı veri aktarımı (Hetzner, Almanya; kullanılırsa Sentry ve Plausible) için KVKK m.9 dayanağını belirle. Hukukçu sorun görürse aynı kurulum bir Türk sağlayıcıya taşınabilir.
 - [ ] `apps/realtime/badwords.tr.txt` kelime listesini doldur. **Liste boşken küfür maskeleme çalışmaz.**
-- [ ] Railway ve Vercel'i README'deki gibi kur. `TRUST_PROXY=true` ayarlanmazsa **kimse eşleşemez.**
+- [ ] Alan adını al, Hetzner sunucusunu README'deki gibi kur.
 - [ ] Yük testini staging ortamında tekrarla. Yerel test Docker ağında yapıldı, gerçek ağ gecikmesini içermiyor.
 
 ## Ürün kararları

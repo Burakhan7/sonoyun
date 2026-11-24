@@ -19,3 +19,7 @@ Thumbs.db
 # Large originals stay local; only the optimized webp files are deployed.
 apps/web/public/avatars/raw/*
 !apps/web/public/avatars/raw/.gitkeep
+
+# Server-only deploy files (secrets and the word list).
+deploy/*.env
+deploy/badwords.tr.txt
