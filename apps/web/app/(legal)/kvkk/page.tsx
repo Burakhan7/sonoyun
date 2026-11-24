@@ -36,9 +36,9 @@ export default function KvkkPage() {
 
       <h2>4. Aktarım</h2>
       <p>
-        Kişisel veriler; barındırma ve altyapı sağlayıcılarına [sağlayıcılar ve ülkeler] ile yetkili
-        kamu kurumlarına aktarılabilir. Yurt dışına aktarım KVKK m.9 kapsamında [aktarım dayanağı]
-        ile yapılır.
+        Kişisel veriler; barındırma sağlayıcısı Hetzner Online GmbH’ye (Almanya) ve yetkili kamu
+        kurumlarına aktarılabilir. Yurt dışına aktarım KVKK m.9 kapsamında [aktarım dayanağı] ile
+        yapılır.
       </p>
 
       <h2>5. Toplama yöntemi</h2>

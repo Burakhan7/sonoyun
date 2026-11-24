@@ -21,6 +21,12 @@ export function clientIp({ address, headers }: HandshakeAddress, trustProxy: boo
   return normalizeIp(address);
 }
 
+/** Source port set by the trusted proxy (Caddy overwrites it), or null when it is absent. */
+export function proxiedPort(header: string | string[] | undefined): number | null {
+  const value = Number(Array.isArray(header) ? header.at(-1) : header);
+  return Number.isInteger(value) && value > 0 && value <= 65535 ? value : null;
+}
+
 function normalizeIp(ip: string) {
   return ip.startsWith('::ffff:') ? ip.slice(7) : ip;
 }

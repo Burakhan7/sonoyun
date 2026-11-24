@@ -1,0 +1,34 @@
+{
+	email {$ACME_EMAIL}
+}
+
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Live game and chat connections.
+	# The source port is logged for Law 5651 and replaces any value the visitor sent.
+	handle /socket.io/* {
+		reverse_proxy realtime:4000 {
+			header_up X-Client-Port {remote_port}
+		}
+	}
+
+	# Everything else, including /api, goes through the web app.
+	# X-Real-IP is overwritten here, so visitors cannot fake it.
+	handle {
+		reverse_proxy web:3100 {
+			header_up X-Real-IP {remote_host}
+		}
+	}
+}

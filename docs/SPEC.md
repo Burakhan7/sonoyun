@@ -39,7 +39,7 @@ Rastgele iki kişi eşleşir → sunucu **rastgele bir kategori** ve o kategoriy
 | Veritabanı | **PostgreSQL 16 + Prisma** | Kullanıcı, arkadaşlık, DM, rapor, eşleşme geçmişi, 5651 logları |
 | Ortak kod | `packages/shared` | Zod şemaları, socket event tipleri, oyun kuralları, kelime filtresi |
 | Monorepo | pnpm workspaces + Turborepo | |
-| Hosting | Web → **Vercel**; Realtime + Redis + Postgres → **Railway** (ya da Fly.io + Neon + Upstash TCP Redis) | Düşük başlangıç maliyeti |
+| Hosting | Tek **Hetzner** sunucusu (Almanya), Docker Compose: Caddy + web + realtime + Postgres + Redis | Düşük maliyet, tek veri sağlayıcısı; realtime zaten tek kopya çalışır |
 | Hata izleme | Sentry (web + realtime) | |
 | Analitik | PostHog veya Plausible (KVKK açısından çerez onayıyla) | |
 

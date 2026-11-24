@@ -4,8 +4,9 @@ Bu repo bir "önce oyun, sonra sohbet" web sitesidir. Ürünün tamamı `docs/SP
 
 ## Teknoloji
 - pnpm workspaces + Turborepo monorepo. Node 22, TypeScript `strict: true`.
-- `apps/web`: Next.js 15 (App Router) + Tailwind CSS + Framer Motion. Vercel'e deploy edilir.
-- `apps/realtime`: Fastify + Socket.IO + ioredis + Prisma (PostgreSQL 16). Railway'e deploy edilir.
+- `apps/web`: Next.js 15 (App Router) + Tailwind CSS + Framer Motion.
+- `apps/realtime`: Fastify + Socket.IO + ioredis + Prisma (PostgreSQL 16).
+- Yayın: tek Hetzner sunucusunda Docker Compose (`deploy/`); Caddy HTTPS ve yönlendirmeyi yapar.
 - `packages/shared`: Zod şemaları, socket event tipleri (`events.ts`), oyun kuralları (`games.ts`), kelime filtresi (`filter.ts`), içerik (`content/questions.json`).
 - Test: Vitest (birim), Playwright (web e2e). Lint: ESLint + Prettier.
 
