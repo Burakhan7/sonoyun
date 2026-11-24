@@ -100,7 +100,7 @@ Rastgele iki kişi eşleşir → sunucu **rastgele bir kategori** ve o kategoriy
    - ayrıca `localStorage` (Socket.IO handshake `auth.token` için).
 3. **Hesap taşıma kodu:** Ayarlar sayfasında "Kodu göster" → 8 karakterlik kod (ör. `K7Q2-M9XA`, karışmaması için 0/O, 1/I hariç). Kod 10 dk geçerli, tek kullanımlık. Yeni cihazda "Kodu gir" → aynı `User` için yeni token.
 4. Takma ad + avatar günde 1 kez birlikte yenilenebilir (rastgele üretilir, serbest metin yok → küfürlü isim riski sıfır).
-5. Ban: `User.bannedUntil`. Ban kaçırmayı zorlaştırmak için cihaz parmak izi (FingerprintJS open-source) hash'i ve IP /24 kayıt altında tutulur.
+5. Ban: `User.bannedUntil`. Ban kaçırmayı zorlaştırmak için cihaz hash'i (§6, ek bağımlılık olmadan tarayıcı özelliklerinden üretilir) ve IP kayıt altında tutulur.
 
 ---
 
@@ -202,7 +202,7 @@ async function tick() {
       if (aRecent.has(b) || aBlock.has(b)) continue;
       const bRecent = await redis.lrange(`mm:recent:${b}`, 0, 19);
       if (bRecent.includes(a)) continue;
-      if (await sameDevice(a, b)) continue; // aynı cihaz hash'i veya aynı IP → eşleştirme
+      if (await sameDevice(a, b)) continue; // aynı IP + (aynı cihaz hash'i veya hash yok) → eşleştirme
 
       used.add(a); used.add(b);
       await redis.zrem('mm:queue', a, b);
@@ -222,6 +222,7 @@ async function pushRecent(u: string, other: string) {
 }
 ```
 
+- **Aynı cihaz kuralı:** Mobil operatörler CGNAT ile çok sayıda kişiye aynı IP'yi verdiği için IP tek başına engel değildir. Aynı IP'deki iki kişi yalnızca cihaz hash'leri aynıysa veya taraflardan birinin hash'i yoksa eşleşmez. Aynı model telefonlar aynı hash'i üretebildiği için hash, farklı IP'ler arasında engel değildir. Hash istemcide tarayıcı özelliklerinden (SHA-256, ilk 128 bit) üretilir ve Socket.IO handshake'inde `auth.device` olarak gönderilir; sunucu son değeri `User.deviceHash`'e yazar.
 - 200'den fazla bekleyen olursa (iyi bir sorun) parçalara bölünür.
 - Eşleşen ikili Postgres `Match` tablosuna da yazılır (analitik + 5651).
 

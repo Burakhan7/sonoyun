@@ -91,6 +91,7 @@ interface SocketData {
   ip: string;
   /** Source port. Unknown behind a reverse proxy, which hides the visitor's port. */
   port: number | null;
+  deviceHash: string | null;
 }
 
 export function buildServer({
@@ -252,7 +253,11 @@ export function buildServer({
       socket.data.userId = user.id;
       socket.data.ip = clientIp(socket.handshake, trustProxy);
       socket.data.port = trustProxy ? null : (socket.request.socket.remotePort ?? null);
+      socket.data.deviceHash = auth.data?.device ?? null;
       users.touch(user.id, now).catch(logFailure);
+      if (socket.data.deviceHash && socket.data.deviceHash !== user.deviceHash) {
+        users.recordDevice(user.id, socket.data.deviceHash).catch(logFailure);
+      }
       return next();
     } catch (error) {
       logFailure(error);
@@ -423,7 +428,7 @@ export function buildServer({
         const result = await matchmaker.join(userId, {
           socketId: socket.id,
           ip,
-          deviceHash: user.deviceHash ?? null,
+          deviceHash: socket.data.deviceHash,
         });
         if (result === 'queued') socket.emit('queue:status', { waitingSec: 0 });
         else if (result === 'already_queued') sendError(SOCKET_ERROR_CODES.alreadyQueued);

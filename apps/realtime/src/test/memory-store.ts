@@ -30,6 +30,11 @@ export class MemoryUserStore implements UserStore {
     if (user && !user.acceptedTermsAt) user.acceptedTermsAt = now;
   }
 
+  async recordDevice(id: string, deviceHash: string) {
+    const user = this.records.get(id);
+    if (user) user.deviceHash = deviceHash;
+  }
+
   async refreshIdentity(id: string, identity: Identity, cutoff: Date, now: Date) {
     const user = this.records.get(id);
     if (!user || (user.nicknameChangedAt && user.nicknameChangedAt > cutoff)) return false;

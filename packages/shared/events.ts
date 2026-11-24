@@ -3,7 +3,13 @@ import { AVATAR_IDS } from './avatars.js';
 import { CATEGORY_IDS } from './categories.js';
 import { ENGINE_IDS } from './games.js';
 
-export const handshakeAuthSchema = z.object({ token: z.string().min(1).max(2048) });
+/** One-way summary of browser traits, used to tell people on a shared IP apart (SPEC §6). */
+export const deviceHashSchema = z.string().regex(/^[0-9a-f]{32}$/);
+
+export const handshakeAuthSchema = z.object({
+  token: z.string().min(1).max(2048),
+  device: deviceHashSchema.optional(),
+});
 
 export const SOCKET_AUTH_ERRORS = {
   unauthorized: 'unauthorized',

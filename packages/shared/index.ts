@@ -10,6 +10,7 @@ export {
   SOCKET_AUTH_ERRORS,
   SOCKET_ERROR_CODES,
   clientEventSchemas,
+  deviceHashSchema,
   handshakeAuthSchema,
   onlineCountSchema,
   opponentSchema,
