@@ -36,6 +36,7 @@ const { app, io } = buildServer({
   presence: new Presence(redis),
   redis,
   allowSameIp: env.MATCH_ALLOW_SAME_IP,
+  avoidRecent: env.MATCH_AVOID_RECENT,
   trustProxy: env.TRUST_PROXY,
   logger: true,
   reportError: captureError,

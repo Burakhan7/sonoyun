@@ -28,7 +28,7 @@ Bir iş bitti sayılmadan önce `pnpm lint`, `pnpm typecheck` ve `pnpm test` hat
 1. **Sunucu otoriterdir.** Doğru cevap, süre ve puan yalnızca `apps/realtime`'da tutulur. Doğru cevap istemciye `round:result` olayından önce asla gönderilmez. JSON'da doğru şık her zaman `answerIndex: 0`'dır; sunucu her soruyu göndermeden önce şıkları karıştırır.
 2. **Event sözleşmesi tektir.** Socket event isimleri ve payload tipleri yalnızca `packages/shared/events.ts`'te tanımlanır; hem web hem realtime oradan import eder. Gelen her payload Zod ile doğrulanır.
 3. **Bot yok.** Kullanıcıya rakip varmış gibi görünen hiçbir sahte oyuncu, sahte mesaj veya sahte sayı üretilmez. Online sayacı gerçek değeri gösterir.
-4. **Eşleşme:** Bir kullanıcı son 20 rakibiyle ve engellediği/engelleyen kişilerle eşleşmez (SPEC §6).
+4. **Eşleşme:** Bir kullanıcı engellediği/engelleyen kişilerle ve kendi cihazıyla eşleşmez. Rakip, uygun bekleyenler arasından rastgele seçilir; son 20 rakip kuralı şimdilik kapalıdır, `MATCH_AVOID_RECENT=true` ile açılır (SPEC §6).
 5. **Kategori ve oyun tamamen rastgeledir**, kullanıcı seçemez (SPEC §7–8).
 6. **Rastgele sohbet 7 dakikadır**, mesajları yalnızca Redis'te tutulur (TTL 24 saat) ve DM'e taşınmaz.
 7. **DM mesajları 24 saat sonra silinir** (`Message.expiresAt`). Okuma sorguları da `expiresAt > now()` filtresi uygular.

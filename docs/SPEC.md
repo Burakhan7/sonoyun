@@ -222,6 +222,7 @@ async function pushRecent(u: string, other: string) {
 }
 ```
 
+- **Güncel karar (Kasım 2026):** Kullanıcı sayısı azken son 20 rakip kuralı **kapalıdır**. En uzun bekleyen önce eşleşir; rakibi, uygun bekleyenler arasından eşit olasılıkla rastgele seçilir, son rakibi dahil. Rakip listeleri yine tutulur; kural `MATCH_AVOID_RECENT=true` ile yeniden açılır. Engelleme ve aynı cihaz kuralı her zaman geçerlidir.
 - **Aynı cihaz kuralı:** Mobil operatörler CGNAT ile çok sayıda kişiye aynı IP'yi verdiği için IP tek başına engel değildir. Aynı IP'deki iki kişi yalnızca cihaz hash'leri aynıysa veya taraflardan birinin hash'i yoksa eşleşmez. Aynı model telefonlar aynı hash'i üretebildiği için hash, farklı IP'ler arasında engel değildir. Hash istemcide tarayıcı özelliklerinden (SHA-256, ilk 128 bit) üretilir ve Socket.IO handshake'inde `auth.device` olarak gönderilir; sunucu son değeri `User.deviceHash`'e yazar.
 - 200'den fazla bekleyen olursa (iyi bir sorun) parçalara bölünür.
 - Eşleşen ikili Postgres `Match` tablosuna da yazılır (analitik + 5651).

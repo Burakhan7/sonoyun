@@ -74,15 +74,23 @@ export interface Candidate extends QueueTicket {
 
 export interface MatchRules {
   allowSameIp: boolean;
+  /** Keeps a user away from their last 20 opponents. Off: a rematch is as likely as anyone else. */
+  avoidRecent: boolean;
+  /** Picks among compatible partners; injectable so tests can be deterministic. */
+  random?: () => number;
 }
 
 export type JoinResult = 'queued' | 'already_queued' | 'in_room';
 
 export type CreateRoom = (roomId: string, a: Candidate, b: Candidate) => Promise<void>;
 
-export function canMatch(a: Candidate, b: Candidate, { allowSameIp }: MatchRules): boolean {
+export function canMatch(
+  a: Candidate,
+  b: Candidate,
+  { allowSameIp, avoidRecent }: MatchRules,
+): boolean {
   if (a.userId === b.userId) return false;
-  if (a.recent.has(b.userId) || b.recent.has(a.userId)) return false;
+  if (avoidRecent && (a.recent.has(b.userId) || b.recent.has(a.userId))) return false;
   if (a.blocked.has(b.userId) || b.blocked.has(a.userId)) return false;
   if (allowSameIp || a.ip !== b.ip) return true;
   // Mobile carriers put many people behind one IP, so a shared IP alone does not mean one person.
@@ -90,16 +98,21 @@ export function canMatch(a: Candidate, b: Candidate, { allowSameIp }: MatchRules
   return a.deviceHash !== null && b.deviceHash !== null && a.deviceHash !== b.deviceHash;
 }
 
-/** Pairs candidates, longest-waiting first. Each candidate appears in at most one pair. */
+/**
+ * The longest-waiting user is served first, so nobody is left behind, and gets a partner
+ * chosen uniformly at random among everyone compatible. Each candidate is in at most one pair.
+ */
 export function findPairs(candidates: Candidate[], rules: MatchRules): [Candidate, Candidate][] {
+  const random = rules.random ?? Math.random;
   const used = new Set<string>();
   const pairs: [Candidate, Candidate][] = [];
 
   for (const a of candidates) {
     if (used.has(a.userId)) continue;
-    const b = candidates.find(
+    const options = candidates.filter(
       (candidate) => !used.has(candidate.userId) && canMatch(a, candidate, rules),
     );
+    const b = options[Math.floor(random() * options.length)];
     if (!b) continue;
     used.add(a.userId);
     used.add(b.userId);
