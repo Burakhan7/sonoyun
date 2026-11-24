@@ -9,7 +9,7 @@ export function LegalPage({ title, children }: { title: string; children: ReactN
         Bu metin şablondur ve yayından önce hukukçu tarafından gözden geçirilecektir. Köşeli
         parantez içindeki alanlar doldurulmalıdır.
       </p>
-      <div className="mt-4 space-y-4 text-sm leading-relaxed [&_h2]:mt-6 [&_h2]:text-base [&_h2]:font-bold [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5">
+      <div className="mt-4 space-y-4 text-sm leading-relaxed [&_h2]:mt-6 [&_h2]:text-base [&_h2]:font-bold [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5 [&_a]:font-semibold [&_a]:underline">
         {children}
       </div>
     </div>

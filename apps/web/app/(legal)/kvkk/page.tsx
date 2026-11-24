@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { LegalPage } from '@/components/LegalPage';
+import { LEGAL } from '@/lib/legal';
 
 export const metadata: Metadata = { title: 'KVKK Aydınlatma Metni' };
 
@@ -8,7 +9,8 @@ export default function KvkkPage() {
     <LegalPage title="KVKK Aydınlatma Metni">
       <p>
         6698 sayılı Kişisel Verilerin Korunması Kanunu’nun 10. maddesi uyarınca veri sorumlusu
-        sıfatıyla [şirket unvanı, MERSİS no, adres] tarafından bilgilendirilirsin.
+        sıfatıyla {LEGAL.operator} ([MERSİS veya vergi no], [adres]) tarafından bilgilendirilirsin.
+        Son güncelleme: {LEGAL.updatedAt}.
       </p>
 
       <h2>1. İşlenen kişisel veriler</h2>
@@ -58,7 +60,11 @@ export default function KvkkPage() {
         <li>Otomatik analiz sonucu aleyhine çıkan sonuca itiraz etme</li>
         <li>Kanuna aykırı işleme nedeniyle zararın giderilmesini talep etme</li>
       </ul>
-      <p>Başvurularını [başvuru e-postası ve yöntemi] üzerinden iletebilirsin.</p>
+      <p>
+        Başvurularını <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a> adresine e-posta ile veya
+        [adres] adresine yazılı olarak iletebilirsin. Başvurular en geç 30 gün içinde ücretsiz
+        yanıtlanır.
+      </p>
     </LegalPage>
   );
 }

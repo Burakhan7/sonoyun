@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
 import { LegalPage } from '@/components/LegalPage';
+import { LEGAL } from '@/lib/legal';
 
 export const metadata: Metadata = { title: 'Kullanım Koşulları' };
 
 export default function TermsPage() {
   return (
     <LegalPage title="Kullanım Koşulları">
-      <p>Son güncelleme: [tarih]. Hizmet sağlayıcı: [şirket unvanı, adres, iletişim e-postası].</p>
+      <p>
+        Son güncelleme: {LEGAL.updatedAt}. Hizmet sağlayıcı: {LEGAL.operator}, [adres]. İletişim:{' '}
+        <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>
+      </p>
 
       <h2>1. Hizmet</h2>
       <p>
