@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ADMIN_REPORT_STATUSES, adminReportsResponseSchema, type AdminReport } from 'shared';
+import { AdminNav, BAN_OPTIONS, button, formatDate, post } from './common';
 
 type Status = (typeof ADMIN_REPORT_STATUSES)[number];
 
@@ -18,26 +19,6 @@ const REASON_LABELS: Record<string, string> = {
   'reşit-olmayan': 'Reşit olmayan şüphesi',
   diger: 'Diğer',
 };
-
-const BAN_OPTIONS = [
-  { hours: 24, label: '24 saat' },
-  { hours: 24 * 7, label: '7 gün' },
-  { hours: 24 * 30, label: '30 gün' },
-  { hours: 24 * 365, label: '1 yıl' },
-];
-
-const button = 'min-h-touch rounded-lg px-3 text-sm font-semibold disabled:opacity-50';
-
-const formatDate = (value: string) => new Date(value).toLocaleString('tr-TR');
-
-async function post(path: string, body?: unknown) {
-  const response = await fetch(`/api/admin/${path}`, {
-    method: 'POST',
-    headers: body === undefined ? {} : { 'content-type': 'application/json' },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-  });
-  if (!response.ok) throw new Error(`Request failed: ${response.status}`);
-}
 
 function ReportCard({
   report,
@@ -216,7 +197,10 @@ export function AdminClient() {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-4">
-      <h1 className="text-2xl font-bold">Raporlar</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">Raporlar</h1>
+        <AdminNav />
+      </div>
       <div role="tablist" className="mt-3 flex gap-2">
         {ADMIN_REPORT_STATUSES.map((item) => (
           <button

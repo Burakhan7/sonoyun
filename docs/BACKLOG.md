@@ -13,6 +13,7 @@ Zamanı gelince yapılacak işler. Yapılan madde bu listeden silinir. Yayın ad
 - [ ] Yük testini staging ortamında tekrarla. Yerel test Docker ağında yapıldı, gerçek ağ gecikmesini içermiyor.
 
 ## Ürün kararları
+- [ ] Admin panelinden tüm sohbetler (DM dahil) okunabiliyor; Koşullar, Gizlilik ve ilk giriş kurallarında yazıyor. Hukukçuya sor: haberleşmenin gizliliği (Anayasa m.22, TCK m.132) açısından bu bilgilendirme ve onay yeterli mi?
 - [ ] Cihaz özeti toplanıyor ve Gizlilik/KVKK metnine yazıldı. Hukukçuya sor: meşru menfaat yeterli mi, yoksa çerez bandında ayrı onay mı gerekir?
 - [ ] Son 20 rakip kuralı kullanıcı isteğiyle kapatıldı (eşleşme tamamen rastgele). Kullanıcı sayısı artınca `deploy/realtime.env` içine `MATCH_AVOID_RECENT=true` yazıp yeniden açmayı değerlendir.
 - [ ] Slogan geçici: "Yabancıyla buz, bir oyunda kırılır." Nihai metni belirle.

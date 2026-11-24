@@ -40,10 +40,12 @@ export default function TermsPage() {
 
       <h2>4. Moderasyon</h2>
       <p>
-        Mesajlar otomatik kelime filtresinden geçer. Kullanıcılar birbirini raporlayabilir ve
-        engelleyebilir. Raporlanan görüşmenin son 50 mesajı inceleme için saklanır. 24 saat içinde 3
-        farklı kişiden rapor alan hesap otomatik olarak 24 saat eşleşmeye kapatılır. Kurallara
-        uymayan hesaplar geçici veya kalıcı olarak kısıtlanabilir.
+        Mesajlar otomatik kelime filtresinden geçer. Kullanıcı güvenliğini sağlamak ve kötüye
+        kullanımı önlemek için rastgele sohbetler, oyun sohbetleri ve özel mesajlar, silindikleri 24
+        saate kadar yetkili moderatörler tarafından canlı veya sonradan incelenebilir. Kullanıcılar
+        birbirini raporlayabilir ve engelleyebilir. Raporlanan görüşmenin son 50 mesajı inceleme
+        için saklanır. 24 saat içinde 3 farklı kişiden rapor alan hesap otomatik olarak 24 saat
+        eşleşmeye kapatılır. Kurallara uymayan hesaplar geçici veya kalıcı olarak kısıtlanabilir.
       </p>
 
       <h2>5. Kullanıcı içeriği ve sorumluluk</h2>

@@ -4,7 +4,7 @@ const ID = '[A-Za-z0-9_-]{1,64}';
 
 // Access to these routes is enforced by middleware.ts.
 const ALLOWED_ROUTES: Record<string, RegExp[]> = {
-  GET: [/^reports$/],
+  GET: [/^reports$/, /^chats$/, new RegExp(`^chats/(room|dm)/${ID}$`)],
   POST: [
     new RegExp(`^reports/${ID}/status$`),
     new RegExp(`^users/${ID}/ban$`),

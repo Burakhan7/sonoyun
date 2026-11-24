@@ -3,11 +3,14 @@ import type { PrismaClient } from '@prisma/client';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import type { Redis } from 'ioredis';
 import {
+  ADMIN_CHAT_KINDS,
   adminBanSchema,
   adminReportStatusSchema,
   adminReportsResponseSchema,
+  type AdminChatKind,
   type AdminReport,
 } from 'shared';
+import type { AdminChatService } from './admin-chats.js';
 import { suspendedKey } from './moderation.js';
 
 const REPORT_PAGE_SIZE = 200;
@@ -111,6 +114,7 @@ export function registerAdminRoutes(
   app: FastifyInstance,
   admin: AdminService,
   internalSecret: string,
+  chats?: AdminChatService,
 ) {
   const expected = sha256(internalSecret);
   const authorized = (request: FastifyRequest) => {
@@ -147,6 +151,24 @@ export function registerAdminRoutes(
         if (!banned) return reply.code(404).send({ code: 'not_found' });
         request.log.info({ userId, hours: parsed.data.hours }, 'Admin banned user');
         return { ok: true };
+      });
+
+      scope.get('/chats', async (_request, reply) => {
+        if (!chats) return reply.code(404).send({ code: 'not_found' });
+        return chats.list();
+      });
+
+      scope.get('/chats/:kind/:id', async (request, reply) => {
+        const kind = param(request, 'kind');
+        const id = param(request, 'id');
+        if (!chats || !ADMIN_CHAT_KINDS.includes(kind as AdminChatKind)) {
+          return reply.code(404).send({ code: 'not_found' });
+        }
+        const detail = await chats.detail(kind as AdminChatKind, id);
+        if (!detail) return reply.code(404).send({ code: 'not_found' });
+        // Every opened conversation is recorded, so moderator access can be audited.
+        request.log.info({ kind, chatId: id }, 'Admin opened chat');
+        return detail;
       });
 
       scope.post('/users/:id/unban', async (request, reply) => {

@@ -1,9 +1,14 @@
 import prismaClient from '@prisma/client';
 import Fastify from 'fastify';
 import { Redis } from 'ioredis';
-import { adminReportsResponseSchema } from 'shared';
+import {
+  adminChatDetailSchema,
+  adminChatsResponseSchema,
+  adminReportsResponseSchema,
+} from 'shared';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AccountService, DELETED_USER_ID } from './account.js';
+import { AdminChatService, type LiveChat } from './admin-chats.js';
 import { AdminService, registerAdminRoutes } from './admin.js';
 import { messagesKey } from './chat.js';
 import { blockKey, recentKey } from './matchmaking.js';
@@ -165,6 +170,163 @@ describe('admin', () => {
       (await prisma.user.findUniqueOrThrow({ where: { id: user.id } })).bannedUntil,
     ).toBeNull();
     expect(await redis.exists(suspendedKey(user.id))).toBe(0);
+  });
+});
+
+describe('admin chats', () => {
+  const live: LiveChat[] = [];
+  const chats = new AdminChatService(prisma, redis, () => live);
+  const admin = new AdminService(prisma, redis, async () => {});
+  const headers = { 'x-internal-secret': SECRET };
+  const buildApp = () => {
+    const app = Fastify();
+    registerAdminRoutes(app, admin, SECRET, chats);
+    return app;
+  };
+
+  const roomMessage = async (roomId: string, senderId: string, body: string, at: Date) =>
+    redis.rpush(
+      messagesKey(roomId),
+      JSON.stringify({ id: `${roomId}-${body}`, senderId, body, at: at.toISOString() }),
+    );
+
+  const createMatch = (id: string, a: string, b: string, startedAt = new Date()) =>
+    prisma.match.create({
+      data: {
+        id,
+        userAId: a,
+        userBId: b,
+        category: 'genel',
+        engine: 'mc',
+        scoreA: 0,
+        scoreB: 0,
+        startedAt,
+      },
+    });
+
+  const createDm = async (a: string, b: string, messages: { body: string; ageMs: number }[]) => {
+    const conversation = await prisma.conversation.create({
+      data: { members: { create: [{ userId: a }, { userId: b }] } },
+    });
+    const now = Date.now();
+    for (const { body, ageMs } of messages) {
+      const createdAt = new Date(now - ageMs);
+      await prisma.message.create({
+        data: {
+          conversationId: conversation.id,
+          senderId: a,
+          body,
+          createdAt,
+          expiresAt: new Date(createdAt.getTime() + 24 * 60 * 60 * 1000),
+        },
+      });
+    }
+    return conversation;
+  };
+
+  beforeEach(() => {
+    live.length = 0;
+  });
+
+  it('separates live chats from stored ones and skips rooms without messages', async () => {
+    const [a, b, c, d] = [
+      await createUser('A'),
+      await createUser('B'),
+      await createUser('C'),
+      await createUser('D'),
+    ];
+    const now = new Date();
+    await createMatch('live-room', a.id, b.id);
+    await createMatch('old-room', c.id, d.id, new Date(now.getTime() - 60 * 60 * 1000));
+    await createMatch('silent-room', c.id, a.id);
+    await roomMessage('live-room', a.id, 'selam', now);
+    await roomMessage('old-room', c.id, 'nasılsın', new Date(now.getTime() - 50 * 60 * 1000));
+    await createReport(d.id, c.id).then((report) =>
+      prisma.report.update({ where: { id: report.id }, data: { matchId: 'old-room' } }),
+    );
+    live.push({
+      id: 'live-room',
+      players: [a.id, b.id],
+      state: 'CHATTING',
+      friendly: false,
+      chatEndsAt: now.getTime() + 60_000,
+    });
+    // A room still in its game is not a conversation yet.
+    live.push({
+      id: 'silent-room',
+      players: [c.id, a.id],
+      state: 'PLAYING',
+      friendly: false,
+      chatEndsAt: 0,
+    });
+    const recentDm = await createDm(a.id, c.id, [{ body: 'dm yeni', ageMs: 60_000 }]);
+    const oldDm = await createDm(b.id, d.id, [
+      { body: 'süresi doldu', ageMs: 25 * 60 * 60 * 1000 },
+      { body: 'dm eski', ageMs: 2 * 60 * 60 * 1000 },
+    ]);
+
+    const app = buildApp();
+    const response = await app.inject({ url: '/internal/admin/chats', headers });
+    const { active, stored } = adminChatsResponseSchema.parse(response.json());
+
+    expect(active.map((chat) => [chat.kind, chat.id])).toEqual([
+      ['room', 'live-room'],
+      ['dm', recentDm.id],
+    ]);
+    expect(active[0]).toMatchObject({ live: true, messageCount: 1, reported: false });
+    expect(active[0]!.endsAt).not.toBeNull();
+    expect(active[0]!.participants.map((party) => party.nickname)).toEqual(['A', 'B']);
+    expect(stored.map((chat) => [chat.kind, chat.id])).toEqual([
+      ['room', 'old-room'],
+      ['dm', oldDm.id],
+    ]);
+    expect(stored[0]).toMatchObject({ reported: true, preview: { body: 'nasılsın' } });
+    // Expired DM messages are never shown.
+    expect(stored[1]).toMatchObject({ messageCount: 1, preview: { body: 'dm eski' } });
+    await app.close();
+  });
+
+  it('opens a game chat and a DM with their messages in order', async () => {
+    const [a, b] = [await createUser('A'), await createUser('B')];
+    const now = Date.now();
+    await createMatch('room-1', a.id, b.id);
+    await roomMessage('room-1', a.id, 'bir', new Date(now - 2000));
+    await roomMessage('room-1', b.id, 'iki', new Date(now - 1000));
+    const dm = await createDm(a.id, b.id, [
+      { body: 'eski', ageMs: 25 * 60 * 60 * 1000 },
+      { body: 'ilk', ageMs: 3000 },
+      { body: 'son', ageMs: 1000 },
+    ]);
+    const app = buildApp();
+
+    const room = adminChatDetailSchema.parse(
+      (await app.inject({ url: '/internal/admin/chats/room/room-1', headers })).json(),
+    );
+    expect(room.messages.map((message) => message.body)).toEqual(['bir', 'iki']);
+    expect(room.chat.live).toBe(false);
+
+    const direct = adminChatDetailSchema.parse(
+      (await app.inject({ url: `/internal/admin/chats/dm/${dm.id}`, headers })).json(),
+    );
+    expect(direct.messages.map((message) => message.body)).toEqual(['ilk', 'son']);
+    expect(direct.chat.participants.map((party) => party.id).sort()).toEqual([a.id, b.id].sort());
+    await app.close();
+  });
+
+  it('returns 404 for unknown chats and hides the routes without the secret', async () => {
+    const app = buildApp();
+    for (const url of [
+      '/internal/admin/chats/room/nope',
+      '/internal/admin/chats/dm/nope',
+      '/internal/admin/chats/x/1',
+    ]) {
+      expect((await app.inject({ url, headers })).statusCode).toBe(404);
+    }
+    for (const url of ['/internal/admin/chats', '/internal/admin/chats/room/nope']) {
+      const response = await app.inject({ url, headers: { 'x-internal-secret': 'wrong' } });
+      expect(response.statusCode).toBe(404);
+    }
+    await app.close();
   });
 });
 
