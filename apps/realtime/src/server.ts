@@ -77,6 +77,8 @@ export interface ServerOptions {
   internalSecret?: string;
   guestLimitPerHour?: number;
   allowSameIp?: boolean;
+  /** Keeps users away from their last 20 opponents (SPEC §6). Off by default for now. */
+  avoidRecent?: boolean;
   trustProxy?: boolean;
   logger?: boolean;
   /** Receives unexpected errors, e.g. to forward them to Sentry. */
@@ -89,7 +91,7 @@ export interface ServerOptions {
 interface SocketData {
   userId: string;
   ip: string;
-  /** Source port. Unknown behind a reverse proxy, which hides the visitor's port. */
+  /** Source port: from the socket, or from the trusted proxy's X-Client-Port header. */
   port: number | null;
   deviceHash: string | null;
 }
@@ -107,6 +109,7 @@ export function buildServer({
   internalSecret,
   guestLimitPerHour,
   allowSameIp = false,
+  avoidRecent = false,
   trustProxy = false,
   logger = false,
   reportError,
@@ -158,7 +161,7 @@ export function buildServer({
       logSocketEvent(a.socketId, 'match');
       logSocketEvent(b.socketId, 'match');
     },
-    { allowSameIp },
+    { allowSameIp, avoidRecent },
   );
   const removeFromQueue = (userId: string) => matchmaker.remove(userId);
   const friends = prisma ? new FriendService(prisma, redis, limiter, presence) : null;

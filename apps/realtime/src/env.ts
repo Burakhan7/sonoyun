@@ -14,6 +14,7 @@ const envSchema = z
     REDIS_URL: z.string().url(),
     JWT_SECRET: z.string().min(32),
     MATCH_ALLOW_SAME_IP: booleanFlag,
+    MATCH_AVOID_RECENT: booleanFlag,
     TRUST_PROXY: booleanFlag,
     INTERNAL_API_SECRET: z.string().min(32).optional(),
     SENTRY_DSN: z.string().url().optional(),

@@ -14,6 +14,7 @@ Zamanı gelince yapılacak işler. Yapılan madde bu listeden silinir. Yayın ad
 
 ## Ürün kararları
 - [ ] Cihaz özeti toplanıyor ve Gizlilik/KVKK metnine yazıldı. Hukukçuya sor: meşru menfaat yeterli mi, yoksa çerez bandında ayrı onay mı gerekir?
+- [ ] Son 20 rakip kuralı kullanıcı isteğiyle kapatıldı (eşleşme tamamen rastgele). Kullanıcı sayısı artınca `deploy/realtime.env` içine `MATCH_AVOID_RECENT=true` yazıp yeniden açmayı değerlendir.
 - [ ] Slogan geçici: "Yabancıyla buz, bir oyunda kırılır." Nihai metni belirle.
 - [ ] Çalışma adı yerine nihai ürün adı ve logoyu belirle.
 - [ ] Arkadaşlar arası oyun sohbetinde link şimdilik rastgele sohbetteki gibi engelli; DM gibi serbest olsun mu kararlaştır.

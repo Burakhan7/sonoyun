@@ -13,6 +13,7 @@ import {
   pushRecent,
   recentKey,
   type Candidate,
+  type MatchRules,
 } from './matchmaking.js';
 
 // Requires Redis (docker compose up -d). Uses a dedicated logical database that is flushed.
@@ -23,13 +24,13 @@ const redis = new Redis(process.env.TEST_REDIS_URL ?? 'redis://127.0.0.1:6379', 
 
 type Pair = { roomId: string; users: [string, string] };
 
-function createMatchmaker(pairs: Pair[], allowSameIp = false) {
+function createMatchmaker(pairs: Pair[], rules: Partial<MatchRules> = {}) {
   return new Matchmaker(
     redis,
     async (roomId, a, b) => {
       pairs.push({ roomId, users: [a.userId, b.userId] });
     },
-    { allowSameIp },
+    { allowSameIp: false, avoidRecent: false, ...rules },
   );
 }
 
@@ -62,62 +63,104 @@ describe('matchmaking', () => {
     redis.disconnect();
   });
 
-  it('matches the two longest-waiting users', async () => {
-    await matchmaker.join('new', ticket(3), 3000);
-    await matchmaker.join('oldest', ticket(1), 1000);
-    await matchmaker.join('older', ticket(2), 2000);
-    await matchmaker.tick();
+  it('always serves the longest-waiting user first', async () => {
+    for (const roll of [0, 0.99]) {
+      await redis.flushdb();
+      const found: Pair[] = [];
+      const worker = createMatchmaker(found, { random: () => roll });
+      await worker.join('new', ticket(3), 3000);
+      await worker.join('oldest', ticket(1), 1000);
+      await worker.join('older', ticket(2), 2000);
+      await worker.tick();
 
-    expect(pairs).toHaveLength(1);
-    expect(pairs[0]!.users).toEqual(['oldest', 'older']);
-    expect(await redis.zrange(QUEUE_KEY, 0, -1)).toEqual(['new']);
-  });
-
-  it('does not match a user with an opponent from their last 20', async () => {
-    await pushRecent(redis, 'a', 'b');
-    await matchmaker.join('a', ticket(1));
-    await matchmaker.join('b', ticket(2));
-    await matchmaker.tick();
-
-    expect(pairs).toHaveLength(0);
-  });
-
-  it('applies the recent list in both directions', async () => {
-    await pushRecent(redis, 'b', 'a');
-    await matchmaker.join('a', ticket(1));
-    await matchmaker.join('b', ticket(2));
-    await matchmaker.tick();
-
-    expect(pairs).toHaveLength(0);
-  });
-
-  it('can rematch only after 20 other opponents', async () => {
-    const rematches = () =>
-      pairs.filter(({ users }) => users.includes('u1') && users.includes('u2')).length;
-
-    await playMatch(1, 2);
-    expect(rematches()).toBe(1);
-
-    for (let i = 0; i < 19; i += 1) {
-      await playMatch(1, 100 + i);
-      await playMatch(2, 200 + i);
+      expect(found).toHaveLength(1);
+      expect(found[0]!.users[0]).toBe('oldest');
+      expect(await redis.zcard(QUEUE_KEY)).toBe(1);
     }
-    await matchmaker.join('u1', ticket(1));
-    await matchmaker.join('u2', ticket(2));
-    await matchmaker.tick();
-    expect(rematches()).toBe(1);
-    await matchmaker.leave('u1', 'socket-1');
-    await matchmaker.leave('u2', 'socket-2');
+  });
 
-    await playMatch(1, 119);
-    await playMatch(2, 219);
-    expect(await redis.llen(recentKey('u1'))).toBe(20);
-    expect(await redis.lpos(recentKey('u1'), 'u2')).toBeNull();
+  it('lets a user rematch their last opponent by default', async () => {
+    await playMatch(1, 2);
+    await playMatch(1, 2);
+    expect(pairs.map(({ users }) => users)).toEqual([
+      ['u1', 'u2'],
+      ['u1', 'u2'],
+    ]);
+  });
 
-    await matchmaker.join('u1', ticket(1));
-    await matchmaker.join('u2', ticket(2));
-    await matchmaker.tick();
-    expect(rematches()).toBe(2);
+  it('picks a partner at random, the last opponent as likely as anyone', async () => {
+    const picked: [string, string][] = [];
+    for (const roll of [0, 0.5, 0.99]) {
+      await redis.flushdb();
+      await pushRecent(redis, 'a', 'b');
+      const found: Pair[] = [];
+      const worker = createMatchmaker(found, { random: () => roll });
+      await worker.join('a', ticket(1), 1);
+      await worker.join('b', ticket(2), 2);
+      await worker.join('c', ticket(3), 3);
+      await worker.join('d', ticket(4), 4);
+      await worker.tick();
+      picked.push(found[0]!.users);
+    }
+    // The longest-waiting user is served first; each roll lands on a different partner.
+    expect(picked).toEqual([
+      ['a', 'b'],
+      ['a', 'c'],
+      ['a', 'd'],
+    ]);
+  });
+
+  describe('with MATCH_AVOID_RECENT', () => {
+    beforeEach(() => {
+      matchmaker = createMatchmaker(pairs, { avoidRecent: true });
+    });
+
+    it('does not match a user with an opponent from their last 20', async () => {
+      await pushRecent(redis, 'a', 'b');
+      await matchmaker.join('a', ticket(1));
+      await matchmaker.join('b', ticket(2));
+      await matchmaker.tick();
+
+      expect(pairs).toHaveLength(0);
+    });
+
+    it('applies the recent list in both directions', async () => {
+      await pushRecent(redis, 'b', 'a');
+      await matchmaker.join('a', ticket(1));
+      await matchmaker.join('b', ticket(2));
+      await matchmaker.tick();
+
+      expect(pairs).toHaveLength(0);
+    });
+
+    it('can rematch only after 20 other opponents', async () => {
+      const rematches = () =>
+        pairs.filter(({ users }) => users.includes('u1') && users.includes('u2')).length;
+
+      await playMatch(1, 2);
+      expect(rematches()).toBe(1);
+
+      for (let i = 0; i < 19; i += 1) {
+        await playMatch(1, 100 + i);
+        await playMatch(2, 200 + i);
+      }
+      await matchmaker.join('u1', ticket(1));
+      await matchmaker.join('u2', ticket(2));
+      await matchmaker.tick();
+      expect(rematches()).toBe(1);
+      await matchmaker.leave('u1', 'socket-1');
+      await matchmaker.leave('u2', 'socket-2');
+
+      await playMatch(1, 119);
+      await playMatch(2, 219);
+      expect(await redis.llen(recentKey('u1'))).toBe(20);
+      expect(await redis.lpos(recentKey('u1'), 'u2')).toBeNull();
+
+      await matchmaker.join('u1', ticket(1));
+      await matchmaker.join('u2', ticket(2));
+      await matchmaker.tick();
+      expect(rematches()).toBe(2);
+    });
   });
 
   it('never matches a blocked pair, in either direction', async () => {
@@ -156,7 +199,7 @@ describe('matchmaking', () => {
     await matchmaker.tick();
     expect(pairs).toHaveLength(0);
 
-    await createMatchmaker(pairs, true).tick();
+    await createMatchmaker(pairs, { allowSameIp: true }).tick();
     expect(pairs).toHaveLength(1);
   });
 
@@ -168,7 +211,7 @@ describe('matchmaking', () => {
   });
 
   it('tells devices apart only when they share an IP', () => {
-    const rules = { allowSameIp: false };
+    const rules = { allowSameIp: false, avoidRecent: false };
     const base: Candidate = {
       userId: 'x',
       socketId: 's',
@@ -186,7 +229,7 @@ describe('matchmaking', () => {
     expect(canMatch(base, { ...unknownDevice, ip: '2.2.2.2' }, rules)).toBe(true);
     // Identical phone models produce the same summary, so it never blocks across networks.
     expect(canMatch(base, { ...sameDevice, ip: '2.2.2.2' }, rules)).toBe(true);
-    expect(canMatch(base, sameDevice, { allowSameIp: true })).toBe(true);
+    expect(canMatch(base, sameDevice, { allowSameIp: true, avoidRecent: false })).toBe(true);
   });
 
   it('puts 100 simultaneous users in at most one room each', async () => {
@@ -262,7 +305,7 @@ describe('matchmaking', () => {
       async () => {
         throw new Error('room failed');
       },
-      { allowSameIp: false },
+      { allowSameIp: false, avoidRecent: false },
     );
     await failing.join('a', ticket(1), 1000);
     await failing.join('b', ticket(2), 2000);
