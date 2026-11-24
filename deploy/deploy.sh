@@ -11,6 +11,7 @@ for file in .env realtime.env web.env badwords.tr.txt; do
 done
 
 git pull --ff-only
+chmod 644 deploy/badwords.tr.txt
 compose() { docker compose -f deploy/docker-compose.yml --env-file deploy/.env "$@"; }
 
 compose build
