@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
 import { LegalPage } from '@/components/LegalPage';
+import { LEGAL } from '@/lib/legal';
 
 export const metadata: Metadata = { title: 'Gizlilik' };
 
 export default function PrivacyPage() {
   return (
     <LegalPage title="Gizlilik Politikası">
-      <p>Son güncelleme: [tarih]. Veri sorumlusu: [şirket unvanı, adres, iletişim e-postası].</p>
+      <p>
+        Son güncelleme: {LEGAL.updatedAt}. Veri sorumlusu: {LEGAL.operator}, [adres]. İletişim:{' '}
+        <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>
+      </p>
 
       <h2>Hangi verileri işliyoruz?</h2>
       <ul>
@@ -61,7 +65,9 @@ export default function PrivacyPage() {
       </p>
 
       <h2>İletişim</h2>
-      <p>Sorularını [iletişim e-postası] adresine iletebilirsin.</p>
+      <p>
+        Sorularını <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a> adresine iletebilirsin.
+      </p>
     </LegalPage>
   );
 }
