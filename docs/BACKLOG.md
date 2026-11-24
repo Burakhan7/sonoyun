@@ -13,8 +13,7 @@ Zamanı gelince yapılacak işler. Yapılan madde bu listeden silinir. Yayın ad
 - [ ] Yük testini staging ortamında tekrarla. Yerel test Docker ağında yapıldı, gerçek ağ gecikmesini içermiyor.
 
 ## Ürün kararları
-- [ ] Aynı IP engelini gözden geçir: Türkiye'de mobil operatörler CGNAT kullandığı için farklı kişiler aynı IP'yi paylaşabilir ve eşleşemeyebilir. **Lansman öncesi önerilir.** Öneri: FingerprintJS cihaz hash'i ekle, engeli ona dayandır, IP'yi ban/rapor sinyali olarak tut.
-- [ ] Cihaz parmak izi (SPEC §4) henüz toplanmıyor; `deviceHash` boş. Eklenirse KVKK metnine de yazılmalı.
+- [ ] Cihaz özeti toplanıyor ve Gizlilik/KVKK metnine yazıldı. Hukukçuya sor: meşru menfaat yeterli mi, yoksa çerez bandında ayrı onay mı gerekir?
 - [ ] Slogan geçici: "Yabancıyla buz, bir oyunda kırılır." Nihai metni belirle.
 - [ ] Çalışma adı yerine nihai ürün adı ve logoyu belirle.
 - [ ] Arkadaşlar arası oyun sohbetinde link şimdilik rastgele sohbetteki gibi engelli; DM gibi serbest olsun mu kararlaştır.
@@ -30,6 +29,7 @@ Zamanı gelince yapılacak işler. Yapılan madde bu listeden silinir. Yayın ad
 - [ ] Kart seçimi ekranında sunucudan gelen hata mesajları gösterilmiyor; `CardPicker` içine bildirim alanı ekle.
 - [ ] Sohbette 1 mesaj/sn sınırına takılan kullanıcı için butonda kısa bir bekleme göstergesi ekle.
 - [ ] Repodaki Playwright testini admin, DM ve davet akışlarını kapsayacak şekilde genişlet.
+- [ ] Admin panelinde raporlanan kullanıcının yanında aynı cihaz özeti ve IP'den açılmış diğer hesapları göster (ban kaçırma sinyali). Aynı model telefonlar aynı özeti üretebildiği için otomatik ban yapma.
 
 ## Bakım
 - [ ] ESLint 9 kullanımdan kalkıyor; uygun bir zamanda ESLint 10'a geç.

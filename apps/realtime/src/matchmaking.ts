@@ -84,8 +84,10 @@ export function canMatch(a: Candidate, b: Candidate, { allowSameIp }: MatchRules
   if (a.userId === b.userId) return false;
   if (a.recent.has(b.userId) || b.recent.has(a.userId)) return false;
   if (a.blocked.has(b.userId) || b.blocked.has(a.userId)) return false;
-  if (a.deviceHash && a.deviceHash === b.deviceHash) return false;
-  return allowSameIp || a.ip !== b.ip;
+  if (allowSameIp || a.ip !== b.ip) return true;
+  // Mobile carriers put many people behind one IP, so a shared IP alone does not mean one person.
+  // Without a device summary on both sides there is no way to tell them apart.
+  return a.deviceHash !== null && b.deviceHash !== null && a.deviceHash !== b.deviceHash;
 }
 
 /** Pairs candidates, longest-waiting first. Each candidate appears in at most one pair. */

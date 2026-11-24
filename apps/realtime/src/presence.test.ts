@@ -23,10 +23,10 @@ describe('presence over Socket.IO', () => {
   let server: ReturnType<typeof buildServer>;
   let url: string;
 
-  const connect = (token: unknown) =>
+  const connect = (token: unknown, device?: string) =>
     new Promise<Socket>((resolve, reject) => {
       const client = connectClient(url, {
-        auth: { token },
+        auth: device === undefined ? { token } : { token, device },
         transports: ['websocket'],
         forceNew: true,
         reconnection: false,
@@ -156,6 +156,17 @@ describe('presence over Socket.IO', () => {
   it.each([undefined, '', 'not-a-token'])('rejects handshake token %s', async (token) => {
     await expect(connect(token)).rejects.toThrow('unauthorized');
     await expectOnline(0);
+  });
+
+  it('records the device summary sent with the handshake', async () => {
+    const { user, token } = await createUser();
+    await connect(token, 'c'.repeat(32));
+    await vi.waitFor(() => expect(users.records.get(user.id)?.deviceHash).toBe('c'.repeat(32)));
+  });
+
+  it('rejects a malformed device summary', async () => {
+    const { token } = await createUser();
+    await expect(connect(token, 'not-a-hash')).rejects.toThrow('unauthorized');
   });
 
   it('rejects a valid token for a deleted user', async () => {

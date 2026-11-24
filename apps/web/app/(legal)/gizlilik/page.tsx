@@ -12,6 +12,12 @@ export default function PrivacyPage() {
       <ul>
         <li>Hesap: rastgele takma ad, avatar, oluşturma ve son görülme zamanı, kural onayı.</li>
         <li>Bağlantı kayıtları: IP adresi, varsa port, olay türü ve zaman damgası.</li>
+        <li>
+          Cihaz özeti: tarayıcı sürümü, dil, saat dilimi, ekran boyutu ve ekran kartı gibi genel
+          özelliklerden tarayıcında üretilen, geri çevrilemeyen bir özet. Aynı ağdaki farklı
+          kişileri ayırt etmek, kişinin kendisiyle eşleşmesini ve ban kaçırmayı önlemek için
+          kullanılır. Cihazında hiçbir şey saklanmaz.
+        </li>
         <li>Oyun: eşleşmeler, kategori, skor, görülen soru kimlikleri.</li>
         <li>Sosyal: arkadaşlıklar, istekler, engellemeler.</li>
         <li>Mesajlar: rastgele sohbet ve özel mesajlar.</li>

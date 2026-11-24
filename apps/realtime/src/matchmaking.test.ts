@@ -149,7 +149,7 @@ describe('matchmaking', () => {
     expect(pairs.map(({ users }) => users)).toEqual([['a', 'c']]);
   });
 
-  it('does not match the same IP or device unless allowed for development', async () => {
+  it('does not match the same IP without device summaries unless allowed for development', async () => {
     const sameIp = { socketId: 's1', ip: '1.1.1.1', deviceHash: null };
     await matchmaker.join('a', sameIp);
     await matchmaker.join('b', { ...sameIp, socketId: 's2' });
@@ -158,18 +158,35 @@ describe('matchmaking', () => {
 
     await createMatchmaker(pairs, true).tick();
     expect(pairs).toHaveLength(1);
+  });
 
+  it('matches different devices behind a shared carrier IP', async () => {
+    await matchmaker.join('a', { socketId: 's1', ip: '1.1.1.1', deviceHash: 'a'.repeat(32) });
+    await matchmaker.join('b', { socketId: 's2', ip: '1.1.1.1', deviceHash: 'b'.repeat(32) });
+    await matchmaker.tick();
+    expect(pairs.map(({ users }) => users)).toEqual([['a', 'b']]);
+  });
+
+  it('tells devices apart only when they share an IP', () => {
+    const rules = { allowSameIp: false };
     const base: Candidate = {
       userId: 'x',
       socketId: 's',
       ip: '1.1.1.1',
-      deviceHash: 'device',
+      deviceHash: 'a'.repeat(32),
       score: 0,
       recent: new Set(),
       blocked: new Set(),
     };
-    const other = { ...base, userId: 'y', ip: '2.2.2.2' };
-    expect(canMatch(base, other, { allowSameIp: true })).toBe(false);
+    const sameDevice = { ...base, userId: 'y' };
+    const unknownDevice = { ...base, userId: 'y', deviceHash: null };
+
+    expect(canMatch(base, sameDevice, rules)).toBe(false);
+    expect(canMatch(base, unknownDevice, rules)).toBe(false);
+    expect(canMatch(base, { ...unknownDevice, ip: '2.2.2.2' }, rules)).toBe(true);
+    // Identical phone models produce the same summary, so it never blocks across networks.
+    expect(canMatch(base, { ...sameDevice, ip: '2.2.2.2' }, rules)).toBe(true);
+    expect(canMatch(base, sameDevice, { allowSameIp: true })).toBe(true);
   });
 
   it('puts 100 simultaneous users in at most one room each', async () => {

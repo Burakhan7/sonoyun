@@ -13,8 +13,9 @@ export default function KvkkPage() {
 
       <h2>1. İşlenen kişisel veriler</h2>
       <p>
-        Takma ad ve avatar; IP adresi, port ve zaman damgası; oyun ve eşleşme kayıtları; arkadaşlık
-        ve engelleme bilgileri; mesaj içerikleri; rapor kayıtları.
+        Takma ad ve avatar; IP adresi, port ve zaman damgası; tarayıcı özelliklerinden üretilen
+        cihaz özeti; oyun ve eşleşme kayıtları; arkadaşlık ve engelleme bilgileri; mesaj içerikleri;
+        rapor kayıtları.
       </p>
 
       <h2>2. İşleme amaçları</h2>

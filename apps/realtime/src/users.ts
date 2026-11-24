@@ -24,6 +24,8 @@ export interface UserStore {
   findById(id: string): Promise<UserRecord | null>;
   touch(id: string, now: Date): Promise<void>;
   acceptTerms(id: string, now: Date): Promise<void>;
+  /** Keeps the latest device summary so a banned person is easier to recognise (SPEC §4). */
+  recordDevice(id: string, deviceHash: string): Promise<void>;
   /** Applies the identity only if it was last changed at or before `cutoff`. */
   refreshIdentity(id: string, identity: Identity, cutoff: Date, now: Date): Promise<boolean>;
 }
@@ -72,6 +74,10 @@ export function createPrismaUserStore(prisma: PrismaClient): UserStore {
         where: { id, acceptedTermsAt: null },
         data: { acceptedTermsAt: now },
       });
+    },
+
+    async recordDevice(id, deviceHash) {
+      await prisma.user.updateMany({ where: { id }, data: { deviceHash } });
     },
 
     async refreshIdentity(id, identity, cutoff, now) {
